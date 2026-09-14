@@ -1,0 +1,96 @@
+#requires -Version 7.0
+<#
+.SYNOPSIS
+  Install or refresh generated local copies of the canonical agents-constitution skill.
+.DESCRIPTION
+  Resolves the requested branch/tag exactly once, then fetches every source file
+  from that immutable commit. This prevents a moving main branch from producing
+  a mixed-revision local skill. Installed copies are generated mirrors, never
+  editable source.
+#>
+[CmdletBinding()]
+param(
+    [string]$Repository = "MrWizard94-Compile/Agents-Constitution",
+    [string]$Ref = "main",
+    [string[]]$TargetSkillPaths = @((Join-Path $HOME ".codex\skills\agents-constitution")),
+    [string]$PackRoot = "",
+    [switch]$UseGitHubCli
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+function Resolve-Commit([string]$RequestedRef) {
+    if ($UseGitHubCli -or (Get-Command gh -ErrorAction SilentlyContinue)) {
+        $sha = (& gh api "repos/$Repository/commits/$RequestedRef" --jq .sha).Trim()
+    } else {
+        $headers = @{ "User-Agent" = "agents-constitution-sync"; "Accept" = "application/vnd.github+json" }
+        $token = [Environment]::GetEnvironmentVariable("GITHUB_TOKEN")
+        if (-not $token) { $token = [Environment]::GetEnvironmentVariable("GH_TOKEN") }
+        if ($token) { $headers["Authorization"] = "Bearer $token" }
+        $payload = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repository/commits/$RequestedRef" -Headers $headers
+        $sha = [string]$payload.sha
+    }
+    if ($sha -notmatch '^[0-9a-fA-F]{40}$') {
+        throw "Could not resolve $Repository@$RequestedRef to an immutable commit."
+    }
+    return $sha.ToLowerInvariant()
+}
+
+function Get-Text([string]$Commit, [string]$Path) {
+    if ($UseGitHubCli -or (Get-Command gh -ErrorAction SilentlyContinue)) {
+        $encoded = (& gh api "repos/$Repository/contents/$Path?ref=$Commit" --jq .content) -replace "`n", ""
+        return [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($encoded))
+    }
+    $uri = "https://raw.githubusercontent.com/$Repository/$Commit/$Path"
+    return (Invoke-WebRequest -UseBasicParsing -Uri $uri).Content
+}
+
+function Write-Atomic([string]$Path, [string]$Content) {
+    $parent = Split-Path -Parent $Path
+    New-Item -ItemType Directory -Path $parent -Force | Out-Null
+    $tmp = "$Path.__new__"
+    [IO.File]::WriteAllText($tmp, $Content, [Text.UTF8Encoding]::new($false))
+    Move-Item -LiteralPath $tmp -Destination $Path -Force
+}
+
+$commit = Resolve-Commit $Ref
+$source = Get-Text $commit "SOURCE.json" | ConvertFrom-Json
+if ($source.canonical_repository -ne $Repository) {
+    throw "Canonical repository mismatch: expected $Repository, source declares $($source.canonical_repository)"
+}
+$version = (Get-Text $commit "VERSION").Trim()
+$files = @(
+    "SKILL.md",
+    "VERSION",
+    "SOURCE.json",
+    "references/always-load.md",
+    "references/pack-root.local.example",
+    "scripts/resolve-pack.ps1"
+)
+
+$payload = @{}
+foreach ($rel in $files) {
+    $payload[$rel] = Get-Text $commit $rel
+}
+
+foreach ($target in $TargetSkillPaths) {
+    if (-not $target) { continue }
+    foreach ($rel in $files) {
+        Write-Atomic (Join-Path $target ($rel -replace "/", [IO.Path]::DirectorySeparatorChar)) $payload[$rel]
+    }
+    if ($PackRoot) {
+        $pin = Join-Path $target "references\pack-root.local"
+        Write-Atomic $pin ($PackRoot.TrimEnd("`r", "`n") + "`n")
+    }
+    $provenance = [ordered]@{
+        generated = $true
+        canonical_repository = $Repository
+        requested_ref = $Ref
+        source_commit = $commit
+        skill_version = $version
+        installed_at_utc = [DateTime]::UtcNow.ToString("o")
+    } | ConvertTo-Json -Depth 5
+    Write-Atomic (Join-Path $target ".GENERATED-MIRROR.json") ($provenance + "`n")
+    Write-Host "Synced agents-constitution $version ($($commit.Substring(0,12))) -> $target"
+}

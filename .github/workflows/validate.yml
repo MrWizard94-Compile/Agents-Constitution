@@ -1,0 +1,25 @@
+name: Validate Canonical Skill Source
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate canonical source invariants
+        run: python tools/validate-source.py
+      - name: Enforce meaningful evolution on pull requests
+        if: github.event_name == 'pull_request'
+        run: python tools/evolution-guard.py --base "${{ github.event.pull_request.base.sha }}"

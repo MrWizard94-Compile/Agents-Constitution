@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import tempfile
+import urllib.request
+from pathlib import Path
+
+DEFAULT_REPO = "MrWizard94-Compile/Agents-Constitution"
+FILES = [
+    "SKILL.md",
+    "VERSION",
+    "SOURCE.json",
+    "references/always-load.md",
+    "references/pack-root.local.example",
+    "scripts/resolve-pack.ps1",
+]
+
+
+def request(url: str) -> bytes:
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "agents-constitution-sync"}
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=30) as response:
+        return response.read()
+
+
+def resolve_commit(repo: str, ref: str) -> str:
+    payload = json.loads(request(f"https://api.github.com/repos/{repo}/commits/{ref}").decode("utf-8"))
+    sha = payload.get("sha", "")
+    if len(sha) != 40:
+        raise SystemExit(f"could not resolve {repo}@{ref} to an immutable commit")
+    return sha
+
+
+def fetch(repo: str, commit: str, rel: str) -> bytes:
+    return request(f"https://raw.githubusercontent.com/{repo}/{commit}/{rel}")
+
+
+def atomic_write(path: Path, data: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as tmp:
+        tmp.write(data)
+        tmp_path = Path(tmp.name)
+    os.replace(tmp_path, path)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Sync generated agents-constitution mirrors")
+    parser.add_argument("targets", nargs="+", help="one or more local skill directories")
+    parser.add_argument("--repo", default=DEFAULT_REPO)
+    parser.add_argument("--ref", default="main", help="branch, tag, or commit to resolve once")
+    parser.add_argument("--pack-root", default="")
+    args = parser.parse_args()
+
+    commit = resolve_commit(args.repo, args.ref)
+    source = json.loads(fetch(args.repo, commit, "SOURCE.json").decode("utf-8"))
+    if source.get("canonical_repository") != args.repo:
+        raise SystemExit("canonical repository mismatch")
+    version = fetch(args.repo, commit, "VERSION").decode("utf-8").strip()
+
+    # All files are fetched from the same immutable commit. `main` cannot move
+    # underneath a partially completed sync.
+    payload = {rel: fetch(args.repo, commit, rel) for rel in FILES}
+    for target_text in args.targets:
+        target = Path(target_text).expanduser().resolve()
+        for rel, data in payload.items():
+            atomic_write(target / rel, data)
+        if args.pack_root:
+            atomic_write(target / "references/pack-root.local", (args.pack_root.rstrip() + "\n").encode("utf-8"))
+        provenance = {
+            "generated": True,
+            "canonical_repository": args.repo,
+            "requested_ref": args.ref,
+            "source_commit": commit,
+            "skill_version": version,
+        }
+        atomic_write(target / ".GENERATED-MIRROR.json", (json.dumps(provenance, indent=2) + "\n").encode("utf-8"))
+        print(f"Synced agents-constitution {version} ({commit[:12]}) -> {target}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
