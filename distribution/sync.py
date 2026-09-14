@@ -19,10 +19,26 @@ FILES = [
 ]
 
 
-def fetch(repo: str, ref: str, rel: str) -> bytes:
-    url = f"https://raw.githubusercontent.com/{repo}/{ref}/{rel}"
-    with urllib.request.urlopen(url, timeout=30) as response:
+def request(url: str) -> bytes:
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "agents-constitution-sync"}
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=30) as response:
         return response.read()
+
+
+def resolve_commit(repo: str, ref: str) -> str:
+    payload = json.loads(request(f"https://api.github.com/repos/{repo}/commits/{ref}").decode("utf-8"))
+    sha = payload.get("sha", "")
+    if len(sha) != 40:
+        raise SystemExit(f"could not resolve {repo}@{ref} to an immutable commit")
+    return sha
+
+
+def fetch(repo: str, commit: str, rel: str) -> bytes:
+    return request(f"https://raw.githubusercontent.com/{repo}/{commit}/{rel}")
 
 
 def atomic_write(path: Path, data: bytes) -> None:
@@ -37,16 +53,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Sync generated agents-constitution mirrors")
     parser.add_argument("targets", nargs="+", help="one or more local skill directories")
     parser.add_argument("--repo", default=DEFAULT_REPO)
-    parser.add_argument("--ref", default="main")
+    parser.add_argument("--ref", default="main", help="branch, tag, or commit to resolve once")
     parser.add_argument("--pack-root", default="")
     args = parser.parse_args()
 
-    source = json.loads(fetch(args.repo, args.ref, "SOURCE.json").decode("utf-8"))
+    commit = resolve_commit(args.repo, args.ref)
+    source = json.loads(fetch(args.repo, commit, "SOURCE.json").decode("utf-8"))
     if source.get("canonical_repository") != args.repo:
         raise SystemExit("canonical repository mismatch")
-    version = fetch(args.repo, args.ref, "VERSION").decode("utf-8").strip()
+    version = fetch(args.repo, commit, "VERSION").decode("utf-8").strip()
 
-    payload = {rel: fetch(args.repo, args.ref, rel) for rel in FILES}
+    # All files are fetched from the same immutable commit. `main` cannot move
+    # underneath a partially completed sync.
+    payload = {rel: fetch(args.repo, commit, rel) for rel in FILES}
     for target_text in args.targets:
         target = Path(target_text).expanduser().resolve()
         for rel, data in payload.items():
@@ -56,11 +75,12 @@ def main() -> int:
         provenance = {
             "generated": True,
             "canonical_repository": args.repo,
-            "source_ref": args.ref,
+            "requested_ref": args.ref,
+            "source_commit": commit,
             "skill_version": version,
         }
         atomic_write(target / ".GENERATED-MIRROR.json", (json.dumps(provenance, indent=2) + "\n").encode("utf-8"))
-        print(f"Synced agents-constitution {version} -> {target}")
+        print(f"Synced agents-constitution {version} ({commit[:12]}) -> {target}")
 
     return 0
 
