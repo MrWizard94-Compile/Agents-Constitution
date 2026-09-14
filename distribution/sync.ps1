@@ -3,9 +3,10 @@
 .SYNOPSIS
   Install or refresh generated local copies of the canonical agents-constitution skill.
 .DESCRIPTION
-  Fetches the canonical source from GitHub, validates provenance, then atomically
-  replaces one or more local skill directories. Installed copies are generated
-  mirrors, never editable source.
+  Resolves the requested branch/tag exactly once, then fetches every source file
+  from that immutable commit. This prevents a moving main branch from producing
+  a mixed-revision local skill. Installed copies are generated mirrors, never
+  editable source.
 #>
 [CmdletBinding()]
 param(
@@ -19,12 +20,29 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-function Get-Text([string]$Path) {
+function Resolve-Commit([string]$RequestedRef) {
     if ($UseGitHubCli -or (Get-Command gh -ErrorAction SilentlyContinue)) {
-        return (& gh api "repos/$Repository/contents/$Path?ref=$Ref" --jq .content) -replace "`n", "" |
-            ForEach-Object { [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($_)) }
+        $sha = (& gh api "repos/$Repository/commits/$RequestedRef" --jq .sha).Trim()
+    } else {
+        $headers = @{ "User-Agent" = "agents-constitution-sync"; "Accept" = "application/vnd.github+json" }
+        $token = [Environment]::GetEnvironmentVariable("GITHUB_TOKEN")
+        if (-not $token) { $token = [Environment]::GetEnvironmentVariable("GH_TOKEN") }
+        if ($token) { $headers["Authorization"] = "Bearer $token" }
+        $payload = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repository/commits/$RequestedRef" -Headers $headers
+        $sha = [string]$payload.sha
     }
-    $uri = "https://raw.githubusercontent.com/$Repository/$Ref/$Path"
+    if ($sha -notmatch '^[0-9a-fA-F]{40}$') {
+        throw "Could not resolve $Repository@$RequestedRef to an immutable commit."
+    }
+    return $sha.ToLowerInvariant()
+}
+
+function Get-Text([string]$Commit, [string]$Path) {
+    if ($UseGitHubCli -or (Get-Command gh -ErrorAction SilentlyContinue)) {
+        $encoded = (& gh api "repos/$Repository/contents/$Path?ref=$Commit" --jq .content) -replace "`n", ""
+        return [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($encoded))
+    }
+    $uri = "https://raw.githubusercontent.com/$Repository/$Commit/$Path"
     return (Invoke-WebRequest -UseBasicParsing -Uri $uri).Content
 }
 
@@ -36,11 +54,12 @@ function Write-Atomic([string]$Path, [string]$Content) {
     Move-Item -LiteralPath $tmp -Destination $Path -Force
 }
 
-$source = Get-Text "SOURCE.json" | ConvertFrom-Json
+$commit = Resolve-Commit $Ref
+$source = Get-Text $commit "SOURCE.json" | ConvertFrom-Json
 if ($source.canonical_repository -ne $Repository) {
     throw "Canonical repository mismatch: expected $Repository, source declares $($source.canonical_repository)"
 }
-$version = (Get-Text "VERSION").Trim()
+$version = (Get-Text $commit "VERSION").Trim()
 $files = @(
     "SKILL.md",
     "VERSION",
@@ -50,10 +69,15 @@ $files = @(
     "scripts/resolve-pack.ps1"
 )
 
+$payload = @{}
+foreach ($rel in $files) {
+    $payload[$rel] = Get-Text $commit $rel
+}
+
 foreach ($target in $TargetSkillPaths) {
     if (-not $target) { continue }
     foreach ($rel in $files) {
-        Write-Atomic (Join-Path $target ($rel -replace "/", [IO.Path]::DirectorySeparatorChar)) (Get-Text $rel)
+        Write-Atomic (Join-Path $target ($rel -replace "/", [IO.Path]::DirectorySeparatorChar)) $payload[$rel]
     }
     if ($PackRoot) {
         $pin = Join-Path $target "references\pack-root.local"
@@ -62,10 +86,11 @@ foreach ($target in $TargetSkillPaths) {
     $provenance = [ordered]@{
         generated = $true
         canonical_repository = $Repository
-        source_ref = $Ref
+        requested_ref = $Ref
+        source_commit = $commit
         skill_version = $version
         installed_at_utc = [DateTime]::UtcNow.ToString("o")
     } | ConvertTo-Json -Depth 5
     Write-Atomic (Join-Path $target ".GENERATED-MIRROR.json") ($provenance + "`n")
-    Write-Host "Synced agents-constitution $version -> $target"
+    Write-Host "Synced agents-constitution $version ($($commit.Substring(0,12))) -> $target"
 }
