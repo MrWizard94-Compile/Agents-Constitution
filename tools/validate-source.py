@@ -73,8 +73,14 @@ def main() -> int:
         fail("generated-mirror marker must never be committed to canonical source")
 
     ledger = normalize_prose((ROOT / "evolution/LEDGER.md").read_text(encoding="utf-8-sig"))
-    if "does not count" not in ledger:
-        fail("evolution ledger must state that the ledger itself does not count")
+    anti_churn_patterns = (
+        "does not count",
+        "doesn't count",
+        "never counts",
+        "never count",
+    )
+    if not any(pattern in ledger for pattern in anti_churn_patterns):
+        fail("evolution ledger must explicitly state that ledger-only evidence does not satisfy meaningful evolution")
 
     print(f"PASS: canonical agents-constitution source v{version} is structurally valid")
     return 0
