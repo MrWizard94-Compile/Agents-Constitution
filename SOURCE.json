@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "name": "agents-constitution",
+  "skill_version": "5.2.0",
+  "pack_version_pin": "5.1.0",
+  "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+  "default_branch": "main",
+  "release_channel": "stable",
+  "local_install_is_authoritative": false,
+  "sync_before_invoke": true,
+  "freeze_revision_per_invocation": true,
+  "mandatory_meaningful_evolution_per_invocation": true
+}
