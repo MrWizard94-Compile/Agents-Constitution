@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.2.1 — 2026-09-14
+
+- Fixed canonical invariant validation to normalize Markdown whitespace before semantic phrase checks.
+- Prevents false CI failures when normal line wrapping splits a required invariant across lines.
+- Keeps semantic removal detectable while allowing harmless reflow/formatting changes.
+
 ## 5.2.0 — 2026-09-14
 
 - Established `MrWizard94-Compile/Agents-Constitution` as the only editable source of the `agents-constitution` skill.

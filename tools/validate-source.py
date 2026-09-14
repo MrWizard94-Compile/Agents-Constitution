@@ -34,6 +34,16 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
+def normalize_prose(text: str) -> str:
+    """Normalize Markdown prose for semantic phrase checks.
+
+    Line wrapping, tabs, and repeated spaces are presentation details. Critical
+    invariant checks should fail when meaning disappears, not when an editor
+    reflows a paragraph.
+    """
+    return " ".join(text.casefold().split())
+
+
 def main() -> int:
     for rel in REQUIRED:
         if not (ROOT / rel).is_file():
@@ -53,18 +63,24 @@ def main() -> int:
     if source.get("mandatory_meaningful_evolution_per_invocation") is not True:
         fail("mandatory_meaningful_evolution_per_invocation must be true")
 
-    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8-sig")
+    skill = normalize_prose((ROOT / "SKILL.md").read_text(encoding="utf-8-sig"))
     for phrase in CRITICAL_PHRASES:
-        if phrase.lower() not in skill.lower():
+        if normalize_prose(phrase) not in skill:
             fail(f"SKILL.md lost critical invariant phrase: {phrase}")
 
     generated_markers = list(ROOT.rglob(".GENERATED-MIRROR.json"))
     if generated_markers:
         fail("generated-mirror marker must never be committed to canonical source")
 
-    ledger = (ROOT / "evolution/LEDGER.md").read_text(encoding="utf-8-sig")
-    if "does not count" not in ledger.lower():
-        fail("evolution ledger must state that the ledger itself does not count")
+    ledger = normalize_prose((ROOT / "evolution/LEDGER.md").read_text(encoding="utf-8-sig"))
+    anti_churn_patterns = (
+        "does not count",
+        "doesn't count",
+        "never counts",
+        "never count",
+    )
+    if not any(pattern in ledger for pattern in anti_churn_patterns):
+        fail("evolution ledger must explicitly state that ledger-only evidence does not satisfy meaningful evolution")
 
     print(f"PASS: canonical agents-constitution source v{version} is structurally valid")
     return 0
