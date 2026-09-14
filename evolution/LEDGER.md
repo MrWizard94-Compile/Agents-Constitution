@@ -13,3 +13,15 @@ The ledger is evidence of evolution. A ledger entry, version bump, changelog edi
 **Changed paths:** `SKILL.md`, `SOURCE.json`, `scripts/resolve-pack.ps1`, `references/*`, `evolution/LEDGER.md`, distribution and validation tooling.
 
 **Validation target:** canonical-source validator, sync dry-run, GitHub PR review, and pack verification where the local pack is available.
+
+## 2026-09-14 — Markdown-reflow-tolerant invariant validation
+
+**Observed issue:** the first live CI run failed even though the required quality-ceiling invariant was present. The validator searched for literal contiguous whitespace, while normal Markdown wrapping split `highest quality reasonably achievable` across a newline.
+
+**Meaningful improvement:** canonical invariant validation now case-folds and normalizes all prose whitespace before semantic phrase checks. Formatting/reflow can change without creating a false constitutional failure, while removal of the invariant still fails validation.
+
+**Future failure reduced:** agents and formatters can reflow canonical Markdown without breaking CI for presentation-only reasons, so validation failures more accurately indicate semantic drift rather than line wrapping.
+
+**Changed path:** `tools/validate-source.py`.
+
+**Validation:** GitHub Actions `Validate Canonical Skill Source` must pass on the evolution PR and again after merge.
