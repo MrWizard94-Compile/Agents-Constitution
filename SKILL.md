@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.2"
+  skill-version: "5.2.3"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -38,9 +38,8 @@ exports, and agent-specific installs are distributions only.
 
 At the start of an invocation, attempt to resolve the latest accepted canonical
 revision, record the exact skill revision being used, and freeze it for that
-invocation. A change authored during the current invocation becomes active only on
-a later invocation. This prevents an agent from changing the rules by which its
-current work is judged.
+invocation. This prevents an agent from changing the rules by which its current
+work is judged.
 
 If the canonical source is temporarily unavailable, a previously verified local
 copy may be used, but the degraded-sync condition must be disclosed.
@@ -102,6 +101,12 @@ Before presenting such a deliverable, explicitly self-review:
 
 A presently-fixable material shortfall blocks delivery until corrected or honestly
 identified as a real external constraint.
+
+For game engines and mods, studio-grade is not met if the interactive entry
+(client renderer, server tick, or GameTest world) still drives a leftover
+prototype fixture while the real pipeline exists only in unit tests. The live
+entry must call the shipped functions, or that gap must be named as an explicit
+external constraint.
 
 ## Modes
 
@@ -275,3 +280,4 @@ When presenting governed work, include at least:
 - Weakening safeguards to satisfy the evolution requirement
 - Allowing a self-authored change to govern the invocation that authored it
 - Direct multi-agent races on canonical `main`
+- Leaving a game/mod live entry on a leftover prototype while the shipped pipeline is only unit-tested
