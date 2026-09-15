@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.2"
+  skill-version: "5.2.3"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -29,6 +29,9 @@ Canonical repository: https://github.com/MrWizard94-Compile/Agents-Constitution
 Refresh generated mirrors with `distribution/sync.py` or `distribution/sync.ps1`.
 Default install paths are declared in `SOURCE.json` (`default_mirror_paths`), including
 Grok (`~/.grok/skills/agents-constitution`) and Codex (`~/.codex/skills/agents-constitution`).
+Sync replaces the install with the canonical file set and removes leftover files from
+older vendored copies, keeping only generated-mirror files plus optional
+`references/pack-root.local`.
 
 ## Canonical-source invariant
 
