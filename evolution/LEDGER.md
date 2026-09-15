@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-15 — Live game/mod entries must drive shipped core
+
+**Observed issue:** a Minecraft/NeoForge increment can look complete in unit tests while the client renderer and server tick still drive a leftover synthetic prototype fixture. Studio-grade requests then ship a functional minimum.
+
+**Meaningful improvement:** quality-ceiling now requires the interactive entry (renderer, server tick, GameTest world) to call shipped functions, or to name that gap as an explicit external constraint. Anti-pattern added for leftover prototype live entries.
+
+**Future failure reduced:** agents are less likely to leave the real pipeline only in tests while claiming a production/studio-grade game or mod.
+
+**Changed paths:** `SKILL.md`.
+
+**Validation target:** GitHub Actions `Validate Canonical Skill Source` must pass on the evolution PR.
+
 ## 2026-09-14 — Grok default mirrors and GitHub-only skill pointers
 
 **Observed issue:** the Grok install at `~/.grok/skills/agents-constitution` stayed on the old 5.0.1 host-local pack pin because `distribution/sync.ps1` defaulted only to Codex, `sync.py` required explicit targets, and `SOURCE.json` / `SKILL.md` skill versions lagged `VERSION`.
