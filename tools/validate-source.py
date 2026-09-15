@@ -56,6 +56,10 @@ def main() -> int:
     source = json.loads((ROOT / "SOURCE.json").read_text(encoding="utf-8-sig"))
     if source.get("canonical_repository") != "MrWizard94-Compile/Agents-Constitution":
         fail("SOURCE.json canonical_repository is incorrect")
+    if source.get("canonical_url") != "https://github.com/MrWizard94-Compile/Agents-Constitution":
+        fail("SOURCE.json canonical_url is incorrect")
+    if source.get("skill_version") != version:
+        fail("SOURCE.json skill_version must match VERSION")
     if source.get("local_install_is_authoritative") is not False:
         fail("local_install_is_authoritative must be false")
     if source.get("freeze_revision_per_invocation") is not True:
@@ -63,10 +67,26 @@ def main() -> int:
     if source.get("mandatory_meaningful_evolution_per_invocation") is not True:
         fail("mandatory_meaningful_evolution_per_invocation must be true")
 
-    skill = normalize_prose((ROOT / "SKILL.md").read_text(encoding="utf-8-sig"))
+    mirrors = source.get("default_mirror_paths")
+    if not isinstance(mirrors, list) or not mirrors:
+        fail("SOURCE.json default_mirror_paths must be a non-empty list")
+    joined = " ".join(str(p).replace("\\", "/").casefold() for p in mirrors)
+    if ".grok/skills/agents-constitution" not in joined:
+        fail("default_mirror_paths must include the Grok skill install path")
+    if ".codex/skills/agents-constitution" not in joined:
+        fail("default_mirror_paths must include the Codex skill install path")
+
+    skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8-sig")
+    meta = re.search(r'skill-version:\s*"(\d+\.\d+\.\d+)"', skill_text)
+    if not meta or meta.group(1) != version:
+        fail("SKILL.md metadata skill-version must match VERSION")
+
+    skill = normalize_prose(skill_text)
     for phrase in CRITICAL_PHRASES:
         if normalize_prose(phrase) not in skill:
             fail(f"SKILL.md lost critical invariant phrase: {phrase}")
+    if "github.com/mrwizard94-compile/agents-constitution" not in skill:
+        fail("SKILL.md must point at the canonical GitHub repository")
 
     generated_markers = list(ROOT.rglob(".GENERATED-MIRROR.json"))
     if generated_markers:

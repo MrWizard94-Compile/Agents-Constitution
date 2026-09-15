@@ -5,6 +5,8 @@
 `MrWizard94-Compile/Agents-Constitution` is the only editable source for the
 `agents-constitution` skill.
 
+Canonical URL: https://github.com/MrWizard94-Compile/Agents-Constitution
+
 - `main` = accepted canonical source.
 - A commit SHA = exact source revision.
 - A tag/release = immutable distribution point.
@@ -69,5 +71,9 @@ product to load a skill. Each platform needs either:
 - a startup/bootstrap hook that runs `distribution/sync.py` or `sync.ps1`, or
 - a native connector that reads this repository when the skill is invoked.
 
-ChatGPT can use the connected GitHub repository directly. Local agents can install
-generated mirrors into their own skill directories.
+ChatGPT can use the connected GitHub repository directly. Local agents install
+generated mirrors into their own skill directories. Default paths are listed in
+`SOURCE.json` (`default_mirror_paths`):
+
+- Grok: `~/.grok/skills/agents-constitution`
+- Codex: `~/.codex/skills/agents-constitution`

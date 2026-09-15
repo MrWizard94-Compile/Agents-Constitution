@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.2.2 — 2026-09-14
+
+- Declared default generated-mirror install paths in `SOURCE.json`, including Grok and Codex.
+- Sync adapters now use those defaults instead of a Codex-only hardcoded target.
+- Aligned `SOURCE.json` / `SKILL.md` skill version with `VERSION`.
+- Skill and always-load pointers name the GitHub repository as the only skill source.
+- Validator requires the GitHub pointer, matching skill versions, and Grok/Codex default mirror paths.
+- Removed host-folder name bias from pack discovery and the pack-root example.
+
 ## 5.2.1 — 2026-09-14
 
 - Fixed canonical invariant validation to normalize Markdown whitespace before semantic phrase checks.

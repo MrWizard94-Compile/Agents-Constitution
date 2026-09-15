@@ -1,13 +1,18 @@
 {
   "schema": 1,
   "name": "agents-constitution",
-  "skill_version": "5.2.0",
+  "skill_version": "5.2.2",
   "pack_version_pin": "5.1.0",
   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+  "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
   "default_branch": "main",
   "release_channel": "stable",
   "local_install_is_authoritative": false,
   "sync_before_invoke": true,
   "freeze_revision_per_invocation": true,
-  "mandatory_meaningful_evolution_per_invocation": true
+  "mandatory_meaningful_evolution_per_invocation": true,
+  "default_mirror_paths": [
+    "~/.grok/skills/agents-constitution",
+    "~/.codex/skills/agents-constitution"
+  ]
 }
