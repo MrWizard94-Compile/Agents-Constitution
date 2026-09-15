@@ -1,5 +1,7 @@
 # Always-load set (pointer)
 
+Skill source: https://github.com/MrWizard94-Compile/Agents-Constitution
+
 Canonical list: pack `ADOPT.md` § Always-load set and pack `AGENTS.md` § Module-Loading Rules.
 
 Order:

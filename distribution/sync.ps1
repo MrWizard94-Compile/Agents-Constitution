@@ -6,19 +6,28 @@
   Resolves the requested branch/tag exactly once, then fetches every source file
   from that immutable commit. This prevents a moving main branch from producing
   a mixed-revision local skill. Installed copies are generated mirrors, never
-  editable source.
+  editable source. When -TargetSkillPaths is omitted, paths come from SOURCE.json
+  default_mirror_paths (Grok and Codex).
 #>
 [CmdletBinding()]
 param(
     [string]$Repository = "MrWizard94-Compile/Agents-Constitution",
     [string]$Ref = "main",
-    [string[]]$TargetSkillPaths = @((Join-Path $HOME ".codex\skills\agents-constitution")),
+    [string[]]$TargetSkillPaths = @(),
     [string]$PackRoot = "",
     [switch]$UseGitHubCli
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+function Expand-HomePath([string]$PathText) {
+    if ($PathText -match '^[~][\\/]?(.*)$') {
+        if ($Matches[1]) { return (Join-Path $HOME $Matches[1]) }
+        return $HOME
+    }
+    return $PathText
+}
 
 function Resolve-Commit([string]$RequestedRef) {
     if ($UseGitHubCli -or (Get-Command gh -ErrorAction SilentlyContinue)) {
@@ -60,12 +69,22 @@ if ($source.canonical_repository -ne $Repository) {
     throw "Canonical repository mismatch: expected $Repository, source declares $($source.canonical_repository)"
 }
 $version = (Get-Text $commit "VERSION").Trim()
+
+$effectiveTargets = @($TargetSkillPaths | Where-Object { $_ })
+if ($effectiveTargets.Count -eq 0 -and $source.PSObject.Properties.Name -contains "default_mirror_paths") {
+    $effectiveTargets = @($source.default_mirror_paths)
+}
+if ($effectiveTargets.Count -eq 0) {
+    throw "No sync targets given and SOURCE.json has no default_mirror_paths."
+}
+
 $files = @(
     "SKILL.md",
     "VERSION",
     "SOURCE.json",
     "references/always-load.md",
     "references/pack-root.local.example",
+    "references/.gitignore",
     "scripts/resolve-pack.ps1"
 )
 
@@ -74,23 +93,30 @@ foreach ($rel in $files) {
     $payload[$rel] = Get-Text $commit $rel
 }
 
-foreach ($target in $TargetSkillPaths) {
+$canonicalUrl = "https://github.com/$Repository"
+if ($source.PSObject.Properties.Name -contains "canonical_url" -and $source.canonical_url) {
+    $canonicalUrl = [string]$source.canonical_url
+}
+
+foreach ($target in $effectiveTargets) {
     if (-not $target) { continue }
+    $resolvedTarget = Expand-HomePath $target
     foreach ($rel in $files) {
-        Write-Atomic (Join-Path $target ($rel -replace "/", [IO.Path]::DirectorySeparatorChar)) $payload[$rel]
+        Write-Atomic (Join-Path $resolvedTarget ($rel -replace "/", [IO.Path]::DirectorySeparatorChar)) $payload[$rel]
     }
     if ($PackRoot) {
-        $pin = Join-Path $target "references\pack-root.local"
+        $pin = Join-Path $resolvedTarget "references\pack-root.local"
         Write-Atomic $pin ($PackRoot.TrimEnd("`r", "`n") + "`n")
     }
     $provenance = [ordered]@{
         generated = $true
         canonical_repository = $Repository
+        canonical_url = $canonicalUrl
         requested_ref = $Ref
         source_commit = $commit
         skill_version = $version
         installed_at_utc = [DateTime]::UtcNow.ToString("o")
     } | ConvertTo-Json -Depth 5
-    Write-Atomic (Join-Path $target ".GENERATED-MIRROR.json") ($provenance + "`n")
-    Write-Host "Synced agents-constitution $version ($($commit.Substring(0,12))) -> $target"
+    Write-Atomic (Join-Path $resolvedTarget ".GENERATED-MIRROR.json") ($provenance + "`n")
+    Write-Host "Synced agents-constitution $version ($($commit.Substring(0,12))) -> $resolvedTarget"
 }

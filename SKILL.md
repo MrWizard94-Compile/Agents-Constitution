@@ -4,6 +4,7 @@ description: >
   Load and enforce the AGENTS Constitution portable pack: quality law (AGENTS.md),
   process law (SOP.md), Section 0 pre-delivery gate, Definition of Done, module
   applicability matrix, and pack tools (verify-pack / self-audit / full self-run).
+  Canonical source is https://github.com/MrWizard94-Compile/Agents-Constitution.
   Use when the user runs /agents-constitution, asks to apply the constitution,
   run Section 0 / pre-delivery gate, package a production delivery under WPAI law,
   adopt the pack into a project, or run the pack against itself (self-audit,
@@ -11,9 +12,10 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.0"
+  skill-version: "5.2.2"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+  canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
 ---
 
 # AGENTS Constitution
@@ -21,6 +23,12 @@ metadata:
 This repository file is the **canonical source skill**. Installed copies are generated
 mirrors and MUST NOT be edited as source. Binding constitutional rules still live in
 the resolved pack (`CONST-ONEHOME-001`); this skill loads and enforces them.
+
+Canonical repository: https://github.com/MrWizard94-Compile/Agents-Constitution
+
+Refresh generated mirrors with `distribution/sync.py` or `distribution/sync.ps1`.
+Default install paths are declared in `SOURCE.json` (`default_mirror_paths`), including
+Grok (`~/.grok/skills/agents-constitution`) and Codex (`~/.codex/skills/agents-constitution`).
 
 ## Canonical-source invariant
 
@@ -108,12 +116,13 @@ Infer mode from the user message / slash args. First match wins.
 
 ## Step 0 — Resolve pack root
 
-Discovery order (stop at first **valid** pack):
+The skill itself is loaded from the GitHub repository named above. Then resolve a
+valid **pack** root for binding law (stop at the first valid pack):
 
 1. Env vars `AGENTS_CONSTITUTION_ROOT` or `WPAI_CONSTITUTION` (if set)
 2. Optional local pin: read `references/pack-root.local` next to the installed SKILL.md (one absolute path, one line; may be absent)
 3. Walk **up** from the workspace path and from the current working directory
-4. Check siblings of those walk stops for folders named `AGENTS Constitution` or `AGENTS-Constitution`
+4. Check siblings of those walk stops for a folder that is a valid pack
 5. Run `scripts/resolve-pack.ps1` if present in the installed distribution
 
 A path is **valid** only if all exist relative to it:

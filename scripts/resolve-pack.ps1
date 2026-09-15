@@ -6,6 +6,8 @@
   Discovery order matches SKILL.md Step 0.
   Prints the absolute pack root path to stdout on success; exit 0.
   Exit 1 if not found. Optional -SkillDir for pack-root.local lookup.
+  This locates binding pack law. It does not locate skill source; skill source is
+  https://github.com/MrWizard94-Compile/Agents-Constitution.
 #>
 [CmdletBinding()]
 param(
@@ -61,7 +63,6 @@ try {
     }
 } catch {}
 
-$names = @("AGENTS Constitution", "AGENTS-Constitution")
 $seen = New-Object "System.Collections.Generic.HashSet[string]"
 
 foreach ($start in $starts) {
@@ -70,16 +71,13 @@ foreach ($start in $starts) {
     while ($cur) {
         if ($seen.Add($cur)) {
             if (Test-PackRoot $cur) { Emit $cur }
-            foreach ($n in $names) {
-                $cand = Join-Path $cur $n
-                if (Test-PackRoot $cand) { Emit $cand }
-            }
             $parent = Split-Path -Parent $cur
             if ($parent) {
-                foreach ($n in $names) {
-                    $sib = Join-Path $parent $n
-                    if (Test-PackRoot $sib) { Emit $sib }
-                }
+                try {
+                    Get-ChildItem -LiteralPath $parent -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+                        if (Test-PackRoot $_.FullName) { Emit $_.FullName }
+                    }
+                } catch {}
             }
         }
         $next = Split-Path -Parent $cur
@@ -88,5 +86,5 @@ foreach ($start in $starts) {
     }
 }
 
-Write-Error "AGENTS Constitution pack root not found. Set AGENTS_CONSTITUTION_ROOT or create references/pack-root.local"
+Write-Error "AGENTS Constitution pack root not found. Set AGENTS_CONSTITUTION_ROOT or create references/pack-root.local. Skill source remains https://github.com/MrWizard94-Compile/Agents-Constitution"
 exit 1

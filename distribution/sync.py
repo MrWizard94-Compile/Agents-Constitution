@@ -15,6 +15,7 @@ FILES = [
     "SOURCE.json",
     "references/always-load.md",
     "references/pack-root.local.example",
+    "references/.gitignore",
     "scripts/resolve-pack.ps1",
 ]
 
@@ -51,7 +52,7 @@ def atomic_write(path: Path, data: bytes) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Sync generated agents-constitution mirrors")
-    parser.add_argument("targets", nargs="+", help="one or more local skill directories")
+    parser.add_argument("targets", nargs="*", help="local skill directories; defaults come from SOURCE.json")
     parser.add_argument("--repo", default=DEFAULT_REPO)
     parser.add_argument("--ref", default="main", help="branch, tag, or commit to resolve once")
     parser.add_argument("--pack-root", default="")
@@ -63,10 +64,16 @@ def main() -> int:
         raise SystemExit("canonical repository mismatch")
     version = fetch(args.repo, commit, "VERSION").decode("utf-8").strip()
 
+    targets = list(args.targets)
+    if not targets:
+        targets = [str(p) for p in source.get("default_mirror_paths") or []]
+    if not targets:
+        raise SystemExit("no sync targets given and SOURCE.json has no default_mirror_paths")
+
     # All files are fetched from the same immutable commit. `main` cannot move
     # underneath a partially completed sync.
     payload = {rel: fetch(args.repo, commit, rel) for rel in FILES}
-    for target_text in args.targets:
+    for target_text in targets:
         target = Path(target_text).expanduser().resolve()
         for rel, data in payload.items():
             atomic_write(target / rel, data)
@@ -75,6 +82,7 @@ def main() -> int:
         provenance = {
             "generated": True,
             "canonical_repository": args.repo,
+            "canonical_url": source.get("canonical_url", f"https://github.com/{args.repo}"),
             "requested_ref": args.ref,
             "source_commit": commit,
             "skill_version": version,
