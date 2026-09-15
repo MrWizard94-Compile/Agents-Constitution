@@ -7,7 +7,8 @@
   from that immutable commit. This prevents a moving main branch from producing
   a mixed-revision local skill. Installed copies are generated mirrors, never
   editable source. When -TargetSkillPaths is omitted, paths come from SOURCE.json
-  default_mirror_paths (Grok and Codex).
+  default_mirror_paths (Grok and Codex). After writing canonical files, leftover
+  files from older vendored copies are removed.
 #>
 [CmdletBinding()]
 param(
@@ -63,6 +64,37 @@ function Write-Atomic([string]$Path, [string]$Content) {
     Move-Item -LiteralPath $tmp -Destination $Path -Force
 }
 
+function Test-SkillDirectory([string]$Target) {
+    $sourcePath = Join-Path $Target "SOURCE.json"
+    if (Test-Path -LiteralPath $sourcePath -PathType Leaf) {
+        try {
+            $parsed = Get-Content -LiteralPath $sourcePath -Raw | ConvertFrom-Json
+            if ($parsed.name -eq "agents-constitution") { return $true }
+        } catch {}
+    }
+    $skillPath = Join-Path $Target "SKILL.md"
+    if (Test-Path -LiteralPath $skillPath -PathType Leaf) {
+        $head = Get-Content -LiteralPath $skillPath -TotalCount 20 -ErrorAction SilentlyContinue
+        if ($head -and ($head -join "`n") -match "name:\s*agents-constitution") { return $true }
+    }
+    return $false
+}
+
+function Remove-StaleMirrorFiles([string]$Target, [string[]]$KeepRel) {
+    if (-not (Test-SkillDirectory $Target)) { return }
+    $keep = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach ($rel in $KeepRel) { [void]$keep.Add(($rel -replace "/", [IO.Path]::DirectorySeparatorChar)) }
+    Get-ChildItem -LiteralPath $Target -Recurse -Force | Sort-Object FullName -Descending | ForEach-Object {
+        if ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) { return }
+        $rel = $_.FullName.Substring($Target.Length).TrimStart('\','/')
+        if (-not $_.PSIsContainer) {
+            if (-not $keep.Contains($rel)) { Remove-Item -LiteralPath $_.FullName -Force }
+        } elseif (-not (Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue)) {
+            Remove-Item -LiteralPath $_.FullName -Force
+        }
+    }
+}
+
 $commit = Resolve-Commit $Ref
 $source = Get-Text $commit "SOURCE.json" | ConvertFrom-Json
 if ($source.canonical_repository -ne $Repository) {
@@ -87,6 +119,7 @@ $files = @(
     "references/.gitignore",
     "scripts/resolve-pack.ps1"
 )
+$keepRel = $files + @(".GENERATED-MIRROR.json", "references/pack-root.local")
 
 $payload = @{}
 foreach ($rel in $files) {
@@ -108,6 +141,7 @@ foreach ($target in $effectiveTargets) {
         $pin = Join-Path $resolvedTarget "references\pack-root.local"
         Write-Atomic $pin ($PackRoot.TrimEnd("`r", "`n") + "`n")
     }
+    Remove-StaleMirrorFiles $resolvedTarget $keepRel
     $provenance = [ordered]@{
         generated = $true
         canonical_repository = $Repository

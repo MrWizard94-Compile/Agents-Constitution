@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.2.3 — 2026-09-15
+
+- Generated-mirror sync now removes leftover files from older vendored skill installs.
+- Preserves only the canonical mirror file set plus optional host-local `references/pack-root.local`.
+- Prevents stale pack copies under `references/` from remaining as shadow law after a GitHub overlay.
+
 ## 5.2.2 — 2026-09-14
 
 - Declared default generated-mirror install paths in `SOURCE.json`, including Grok and Codex.
