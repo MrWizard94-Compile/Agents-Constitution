@@ -18,6 +18,10 @@ FILES = [
     "references/.gitignore",
     "scripts/resolve-pack.ps1",
 ]
+KEEP_ALWAYS = {
+    ".GENERATED-MIRROR.json",
+    "references/pack-root.local",
+}
 
 
 def request(url: str) -> bytes:
@@ -50,6 +54,39 @@ def atomic_write(path: Path, data: bytes) -> None:
     os.replace(tmp_path, path)
 
 
+def looks_like_skill(target: Path) -> bool:
+    source = target / "SOURCE.json"
+    if source.is_file():
+        try:
+            data = json.loads(source.read_text(encoding="utf-8-sig"))
+            if data.get("name") == "agents-constitution":
+                return True
+        except (OSError, json.JSONDecodeError):
+            pass
+    skill = target / "SKILL.md"
+    if skill.is_file():
+        head = skill.read_text(encoding="utf-8-sig", errors="replace")[:800]
+        return "name: agents-constitution" in head
+    return False
+
+
+def prune_stale(target: Path) -> None:
+    if not looks_like_skill(target):
+        return
+    keep = set(FILES) | KEEP_ALWAYS
+    for path in sorted(target.rglob("*"), reverse=True):
+        if path.is_symlink():
+            continue
+        rel = path.relative_to(target).as_posix()
+        if path.is_file() and rel not in keep:
+            path.unlink()
+        elif path.is_dir():
+            try:
+                next(path.iterdir())
+            except StopIteration:
+                path.rmdir()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Sync generated agents-constitution mirrors")
     parser.add_argument("targets", nargs="*", help="local skill directories; defaults come from SOURCE.json")
@@ -79,6 +116,7 @@ def main() -> int:
             atomic_write(target / rel, data)
         if args.pack_root:
             atomic_write(target / "references/pack-root.local", (args.pack_root.rstrip() + "\n").encode("utf-8"))
+        prune_stale(target)
         provenance = {
             "generated": True,
             "canonical_repository": args.repo,
