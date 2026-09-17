@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "agents-constitution",
-  "skill_version": "5.2.3",
+  "skill_version": "5.2.4",
   "pack_version_pin": "5.1.0",
   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",

@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.3"
+  skill-version: "5.2.4"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -181,6 +181,25 @@ Catalog: `RULE-REGISTRY.md`, `MODULE-INDEX.md`.
 5. Before presenting anything to the human, execute **Mode: `gate`** and pass all applicable items.
 6. Package the handoff per `collaboration/REVIEW-PACKAGING.md` (`REV-PACK-001`).
 7. Complete the mandatory evolution closure before ending the top-level invocation.
+
+#### Runtime fixture dependency closure
+
+When the delivery includes a modpack, plugin host, application bundle, container,
+or other runtime assembled from third-party components:
+
+1. Inventory every declared required dependency and compatible version before the
+   first acceptance launch, including dependencies normally supplied through
+   nested/embedded packaging.
+2. Obtain missing artifacts only from authoritative release sources, record exact
+   versions, and verify published integrity hashes when available.
+3. Launch the repaired third-party fixture without the product under test first so
+   baseline failures are not misattributed to the new delivery.
+4. In logs, distinguish the earliest independent construction/load failure from
+   downstream cascade errors. Do not treat a later exception as root cause merely
+   because it is the final crash line.
+5. A complete dependency closure or successful catalog scan is preparation, not
+   runtime acceptance. Credit the repair only after a clean relaunch and the
+   relevant behavior flow pass.
 
 ### Mode: `gate`
 
