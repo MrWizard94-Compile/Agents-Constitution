@@ -125,7 +125,7 @@ valid **pack** root for binding law (stop at the first valid pack):
 1. Env vars `AGENTS_CONSTITUTION_ROOT` or `WPAI_CONSTITUTION` (if set)
 2. Optional local pin: read `references/pack-root.local` next to the installed SKILL.md (one absolute path, one line; may be absent)
 3. Walk **up** from the workspace path and from the current working directory
-4. Check siblings of those walk stops for a folder that is a valid pack
+4. Check siblings of those walk stops, then one directory level inside each sibling, for a folder that is a valid pack. A pack often lives at `<drive>\<studio>\<pack name>` and is invisible to a sibling-only walk.
 5. Run `scripts/resolve-pack.ps1` if present in the installed distribution
 
 A path is **valid** only if all exist relative to it:
