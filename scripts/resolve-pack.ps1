@@ -76,6 +76,12 @@ foreach ($start in $starts) {
                 try {
                     Get-ChildItem -LiteralPath $parent -Directory -ErrorAction SilentlyContinue | ForEach-Object {
                         if (Test-PackRoot $_.FullName) { Emit $_.FullName }
+                        $sibling = $_.FullName
+                        try {
+                            Get-ChildItem -LiteralPath $sibling -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+                                if (Test-PackRoot $_.FullName) { Emit $_.FullName }
+                            }
+                        } catch {}
                     }
                 } catch {}
             }

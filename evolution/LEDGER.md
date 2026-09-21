@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-21 — Resolve packs one directory inside walk siblings
+
+**Observed issue:** `resolve-pack.ps1` only tested the walk directory and its direct siblings. A valid pack at `C:\WPAI\AGENTS Constitution` was invisible from a user-profile workspace, so Step 0 exited 1 even though the pack was present.
+
+**Meaningful improvement:** the resolver now also tests one directory level inside each sibling, and Step 0 says that is required. Direct sibling packs still win because they are tested first.
+
+**Future failure reduced:** an agent is less likely to stop and ask for a pack path when the pack sits one folder below a drive-level studio directory.
+
+**Changed paths:** `scripts/resolve-pack.ps1`, `SKILL.md`.
+
+**Validation target:** `scripts/resolve-pack.ps1 -StartPath` from a profile path whose sibling-of-parent contains the pack one level down, exit 0. `python tools/validate-source.py`.
+
 ## 2026-09-15 — Prune leftover vendored files on generated-mirror sync
 
 **Observed issue:** overlaying the GitHub skill onto Codex left the old 5.0.1 pack tree under `references/` (`AGENTS.md`, modules, templates, `gate_check.py`). Those leftovers could still be read as law even after `SKILL.md` pointed at GitHub.
