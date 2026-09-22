@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.2.5 — 2026-09-22
+
+- Validate explicit `PACK_ROOT` candidates and root environment variables before discovery can fall back to another local pack.
+- Report missing binding-law files when a canonical skill-source checkout is mistaken for a law pack.
+
+
 ## 5.2.3 — 2026-09-15
 
 - Generated-mirror sync now removes leftover files from older vendored skill installs.

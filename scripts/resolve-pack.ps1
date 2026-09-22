@@ -6,13 +6,16 @@
   Discovery order matches SKILL.md Step 0.
   Prints the absolute pack root path to stdout on success; exit 0.
   Exit 1 if not found. Optional -SkillDir for pack-root.local lookup.
+  -RequestedPackRoot validates a human-specified root without falling back.
   This locates binding pack law. It does not locate skill source; skill source is
   https://github.com/MrWizard94-Compile/Agents-Constitution.
 #>
 [CmdletBinding()]
 param(
     [string]$SkillDir = "",
-    [string]$StartPath = ""
+    [string]$StartPath = "",
+    [Alias("PackRoot")]
+    [string]$RequestedPackRoot = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,15 +35,39 @@ function Test-PackRoot([string]$path) {
     return $true
 }
 
+function Assert-ExplicitPackRoot([string]$path, [string]$source) {
+    if (Test-PackRoot $path) { Emit $path }
+    $missing = New-Object System.Collections.Generic.List[string]
+    if (-not (Test-Path -LiteralPath $path -PathType Container)) {
+        [void]$missing.Add("directory")
+    } else {
+        foreach ($relative in @("VERSION", "AGENTS.md", "SOP.md", "tools\verify-pack.ps1")) {
+            if (-not (Test-Path -LiteralPath (Join-Path $path $relative) -PathType Leaf)) {
+                [void]$missing.Add($relative)
+            }
+        }
+        $agents = Join-Path $path "AGENTS.md"
+        if ((Test-Path -LiteralPath $agents -PathType Leaf) -and
+            -not ((Get-Content -LiteralPath $agents -Raw) -match "CONST-GATE-001")) {
+            [void]$missing.Add("CONST-GATE-001 in AGENTS.md")
+        }
+    }
+    throw "$source is not a binding PACK_ROOT: '$path' (missing: $($missing -join ', ')). A canonical skill-source checkout is not automatically a law pack. Supply a root containing VERSION, AGENTS.md with CONST-GATE-001, SOP.md, and tools/verify-pack.ps1."
+}
+
 function Emit([string]$path) {
     $resolved = (Resolve-Path -LiteralPath $path).Path
     Write-Output $resolved
     exit 0
 }
 
+if ($RequestedPackRoot) {
+    Assert-ExplicitPackRoot $RequestedPackRoot "RequestedPackRoot"
+}
+
 foreach ($envName in @("AGENTS_CONSTITUTION_ROOT", "WPAI_CONSTITUTION")) {
     $v = [Environment]::GetEnvironmentVariable($envName)
-    if ($v -and (Test-PackRoot $v)) { Emit $v }
+    if ($v) { Assert-ExplicitPackRoot $v $envName }
 }
 
 if (-not $SkillDir) {
