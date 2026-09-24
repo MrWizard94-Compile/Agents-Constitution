@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.2.5 — 2026-09-24
+
+- Distinguishes the canonical skill checkout from the binding-law pack root.
+- Requires verified pack-repository provenance and a valid isolated pack directory when a human requests an isolated `PACK_ROOT`.
+- Prevents a skill-only clone or installed mirror from being represented as the binding pack.
+
+## 5.2.4 — 2026-09-16
+
+- Added runtime-fixture dependency closure and primary-failure classification before acceptance launches.
+
 ## 5.2.3 — 2026-09-15
 
 - Generated-mirror sync now removes leftover files from older vendored skill installs.

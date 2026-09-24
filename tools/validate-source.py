@@ -27,6 +27,7 @@ CRITICAL_PHRASES = [
     "exactly one evolution obligation per top-level invocation",
     "highest quality reasonably achievable",
     "runtime fixture dependency closure",
+    "not automatically `PACK_ROOT`",
 ]
 
 

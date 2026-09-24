@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.4"
+  skill-version: "5.2.5"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -119,8 +119,19 @@ Infer mode from the user message / slash args. First match wins.
 
 ## Step 0 — Resolve pack root
 
-The skill itself is loaded from the GitHub repository named above. Then resolve a
-valid **pack** root for binding law (stop at the first valid pack):
+The skill source checkout and the binding-law pack are distinct unless the same
+checkout passes the pack-validity checks below. A fresh clone of the canonical
+skill repository is **not automatically `PACK_ROOT`**: the repository may contain
+the skill and distribution tools without the binding `AGENTS.md` and `SOP.md`.
+Never label a skill-only checkout as the pack or silently substitute an installed
+mirror for a human-requested isolated pack checkout.
+
+If the human requires a fresh isolated `PACK_ROOT`, first identify the repository
+that actually contains the valid pack (from an explicit human source or verified
+provenance of a valid local pack), check it out in isolation, and set `PACK_ROOT`
+to the directory inside that checkout that passes every validity check below.
+If its source cannot be established, stop and ask the human. Otherwise, resolve
+a valid **pack** root for binding law (stop at the first valid pack):
 
 1. Env vars `AGENTS_CONSTITUTION_ROOT` or `WPAI_CONSTITUTION` (if set)
 2. Optional local pin: read `references/pack-root.local` next to the installed SKILL.md (one absolute path, one line; may be absent)
