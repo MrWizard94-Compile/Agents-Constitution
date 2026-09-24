@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-24 — Distinguish the canonical skill checkout from the binding pack root
+
+**Observed issue:** a human required a fresh isolated checkout as `PACK_ROOT`, but the canonical skill repository did not contain the binding pack sentinels. Treating that skill-only checkout as the pack, or silently using a mutable installed copy, would misidentify the governing law.
+
+**Meaningful improvement:** Step 0 now requires agents to distinguish skill source from binding pack, verify provenance of the repository containing the pack when isolation is requested, and set `PACK_ROOT` only to a directory that passes the existing validity checks. Missing provenance requires a human question rather than a guessed root. The source validator guards this distinction.
+
+**Future failure reduced:** agents are less likely to enforce the wrong law or misrepresent an isolated skill clone as an isolated pack checkout.
+
+**Changed paths:** `SKILL.md`, `VERSION`, `SOURCE.json`, `tools/validate-source.py`, `evolution/LEDGER.md`.
+
+**Validation target:** `python tools/validate-source.py`, pack verification against an isolated valid pack, and GitHub Actions `Validate Canonical Skill Source` on the evolution PR.
+
 ## 2026-09-16 — Runtime fixture dependency-closure preflight
 
 **Observed issue:** a third-party mod fixture had two independent missing runtime dependencies, followed by a later secondary exception. File installation and a catalog rescan could have been mistaken for a complete repair even though no clean relaunch had occurred.
