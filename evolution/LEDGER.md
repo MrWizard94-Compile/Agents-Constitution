@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-25 — Compare exact classes at equivalent memory lifecycle points
+
+**Observed issue:** a modpack world-exit histogram search matched synthetic and lambda class names as well as the intended world classes, producing noisy truncated output. A corrected exact-class comparison showed no retained world objects after two exits, while the prior version retained servers, worlds, a player, and chunks. That result still did not prove all heap growth was gone.
+
+**Meaningful improvement:** the diagnostic hygiene guidance now requires equivalent lifecycle points, exact histogram class matching, scoped conclusions about cleared object roots, and a normal re-entry check after cleanup.
+
+**Future failure reduced:** agents are less likely to mistake noisy substring hits for retained objects, compare incomparable captures, declare an entire runtime leak-free from a few absent classes, or break the next session while clearing caches.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR without changing the frozen accepted rules for this invocation.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, and canonical-source CI on the PR.
+
 ## 2026-09-25 — Handle intrusive diagnostic artifacts without leaking credentials or exhausting disk
 
 **Observed issue:** a modpack memory investigation required a 6.35 GiB heap dump and generated large analysis indexes, leaving little free disk. A process-inspection output also exposed a launcher command line containing a session token even though only the game PID was needed.

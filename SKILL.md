@@ -233,6 +233,12 @@ process inspection, or similarly intrusive artifact:
    interpret the artifact; distinguish a stopped process from a failed poll.
    Do not delete material diagnostics to reclaim space without clear authority
    (`HW-RESPECT-001`, `REV-PACK-001`).
+4. For memory-retention acceptance, compare equivalent lifecycle points (for
+   example, after normal exit and an approved full GC). Match histogram class
+   names exactly so similarly named synthetic or lambda classes do not become
+   false evidence. Report which object classes or GC-root paths were actually
+   cleared; absence of selected rows is not proof that the whole process is
+   leak-free. Check that normal re-entry still works after cleanup.
 
 ### Mode: `gate`
 
