@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-25 — Handle intrusive diagnostic artifacts without leaking credentials or exhausting disk
+
+**Observed issue:** a modpack memory investigation required a 6.35 GiB heap dump and generated large analysis indexes, leaving little free disk. A process-inspection output also exposed a launcher command line containing a session token even though only the game PID was needed.
+
+**Meaningful improvement:** enforce-mode guidance now requires a least-intrusive evidence choice, capture-specific approval and storage budgeting, process identification without command-line or environment disclosure, local review of sensitive artifacts before publication, and explicit authority before deleting material diagnostics.
+
+**Future failure reduced:** agents are less likely to expose live credentials, fill a user's drive, treat a transient observation failure as a stopped runtime, or delete evidence while trying to recover space.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open 5.2.5 source-validation PR; the previously proposed version and metadata bump remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, and the PR's canonical-source CI.
+
 ## 2026-09-24 — Verify low-level lifecycle call paths before installation
 
 **Observed issue:** a Minecraft NeoForge client-memory repair compiled and passed helper tests but targeted `setLevel(null)`. The actual normal disconnect and client-level teardown paths assign the level field directly and call a different shared method, so the repair would have missed the user-visible exit flow.

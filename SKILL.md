@@ -217,6 +217,23 @@ depends on a lifecycle transition such as world exit, reload, or shutdown:
    does not credit a teardown repair until a real exit/re-entry flow verifies
    that the hook executed and the retained state was released.
 
+#### Intrusive diagnostic artifact hygiene
+
+When runtime diagnosis calls for a heap/core dump, full-GC histogram, JFR,
+process inspection, or similarly intrusive artifact:
+
+1. Start with the least intrusive evidence that can answer the question. Before
+   a pause or large capture, estimate its disk/memory cost, check free space
+   with a margin, and obtain the human's approval for that specific capture.
+2. Identify the target process without exposing command-line arguments or
+   environment values, which may contain access tokens. Keep raw dumps and
+   logs local and out of source, commits, PRs, and release packages until their
+   sensitive contents have been reviewed (`SEC-SECRET-001`).
+3. Record the build identity, process, capture time, and observation used to
+   interpret the artifact; distinguish a stopped process from a failed poll.
+   Do not delete material diagnostics to reclaim space without clear authority
+   (`HW-RESPECT-001`, `REV-PACK-001`).
+
 ### Mode: `gate`
 
 1. Resolve `PACK_ROOT`; re-read Section 0 in pack `AGENTS.md` (canonical 15-point checklist).
