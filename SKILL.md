@@ -240,6 +240,21 @@ process inspection, or similarly intrusive artifact:
    cleared; absence of selected rows is not proof that the whole process is
    leak-free. Check that normal re-entry still works after cleanup.
 
+#### Runtime performance attribution closure
+
+When a live system reports lag and a trace or profiler is available:
+
+1. Align the recording, log, and observed user action by time and process.
+   A server's "running N ms behind" warning is accumulated backlog, not
+   evidence that one method blocked for N ms. Sampling counts identify
+   candidate call paths, not exact wall-time shares or causality.
+2. Separate startup, new-data generation, settled idle, and the specific
+   interaction into comparable windows before assigning an interaction's
+   latency to its own code. Inspect CPU saturation, thread waits, and GC
+   pauses independently; do not prescribe GC flags from heap growth alone.
+3. Tie a proposed hot-path change to the measured path, preserve behavior,
+   and compare equivalent workloads before claiming the optimization worked.
+
 #### Serialized fixture repair closure
 
 When repairing a binary structure, save, generated asset, or other serialized

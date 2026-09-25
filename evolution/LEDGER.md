@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-25 — Attribute runtime lag using comparable windows
+
+**Observed issue:** a Minecraft integrated-server log reported a 20-second backlog during a 90-second recording. Initially calling it one 20-second stall overstated the evidence: short individual parks, short GC pauses, and simultaneous terrain/render-worker saturation required a different interpretation. Container-opening samples were mixed with new-world generation.
+
+**Meaningful improvement:** enforce-mode guidance now requires time-aligned log, action, and trace evidence; distinguishes accumulated backlog from one blocking call and sampled frames from wall time; separates startup, generation, settled, and interaction windows; and requires an equivalent-workload comparison before crediting an optimization.
+
+**Future failure reduced:** agents are less likely to change a container or GC path because of a misleading backlog line while the actual workload is competing terrain generation and rendering.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
 ## 2026-09-25 — Close binary fixture repairs against packaged and live content
 
 **Observed issue:** a missing item reported during Minecraft world generation came from two mirrored serialized copies inside one compressed structure template, not from a text recipe. Dropping the structure would hide the error but lose content; changing only one copy would leave the toolbox inconsistent.
