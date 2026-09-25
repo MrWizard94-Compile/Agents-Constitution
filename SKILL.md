@@ -240,6 +240,22 @@ process inspection, or similarly intrusive artifact:
    cleared; absence of selected rows is not proof that the whole process is
    leak-free. Check that normal re-entry still works after cleanup.
 
+#### Serialized fixture repair closure
+
+When repairing a binary structure, save, generated asset, or other serialized
+resource supplied by a third-party fixture:
+
+1. Trace the observed bad value to the exact source archive and entry. Inspect
+   all serialized copies or mirrored fields that represent the same logical
+   value; changing only one can leave the resource inconsistent.
+2. Pin the original payload by digest, make the smallest semantics-approved
+   substitution, and verify an exact before/after diff of the decoded payload.
+   Preserve unrelated content rather than dropping the containing feature.
+3. Verify the replacement identifier or dependency exists in the declared
+   runtime, the repaired resource wins the pack/loader precedence, and the
+   production package contains the verified bytes. Source-level parsing alone
+   is not live acceptance: exercise the affected generated or loaded content.
+
 ### Mode: `gate`
 
 1. Resolve `PACK_ROOT`; re-read Section 0 in pack `AGENTS.md` (canonical 15-point checklist).

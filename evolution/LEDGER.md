@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-25 — Close binary fixture repairs against packaged and live content
+
+**Observed issue:** a missing item reported during Minecraft world generation came from two mirrored serialized copies inside one compressed structure template, not from a text recipe. Dropping the structure would hide the error but lose content; changing only one copy would leave the toolbox inconsistent.
+
+**Meaningful improvement:** enforce-mode guidance now requires exact archive-entry tracing, complete mirrored-field inspection, original-payload digest, minimal approved decoded diff, replacement availability, loader-precedence and packaged-byte checks, and a live behavior gate.
+
+**Future failure reduced:** agents are less likely to silence a binary-content warning by deleting a whole feature, ship a partial serialized edit, trust the wrong resource priority, or confuse source validity with in-game generation.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
 ## 2026-09-25 — Compare exact classes at equivalent memory lifecycle points
 
 **Observed issue:** a modpack world-exit histogram search matched synthetic and lambda class names as well as the intended world classes, producing noisy truncated output. A corrected exact-class comparison showed no retained world objects after two exits, while the prior version retained servers, worlds, a player, and chunks. That result still did not prove all heap growth was gone.
