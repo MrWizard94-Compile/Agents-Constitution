@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.4"
+  skill-version: "5.2.5"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -200,6 +200,22 @@ or other runtime assembled from third-party components:
 5. A complete dependency closure or successful catalog scan is preparation, not
    runtime acceptance. Credit the repair only after a clean relaunch and the
    relevant behavior flow pass.
+
+#### Low-level lifecycle hook closure
+
+When a Mixin, bytecode hook, reflection bridge, or equivalent low-level repair
+depends on a lifecycle transition such as world exit, reload, or shutdown:
+
+1. Inspect the **exact target-version** source or bytecode for every normal path
+   that performs the transition, including alternate methods and direct field
+   assignments. Finding a target method by name does not prove it runs on the
+   player-visible path.
+2. Verify that each path reaches the proposed hook with the expected arguments
+   and only after the state it must preserve has been used. Where practical,
+   lock this call-path and argument contract in a versioned integration test.
+3. Keep build, helper-unit-test, and runtime evidence separate. A green build
+   does not credit a teardown repair until a real exit/re-entry flow verifies
+   that the hook executed and the retained state was released.
 
 ### Mode: `gate`
 

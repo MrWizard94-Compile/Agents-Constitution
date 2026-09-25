@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-24 — Verify low-level lifecycle call paths before installation
+
+**Observed issue:** a Minecraft NeoForge client-memory repair compiled and passed helper tests but targeted `setLevel(null)`. The actual normal disconnect and client-level teardown paths assign the level field directly and call a different shared method, so the repair would have missed the user-visible exit flow.
+
+**Meaningful improvement:** enforce-mode guidance now requires exact-version call-path inspection, argument and ordering verification, a versioned contract test where practical, and separate runtime exit/re-entry evidence for low-level lifecycle hooks.
+
+**Future failure reduced:** agents are less likely to ship a Mixin that targets a real method yet never executes on the relevant lifecycle path, or to mistake compilation for a verified teardown fix.
+
+**Changed paths:** `SKILL.md`, `VERSION`, `SOURCE.json`, `evolution/LEDGER.md`.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, and GitHub Actions `Validate Canonical Skill Source` on the PR.
+
 ## 2026-09-16 — Runtime fixture dependency-closure preflight
 
 **Observed issue:** a third-party mod fixture had two independent missing runtime dependencies, followed by a later secondary exception. File installation and a catalog rescan could have been mistaken for a complete repair even though no clean relaunch had occurred.
