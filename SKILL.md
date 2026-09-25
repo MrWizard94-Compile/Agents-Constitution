@@ -254,6 +254,12 @@ When a live system reports lag and a trace or profiler is available:
    pauses independently; do not prescribe GC flags from heap growth alone.
 3. Tie a proposed hot-path change to the measured path, preserve behavior,
    and compare equivalent workloads before claiming the optimization worked.
+4. For a trial that adds or replaces a runtime component, record the exact
+   baseline versions and configuration, then change only the tested component.
+   Defer unrelated repairs until after the paired run, even when the repairs
+   are valid; otherwise the measured difference has multiple causes. Verify
+   the trial artifact's identity and a precise rollback path before installing
+   it, and do not mutate an active process's runtime files.
 
 #### Serialized fixture repair closure
 

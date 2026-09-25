@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-25 — Isolate third-party performance trials from unrelated repairs
+
+**Observed issue:** a modpack profile needed a settled-world control before a separately approved world-generation optimizer trial. While the user launched that control, an unrelated but real claim-provider configuration mismatch was discovered. Applying both changes together would make the optimizer's effect impossible to attribute.
+
+**Meaningful improvement:** runtime performance guidance now requires exact baseline versions and configuration, a one-component trial, deferred unrelated fixes, artifact identity and rollback checks, and no mutation of live runtime files.
+
+**Future failure reduced:** agents are less likely to conflate two valid changes in an A/B test, install an unverified component, or corrupt a running instance while trying to improve performance.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
 ## 2026-09-25 — Attribute runtime lag using comparable windows
 
 **Observed issue:** a Minecraft integrated-server log reported a 20-second backlog during a 90-second recording. Initially calling it one 20-second stall overstated the evidence: short individual parks, short GC pauses, and simultaneous terrain/render-worker saturation required a different interpretation. Container-opening samples were mixed with new-world generation.
