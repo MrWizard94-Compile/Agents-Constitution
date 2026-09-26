@@ -201,6 +201,20 @@ or other runtime assembled from third-party components:
    runtime acceptance. Credit the repair only after a clean relaunch and the
    relevant behavior flow pass.
 
+#### Generated-content capacity closure
+
+When a compatibility converter produces data for a different runtime consumer:
+
+1. Verify the exact consumer's hard limits and the converter's fallback policy.
+   A serializable result is not necessarily a usable result for that consumer.
+2. Select an existing behavior-preserving fallback before constructing a known
+   invalid result. Preserve all required inputs and the original all-or-partial
+   conversion policy; do not drop inputs, widen a physical limit or filter a log
+   merely to make validation pass. Keep unrelated validation failures observable.
+3. Test capacity boundaries, alternative combinations, fallback construction and
+   failure paths. Verify the real generated-content consumer and reload behavior;
+   fewer logged exceptions alone do not prove acceptance or a performance gain.
+
 #### Low-level lifecycle hook closure
 
 When a Mixin, bytecode hook, reflection bridge, or equivalent low-level repair

@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-26 — Validate generated conversions against actual consumer capacity
+
+**Observed issue:** a cooking converter produced a three-fluid alternative for a two-fluid basin, then threw during validation and fell back to the original item inputs. Dropping an ingredient, increasing only the validator's limit, retaining partial alternatives or filtering the warning would change semantics or leave physically unusable recipes.
+
+**Meaningful improvement:** generated-content guidance now requires exact consumer limits, preservation of the converter's all-or-partial fallback policy, preconstruction selection of a valid existing representation, observable unrelated failures, boundary tests and real consumer/reload acceptance.
+
+**Future failure reduced:** agents are less likely to equate serializable data with usable data, silence a warning by weakening validation or losing inputs, change a transactional fallback policy, or mistake fewer exceptions for measured performance improvement.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the isolated canonical-source PR; accepted invocation rules remain frozen.
+
+**Validation target:** canonical source validator/evolution guard, isolated pack full self-run and canonical PR CI.
+
 ## 2026-09-26 — Resolve replacement asset dependencies and output providers
 
 **Observed issue:** two item models named obsolete parents. Their replacement parents existed, but one was particle-only because the block's separate renderer draws the moving head. A filename-only check would not validate dependent textures, while inventing visible geometry for that empty parent could alter rendering rather than repair the stale reference.
