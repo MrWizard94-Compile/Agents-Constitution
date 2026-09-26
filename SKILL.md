@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.4"
+  skill-version: "5.2.5"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -134,6 +134,15 @@ A path is **valid** only if all exist relative to it:
 - `AGENTS.md` (must mention `CONST-GATE-001`)
 - `SOP.md`
 - `tools/verify-pack.ps1`
+
+If the human explicitly names `PACK_ROOT`, validate that candidate first with
+`scripts/resolve-pack.ps1 -RequestedPackRoot <path>`. An invalid explicit root
+is an actionable error: report its missing requirements and ask for a valid pack
+instead of silently binding a different one. A fresh checkout of this canonical
+skill-source repository is not automatically a law pack; it may lack `AGENTS.md`,
+`SOP.md`, and `tools/verify-pack.ps1`. Keep that checkout for source/evolution
+work, and bind only a separately validated pack root. This clarification governs
+subsequent invocations, not a frozen invocation already in progress.
 
 Store as `PACK_ROOT`. If none resolve: **stop and ask the human** for the pack path.
 Do not invent law.

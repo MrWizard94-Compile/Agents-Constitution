@@ -2,6 +2,24 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-22 — Explicit PACK_ROOT validation cannot silently fall through
+
+**Meaningful improvement:** `resolve-pack.ps1` now validates a human-specified
+`-RequestedPackRoot` (or `-PackRoot`) and explicit root environment variables as
+binding law packs, reporting exactly which required files or gate marker are
+missing. The skill instructions distinguish a canonical skill-source checkout
+from a valid law pack and require clarification when an explicit root is invalid.
+
+**Future failure reduced:** an agent is less likely to silently apply law from a
+different local pack when the user explicitly requested an isolated checkout
+that contains skill source but no binding pack files.
+
+**Changed paths:** `SKILL.md`, `scripts/resolve-pack.ps1`, `VERSION`,
+`SOURCE.json`, `CHANGELOG.md`, `evolution/LEDGER.md`.
+
+**Validation target:** canonical source validation plus resolver checks for a
+valid explicit fixture, invalid explicit fixture, and invalid explicit env root.
+
 ## 2026-09-16 — Runtime fixture dependency-closure preflight
 
 **Observed issue:** a third-party mod fixture had two independent missing runtime dependencies, followed by a later secondary exception. File installation and a catalog rescan could have been mistaken for a complete repair even though no clean relaunch had occurred.
