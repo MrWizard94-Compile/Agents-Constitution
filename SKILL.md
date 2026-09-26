@@ -277,6 +277,24 @@ resource supplied by a third-party fixture:
    production package contains the verified bytes. Source-level parsing alone
    is not live acceptance: exercise the affected generated or loaded content.
 
+### Declarative asset/program contract closure
+
+When a runtime warning originates in declarative assets consumed by a program:
+
+1. Trace the declaration to the exact upstream version, executable program, and
+   consumer lookup path. Distinguish an inactive declaration from missing active
+   content; removing required content is not a warning repair.
+2. Before deleting a declaration, prove that it does not contribute to output or
+   behavior and verify how the consumer handles its absence. Account for linker
+   optimization or generated-program behavior where applicable; a warning alone
+   is not enough to establish semantic equivalence.
+3. Preserve executable code, active values, and unrelated settings. Test the exact
+   semantic difference against versioned original fixtures, verify production
+   package bytes and resource precedence, and guard the supported upstream version.
+4. Keep source/package verification separate from live behavior acceptance.
+   Exercise affected visuals or interactions and confirm the original warning is
+   absent without new failures before calling the repair accepted.
+
 ### Mode: `gate`
 
 1. Resolve `PACK_ROOT`; re-read Section 0 in pack `AGENTS.md` (canonical 15-point checklist).

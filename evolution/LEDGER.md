@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-25 — Validate declarative warning repairs against program behavior
+
+**Observed issue:** four Minecraft shader definitions listed ten uniforms that the driver reported inactive. Deleting declarations solely to silence warnings would not establish whether rendering output, consumer lookups, or later upstream versions remained correct.
+
+**Meaningful improvement:** enforce-mode guidance now traces declarations through exact-version programs and consumer absence contracts, distinguishes inactive fields from missing active content, requires exact semantic preservation and package checks, guards upstream versions, and separates live visual acceptance from source verification.
+
+**Future failure reduced:** agents are less likely to remove required shader or other declarative fields to obtain a green log, silently alter active behavior, ship stale overlays after an upstream update, or mistake fixture comparison for runtime acceptance.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
 ## 2026-09-25 — Isolate third-party performance trials from unrelated repairs
 
 **Observed issue:** a modpack profile needed a settled-world control before a separately approved world-generation optimizer trial. While the user launched that control, an unrelated but real claim-provider configuration mismatch was discovered. Applying both changes together would make the optimizer's effect impossible to attribute.
