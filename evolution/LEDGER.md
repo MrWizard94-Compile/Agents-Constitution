@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-26 — Require mutation and publication closure for hot-path caches
+
+**Observed issue:** a global Minecraft block-remap hook was a leading stationary server sample. Its private map is rebuilt through a public method; a permanent first-read cache would become stale, and an identity-only cache could change normal map equality semantics.
+
+**Meaningful improvement:** enforce-mode guidance now requires exact read/write surface inspection, rebuild and null/equality coverage, publication after successful actual writes, visibility/ownership rules, invariant-aware fallbacks, executable versioned contracts, and separate merged/live acceptance from helper benchmarks.
+
+**Future failure reduced:** agents are less likely to ship stale caches after rebuilds, publish failed or transformed-away writes, break equality-based keys, retain stopped lifecycle owners, or equate a faster synthetic lookup with verified application latency.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the existing canonical-source PR; accepted rules remain frozen for the current invocation.
+
+**Validation target:** source validator, evolution guard against accepted main, pack full self-run, and canonical PR CI.
+
 ## 2026-09-25 — Validate declarative warning repairs against program behavior
 
 **Observed issue:** four Minecraft shader definitions listed ten uniforms that the driver reported inactive. Deleting declarations solely to silence warnings would not establish whether rendering output, consumer lookups, or later upstream versions remained correct.

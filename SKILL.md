@@ -261,6 +261,23 @@ When a live system reports lag and a trace or profiler is available:
    the trial artifact's identity and a precise rollback path before installing
    it, and do not mutate an active process's runtime files.
 
+#### Hot-path cache mutation contract closure
+
+When replacing a frequently read third-party lookup with cached or intrusive state:
+
+1. Establish the exact-version read and mutation surface, including public rebuilds,
+   alternate writes, null/missing values, and equality semantics. Caching a first
+   result forever is not correct when the original data can change.
+2. Update or invalidate at every supported mutation, publish only after successful
+   writes, and preserve the actual result of chained write transformations. Define
+   reader/writer ownership and visibility; retain no unrelated lifecycle owners.
+3. If the fast path requires identity keys or another stronger invariant than the
+   original API, prove that invariant or keep a correct fallback when it fails.
+   Lock mutation coverage and version guards in executable contract tests.
+4. Separate helper tests and lookup-only benchmarks from merged/runtime acceptance.
+   Verify optional dependency absence and the real transformed call path, then use
+   equivalent live workloads before crediting application latency improvements.
+
 #### Serialized fixture repair closure
 
 When repairing a binary structure, save, generated asset, or other serialized
