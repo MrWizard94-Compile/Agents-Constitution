@@ -260,6 +260,15 @@ When a live system reports lag and a trace or profiler is available:
    are valid; otherwise the measured difference has multiple causes. Verify
    the trial artifact's identity and a precise rollback path before installing
    it, and do not mutate an active process's runtime files.
+5. Before attributing sampled work, check stack depth/truncation and classify
+   all relevant samples, not only one example stack. A missing outer caller
+   in a truncated trace is unknown ownership, not evidence of absence; shared
+   utility frames do not by themselves establish a subsystem's execution.
+6. Before distributing a batch across ticks or other latency budgets, establish
+   the cost of its largest indivisible work unit as well as total completion
+   time. Cooperative scheduling does not make one expensive unit cheap. Preserve
+   thread ownership, ordering, completion and cancellation semantics, and verify
+   the largest task after the change before claiming the latency bound holds.
 
 #### Hot-path cache mutation contract closure
 

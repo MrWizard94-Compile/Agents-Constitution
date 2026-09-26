@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-26 — Bound sampling attribution and indivisible scheduling work
+
+**Observed issue:** a road-sign stall's first stack showed template loading, while grouping all samples exposed predictive noise work and many deeply truncated data-conversion stacks without their outer caller. A generic Either helper initially resembled conversion work. Splitting the candidate loop across ticks would still leave an unknown single-check latency.
+
+**Meaningful improvement:** runtime performance guidance now requires whole-sample classification, explicit stack-truncation and shared-utility attribution limits, and largest-indivisible-unit measurement before and after cooperative scheduling. Thread ownership, ordering, completion and cancellation remain required.
+
+**Future failure reduced:** agents are less likely to optimize the first visible stack, infer absence from truncated callers, treat generic utility frames as subsystem ownership, or claim a bounded tick cost merely by yielding between unbounded tasks.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the isolated canonical-source PR; newly authored rules do not govern this invocation.
+
+**Validation target:** source validator, evolution guard against accepted main, isolated pack full self-run, and canonical PR CI.
+
 ## 2026-09-26 — Require mutation and publication closure for hot-path caches
 
 **Observed issue:** a global Minecraft block-remap hook was a leading stationary server sample. Its private map is rebuilt through a public method; a permanent first-read cache would become stale, and an identity-only cache could change normal map equality semantics.
