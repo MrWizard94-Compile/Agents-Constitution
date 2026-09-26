@@ -2,6 +2,138 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-26 — Resolve replacement asset dependencies and output providers
+
+**Observed issue:** two item models named obsolete parents. Their replacement parents existed, but one was particle-only because the block's separate renderer draws the moving head. A filename-only check would not validate dependent textures, while inventing visible geometry for that empty parent could alter rendering rather than repair the stale reference.
+
+**Meaningful improvement:** declarative asset guidance now requires resolving the replacement dependency chain in the exact runtime and inspecting the consumer/output provider before filling apparently empty resources.
+
+**Future failure reduced:** agents are less likely to replace one unresolved reference with another, mistake intentional provider-owned output for missing content, or hide a warning by introducing incompatible fallback geometry or data.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the isolated canonical-source PR; accepted invocation rules remain frozen.
+
+**Validation target:** canonical source validator/evolution guard, isolated pack full self-run, and canonical PR CI.
+
+## 2026-09-26 — Keep binary prefilters consistent with decoded search semantics
+
+**Observed issue:** an NBT inspector's decoded traversal accepted key/value substrings, but its binary prefilter required a complete length-prefixed string. Searches for a connector suffix returned no hits even though full pool IDs were present in the original structures. Full regeneration also exposed an intentional dependency/compat duplicate, while the higher-priority installed datapack still carried the old tool IDs.
+
+**Meaningful improvement:** serialized-fixture guidance now requires prefilter/decoder match-mode agreement, positive and negative contracts across supported encodings, and explicit limits on no-match evidence for uninspected inputs. It also requires digest-guarded composition of known overlapping repairs, final precedence verification, and rejection of unknown conflicting copies rather than filename-order selection.
+
+**Future failure reduced:** agents are less likely to miss the root cause, falsely report an identifier absent, or design a replacement from an incomplete binary scan when a cheap filter silently discards legitimate decoded matches.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the isolated canonical-source PR; the accepted revision stays frozen for this invocation.
+
+**Validation target:** canonical source validator/evolution guard, isolated pack full self-run, and canonical PR CI.
+
+## 2026-09-26 — Bound sampling attribution and indivisible scheduling work
+
+**Observed issue:** a road-sign stall's first stack showed template loading, while grouping all samples exposed predictive noise work and many deeply truncated data-conversion stacks without their outer caller. A generic Either helper initially resembled conversion work. Splitting the candidate loop across ticks would still leave an unknown single-check latency.
+
+**Meaningful improvement:** runtime performance guidance now requires whole-sample classification, explicit stack-truncation and shared-utility attribution limits, and largest-indivisible-unit measurement before and after cooperative scheduling. Thread ownership, ordering, completion and cancellation remain required.
+
+**Future failure reduced:** agents are less likely to optimize the first visible stack, infer absence from truncated callers, treat generic utility frames as subsystem ownership, or claim a bounded tick cost merely by yielding between unbounded tasks.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the isolated canonical-source PR; newly authored rules do not govern this invocation.
+
+**Validation target:** source validator, evolution guard against accepted main, isolated pack full self-run, and canonical PR CI.
+
+## 2026-09-26 — Require mutation and publication closure for hot-path caches
+
+**Observed issue:** a global Minecraft block-remap hook was a leading stationary server sample. Its private map is rebuilt through a public method; a permanent first-read cache would become stale, and an identity-only cache could change normal map equality semantics.
+
+**Meaningful improvement:** enforce-mode guidance now requires exact read/write surface inspection, rebuild and null/equality coverage, publication after successful actual writes, visibility/ownership rules, invariant-aware fallbacks, executable versioned contracts, and separate merged/live acceptance from helper benchmarks.
+
+**Future failure reduced:** agents are less likely to ship stale caches after rebuilds, publish failed or transformed-away writes, break equality-based keys, retain stopped lifecycle owners, or equate a faster synthetic lookup with verified application latency.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the existing canonical-source PR; accepted rules remain frozen for the current invocation.
+
+**Validation target:** source validator, evolution guard against accepted main, pack full self-run, and canonical PR CI.
+
+## 2026-09-25 — Validate declarative warning repairs against program behavior
+
+**Observed issue:** four Minecraft shader definitions listed ten uniforms that the driver reported inactive. Deleting declarations solely to silence warnings would not establish whether rendering output, consumer lookups, or later upstream versions remained correct.
+
+**Meaningful improvement:** enforce-mode guidance now traces declarations through exact-version programs and consumer absence contracts, distinguishes inactive fields from missing active content, requires exact semantic preservation and package checks, guards upstream versions, and separates live visual acceptance from source verification.
+
+**Future failure reduced:** agents are less likely to remove required shader or other declarative fields to obtain a green log, silently alter active behavior, ship stale overlays after an upstream update, or mistake fixture comparison for runtime acceptance.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
+## 2026-09-25 — Isolate third-party performance trials from unrelated repairs
+
+**Observed issue:** a modpack profile needed a settled-world control before a separately approved world-generation optimizer trial. While the user launched that control, an unrelated but real claim-provider configuration mismatch was discovered. Applying both changes together would make the optimizer's effect impossible to attribute.
+
+**Meaningful improvement:** runtime performance guidance now requires exact baseline versions and configuration, a one-component trial, deferred unrelated fixes, artifact identity and rollback checks, and no mutation of live runtime files.
+
+**Future failure reduced:** agents are less likely to conflate two valid changes in an A/B test, install an unverified component, or corrupt a running instance while trying to improve performance.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
+## 2026-09-25 — Attribute runtime lag using comparable windows
+
+**Observed issue:** a Minecraft integrated-server log reported a 20-second backlog during a 90-second recording. Initially calling it one 20-second stall overstated the evidence: short individual parks, short GC pauses, and simultaneous terrain/render-worker saturation required a different interpretation. Container-opening samples were mixed with new-world generation.
+
+**Meaningful improvement:** enforce-mode guidance now requires time-aligned log, action, and trace evidence; distinguishes accumulated backlog from one blocking call and sampled frames from wall time; separates startup, generation, settled, and interaction windows; and requires an equivalent-workload comparison before crediting an optimization.
+
+**Future failure reduced:** agents are less likely to change a container or GC path because of a misleading backlog line while the actual workload is competing terrain generation and rendering.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
+## 2026-09-25 — Close binary fixture repairs against packaged and live content
+
+**Observed issue:** a missing item reported during Minecraft world generation came from two mirrored serialized copies inside one compressed structure template, not from a text recipe. Dropping the structure would hide the error but lose content; changing only one copy would leave the toolbox inconsistent.
+
+**Meaningful improvement:** enforce-mode guidance now requires exact archive-entry tracing, complete mirrored-field inspection, original-payload digest, minimal approved decoded diff, replacement availability, loader-precedence and packaged-byte checks, and a live behavior gate.
+
+**Future failure reduced:** agents are less likely to silence a binary-content warning by deleting a whole feature, ship a partial serialized edit, trust the wrong resource priority, or confuse source validity with in-game generation.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR; the accepted rules frozen for this invocation remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, pack full self-run, and canonical-source CI on the PR.
+
+## 2026-09-25 — Compare exact classes at equivalent memory lifecycle points
+
+**Observed issue:** a modpack world-exit histogram search matched synthetic and lambda class names as well as the intended world classes, producing noisy truncated output. A corrected exact-class comparison showed no retained world objects after two exits, while the prior version retained servers, worlds, a player, and chunks. That result still did not prove all heap growth was gone.
+
+**Meaningful improvement:** the diagnostic hygiene guidance now requires equivalent lifecycle points, exact histogram class matching, scoped conclusions about cleared object roots, and a normal re-entry check after cleanup.
+
+**Future failure reduced:** agents are less likely to mistake noisy substring hits for retained objects, compare incomparable captures, declare an entire runtime leak-free from a few absent classes, or break the next session while clearing caches.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open canonical-source PR without changing the frozen accepted rules for this invocation.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, and canonical-source CI on the PR.
+
+## 2026-09-25 — Handle intrusive diagnostic artifacts without leaking credentials or exhausting disk
+
+**Observed issue:** a modpack memory investigation required a 6.35 GiB heap dump and generated large analysis indexes, leaving little free disk. A process-inspection output also exposed a launcher command line containing a session token even though only the game PID was needed.
+
+**Meaningful improvement:** enforce-mode guidance now requires a least-intrusive evidence choice, capture-specific approval and storage budgeting, process identification without command-line or environment disclosure, local review of sensitive artifacts before publication, and explicit authority before deleting material diagnostics.
+
+**Future failure reduced:** agents are less likely to expose live credentials, fill a user's drive, treat a transient observation failure as a stopped runtime, or delete evidence while trying to recover space.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. This extends the open 5.2.5 source-validation PR; the previously proposed version and metadata bump remain unchanged.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, and the PR's canonical-source CI.
+
+## 2026-09-24 — Verify low-level lifecycle call paths before installation
+
+**Observed issue:** a Minecraft NeoForge client-memory repair compiled and passed helper tests but targeted `setLevel(null)`. The actual normal disconnect and client-level teardown paths assign the level field directly and call a different shared method, so the repair would have missed the user-visible exit flow.
+
+**Meaningful improvement:** enforce-mode guidance now requires exact-version call-path inspection, argument and ordering verification, a versioned contract test where practical, and separate runtime exit/re-entry evidence for low-level lifecycle hooks.
+
+**Future failure reduced:** agents are less likely to ship a Mixin that targets a real method yet never executes on the relevant lifecycle path, or to mistake compilation for a verified teardown fix.
+
+**Changed paths:** `SKILL.md`, `VERSION`, `SOURCE.json`, `evolution/LEDGER.md`.
+
+**Validation target:** `python tools/validate-source.py`, `python tools/evolution-guard.py --base <main commit>`, and GitHub Actions `Validate Canonical Skill Source` on the PR.
+
 ## 2026-09-16 — Runtime fixture dependency-closure preflight
 
 **Observed issue:** a third-party mod fixture had two independent missing runtime dependencies, followed by a later secondary exception. File installation and a catalog rescan could have been mistaken for a complete repair even though no clean relaunch had occurred.

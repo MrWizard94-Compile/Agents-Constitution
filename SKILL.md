@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.4"
+  skill-version: "5.2.5"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -200,6 +200,139 @@ or other runtime assembled from third-party components:
 5. A complete dependency closure or successful catalog scan is preparation, not
    runtime acceptance. Credit the repair only after a clean relaunch and the
    relevant behavior flow pass.
+
+#### Low-level lifecycle hook closure
+
+When a Mixin, bytecode hook, reflection bridge, or equivalent low-level repair
+depends on a lifecycle transition such as world exit, reload, or shutdown:
+
+1. Inspect the **exact target-version** source or bytecode for every normal path
+   that performs the transition, including alternate methods and direct field
+   assignments. Finding a target method by name does not prove it runs on the
+   player-visible path.
+2. Verify that each path reaches the proposed hook with the expected arguments
+   and only after the state it must preserve has been used. Where practical,
+   lock this call-path and argument contract in a versioned integration test.
+3. Keep build, helper-unit-test, and runtime evidence separate. A green build
+   does not credit a teardown repair until a real exit/re-entry flow verifies
+   that the hook executed and the retained state was released.
+
+#### Intrusive diagnostic artifact hygiene
+
+When runtime diagnosis calls for a heap/core dump, full-GC histogram, JFR,
+process inspection, or similarly intrusive artifact:
+
+1. Start with the least intrusive evidence that can answer the question. Before
+   a pause or large capture, estimate its disk/memory cost, check free space
+   with a margin, and obtain the human's approval for that specific capture.
+2. Identify the target process without exposing command-line arguments or
+   environment values, which may contain access tokens. Keep raw dumps and
+   logs local and out of source, commits, PRs, and release packages until their
+   sensitive contents have been reviewed (`SEC-SECRET-001`).
+3. Record the build identity, process, capture time, and observation used to
+   interpret the artifact; distinguish a stopped process from a failed poll.
+   Do not delete material diagnostics to reclaim space without clear authority
+   (`HW-RESPECT-001`, `REV-PACK-001`).
+4. For memory-retention acceptance, compare equivalent lifecycle points (for
+   example, after normal exit and an approved full GC). Match histogram class
+   names exactly so similarly named synthetic or lambda classes do not become
+   false evidence. Report which object classes or GC-root paths were actually
+   cleared; absence of selected rows is not proof that the whole process is
+   leak-free. Check that normal re-entry still works after cleanup.
+
+#### Runtime performance attribution closure
+
+When a live system reports lag and a trace or profiler is available:
+
+1. Align the recording, log, and observed user action by time and process.
+   A server's "running N ms behind" warning is accumulated backlog, not
+   evidence that one method blocked for N ms. Sampling counts identify
+   candidate call paths, not exact wall-time shares or causality.
+2. Separate startup, new-data generation, settled idle, and the specific
+   interaction into comparable windows before assigning an interaction's
+   latency to its own code. Inspect CPU saturation, thread waits, and GC
+   pauses independently; do not prescribe GC flags from heap growth alone.
+3. Tie a proposed hot-path change to the measured path, preserve behavior,
+   and compare equivalent workloads before claiming the optimization worked.
+4. For a trial that adds or replaces a runtime component, record the exact
+   baseline versions and configuration, then change only the tested component.
+   Defer unrelated repairs until after the paired run, even when the repairs
+   are valid; otherwise the measured difference has multiple causes. Verify
+   the trial artifact's identity and a precise rollback path before installing
+   it, and do not mutate an active process's runtime files.
+5. Before attributing sampled work, check stack depth/truncation and classify
+   all relevant samples, not only one example stack. A missing outer caller
+   in a truncated trace is unknown ownership, not evidence of absence; shared
+   utility frames do not by themselves establish a subsystem's execution.
+6. Before distributing a batch across ticks or other latency budgets, establish
+   the cost of its largest indivisible work unit as well as total completion
+   time. Cooperative scheduling does not make one expensive unit cheap. Preserve
+   thread ownership, ordering, completion and cancellation semantics, and verify
+   the largest task after the change before claiming the latency bound holds.
+
+#### Hot-path cache mutation contract closure
+
+When replacing a frequently read third-party lookup with cached or intrusive state:
+
+1. Establish the exact-version read and mutation surface, including public rebuilds,
+   alternate writes, null/missing values, and equality semantics. Caching a first
+   result forever is not correct when the original data can change.
+2. Update or invalidate at every supported mutation, publish only after successful
+   writes, and preserve the actual result of chained write transformations. Define
+   reader/writer ownership and visibility; retain no unrelated lifecycle owners.
+3. If the fast path requires identity keys or another stronger invariant than the
+   original API, prove that invariant or keep a correct fallback when it fails.
+   Lock mutation coverage and version guards in executable contract tests.
+4. Separate helper tests and lookup-only benchmarks from merged/runtime acceptance.
+   Verify optional dependency absence and the real transformed call path, then use
+   equivalent live workloads before crediting application latency improvements.
+
+#### Serialized fixture repair closure
+
+When repairing a binary structure, save, generated asset, or other serialized
+resource supplied by a third-party fixture:
+
+1. Trace the observed bad value to the exact source archive and entry. Inspect
+   all serialized copies or mirrored fields that represent the same logical
+   value; changing only one can leave the resource inconsistent.
+   Ensure binary/encoded scan prefilters implement the decoder's intended match
+   mode (for example, exact versus substring and keys versus values). Test
+   representative positive and negative cases across the supported encodings;
+   a no-match result is not absence evidence for excluded or uninspected inputs.
+2. Pin the original payload by digest, make the smallest semantics-approved
+   substitution, and verify an exact before/after diff of the decoded payload.
+   Preserve unrelated content rather than dropping the containing feature.
+3. Verify the replacement identifier or dependency exists in the declared
+   runtime, the repaired resource wins the pack/loader precedence, and the
+   production package contains the verified bytes. Source-level parsing alone
+   is not live acceptance: exercise the affected generated or loaded content.
+4. When multiple repair layers target the same resource, compose recognized,
+   digest-guarded transformations explicitly and verify that the highest-priority
+   final payload retains every approved repair. Reject unknown conflicting copies;
+   filename order or silent last-wins selection is not a conflict-resolution policy.
+
+### Declarative asset/program contract closure
+
+When a runtime warning originates in declarative assets consumed by a program:
+
+1. Trace the declaration to the exact upstream version, executable program, and
+   consumer lookup path. Distinguish an inactive declaration from missing active
+   content; removing required content is not a warning repair.
+   When correcting a reference, verify the replacement's dependency chain, not
+   merely its filename: inherited parents, textures, schemas or executable
+   providers must resolve in the declared runtime. Inspect the consumer before
+   filling an apparently empty resource; a separate renderer/provider may supply
+   its output, so invented fallback content can change valid behavior.
+2. Before deleting a declaration, prove that it does not contribute to output or
+   behavior and verify how the consumer handles its absence. Account for linker
+   optimization or generated-program behavior where applicable; a warning alone
+   is not enough to establish semantic equivalence.
+3. Preserve executable code, active values, and unrelated settings. Test the exact
+   semantic difference against versioned original fixtures, verify production
+   package bytes and resource precedence, and guard the supported upstream version.
+4. Keep source/package verification separate from live behavior acceptance.
+   Exercise affected visuals or interactions and confirm the original warning is
+   absent without new failures before calling the repair accepted.
 
 ### Mode: `gate`
 
