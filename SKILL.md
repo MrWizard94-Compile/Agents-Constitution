@@ -318,6 +318,11 @@ When a runtime warning originates in declarative assets consumed by a program:
 1. Trace the declaration to the exact upstream version, executable program, and
    consumer lookup path. Distinguish an inactive declaration from missing active
    content; removing required content is not a warning repair.
+   When correcting a reference, verify the replacement's dependency chain, not
+   merely its filename: inherited parents, textures, schemas or executable
+   providers must resolve in the declared runtime. Inspect the consumer before
+   filling an apparently empty resource; a separate renderer/provider may supply
+   its output, so invented fallback content can change valid behavior.
 2. Before deleting a declaration, prove that it does not contribute to output or
    behavior and verify how the consumer handles its absence. Account for linker
    optimization or generated-program behavior where applicable; a warning alone

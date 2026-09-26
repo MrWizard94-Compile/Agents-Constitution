@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-26 — Resolve replacement asset dependencies and output providers
+
+**Observed issue:** two item models named obsolete parents. Their replacement parents existed, but one was particle-only because the block's separate renderer draws the moving head. A filename-only check would not validate dependent textures, while inventing visible geometry for that empty parent could alter rendering rather than repair the stale reference.
+
+**Meaningful improvement:** declarative asset guidance now requires resolving the replacement dependency chain in the exact runtime and inspecting the consumer/output provider before filling apparently empty resources.
+
+**Future failure reduced:** agents are less likely to replace one unresolved reference with another, mistake intentional provider-owned output for missing content, or hide a warning by introducing incompatible fallback geometry or data.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the isolated canonical-source PR; accepted invocation rules remain frozen.
+
+**Validation target:** canonical source validator/evolution guard, isolated pack full self-run, and canonical PR CI.
+
 ## 2026-09-26 — Keep binary prefilters consistent with decoded search semantics
 
 **Observed issue:** an NBT inspector's decoded traversal accepted key/value substrings, but its binary prefilter required a complete length-prefixed string. Searches for a connector suffix returned no hits even though full pool IDs were present in the original structures. Full regeneration also exposed an intentional dependency/compat duplicate, while the higher-priority installed datapack still carried the old tool IDs.
