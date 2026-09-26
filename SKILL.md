@@ -306,6 +306,10 @@ resource supplied by a third-party fixture:
    runtime, the repaired resource wins the pack/loader precedence, and the
    production package contains the verified bytes. Source-level parsing alone
    is not live acceptance: exercise the affected generated or loaded content.
+4. When multiple repair layers target the same resource, compose recognized,
+   digest-guarded transformations explicitly and verify that the highest-priority
+   final payload retains every approved repair. Reject unknown conflicting copies;
+   filename order or silent last-wins selection is not a conflict-resolution policy.
 
 ### Declarative asset/program contract closure
 

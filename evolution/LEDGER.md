@@ -4,9 +4,9 @@ The ledger is evidence of evolution. A ledger entry, version bump, changelog edi
 
 ## 2026-09-26 — Keep binary prefilters consistent with decoded search semantics
 
-**Observed issue:** an NBT inspector's decoded traversal accepted key/value substrings, but its binary prefilter required a complete length-prefixed string. Searches for a connector suffix returned no hits even though full pool IDs were present in the original structures.
+**Observed issue:** an NBT inspector's decoded traversal accepted key/value substrings, but its binary prefilter required a complete length-prefixed string. Searches for a connector suffix returned no hits even though full pool IDs were present in the original structures. Full regeneration also exposed an intentional dependency/compat duplicate, while the higher-priority installed datapack still carried the old tool IDs.
 
-**Meaningful improvement:** serialized-fixture guidance now requires prefilter/decoder match-mode agreement, positive and negative contracts across supported encodings, and explicit limits on no-match evidence for uninspected inputs.
+**Meaningful improvement:** serialized-fixture guidance now requires prefilter/decoder match-mode agreement, positive and negative contracts across supported encodings, and explicit limits on no-match evidence for uninspected inputs. It also requires digest-guarded composition of known overlapping repairs, final precedence verification, and rejection of unknown conflicting copies rather than filename-order selection.
 
 **Future failure reduced:** agents are less likely to miss the root cause, falsely report an identifier absent, or design a replacement from an incomplete binary scan when a cheap filter silently discards legitimate decoded matches.
 
