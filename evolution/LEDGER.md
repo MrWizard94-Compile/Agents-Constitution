@@ -2,6 +2,18 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-09-26 — Keep binary prefilters consistent with decoded search semantics
+
+**Observed issue:** an NBT inspector's decoded traversal accepted key/value substrings, but its binary prefilter required a complete length-prefixed string. Searches for a connector suffix returned no hits even though full pool IDs were present in the original structures.
+
+**Meaningful improvement:** serialized-fixture guidance now requires prefilter/decoder match-mode agreement, positive and negative contracts across supported encodings, and explicit limits on no-match evidence for uninspected inputs.
+
+**Future failure reduced:** agents are less likely to miss the root cause, falsely report an identifier absent, or design a replacement from an incomplete binary scan when a cheap filter silently discards legitimate decoded matches.
+
+**Changed paths:** `SKILL.md`, `evolution/LEDGER.md`. Extends the isolated canonical-source PR; the accepted revision stays frozen for this invocation.
+
+**Validation target:** canonical source validator/evolution guard, isolated pack full self-run, and canonical PR CI.
+
 ## 2026-09-26 — Bound sampling attribution and indivisible scheduling work
 
 **Observed issue:** a road-sign stall's first stack showed template loading, while grouping all samples exposed predictive noise work and many deeply truncated data-conversion stacks without their outer caller. A generic Either helper initially resembled conversion work. Splitting the candidate loop across ticks would still leave an unknown single-check latency.

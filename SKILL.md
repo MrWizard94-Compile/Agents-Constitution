@@ -295,6 +295,10 @@ resource supplied by a third-party fixture:
 1. Trace the observed bad value to the exact source archive and entry. Inspect
    all serialized copies or mirrored fields that represent the same logical
    value; changing only one can leave the resource inconsistent.
+   Ensure binary/encoded scan prefilters implement the decoder's intended match
+   mode (for example, exact versus substring and keys versus values). Test
+   representative positive and negative cases across the supported encodings;
+   a no-match result is not absence evidence for excluded or uninspected inputs.
 2. Pin the original payload by digest, make the smallest semantics-approved
    substitution, and verify an exact before/after diff of the decoded payload.
    Preserve unrelated content rather than dropping the containing feature.
