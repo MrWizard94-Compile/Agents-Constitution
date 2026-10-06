@@ -2,6 +2,31 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-06 — Scope warning gates to delivery-owned compilation
+
+**Observed issue:** a NeoGradle build used a global `JavaCompile` matcher for
+`-Xlint:all -Werror`. That matcher also changed NeoForge's internal task for
+recompiling generated Minecraft and platform source, so pre-existing vendor
+warnings failed the build before project code was evaluated.
+
+**Meaningful improvement:** enforce mode now requires warning-as-error and lint
+flags to target project-owned compile tasks when a build graph also compiles
+generated or third-party source. Agents must inspect the resolved task graph,
+keep inherited warnings visible and triaged, and obtain a warning-free verification
+of the owned source without weakening its gate.
+
+**Future failure reduced:** agents are less likely to break toolchain bootstrap,
+misclassify upstream-generated warnings as product warnings, hide inherited
+findings, or disable strict compilation for their own code to make a vendor task
+pass.
+
+**Changed paths:** `SKILL.md`, `VERSION`, `SOURCE.json`, `CHANGELOG.md`,
+`tools/validate-source.py`, `evolution/LEDGER.md`.
+
+**Validation target:** `python tools/validate-source.py`,
+`python tools/evolution-guard.py --base 969ae2caa33c1e4c9de325282fe6029e35a1caea`,
+and the binding pack full self-run must pass before propagation.
+
 ## 2026-09-22 — Explicit PACK_ROOT validation cannot silently fall through
 
 **Meaningful improvement:** `resolve-pack.ps1` now validates a human-specified

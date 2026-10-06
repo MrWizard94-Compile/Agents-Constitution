@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.2.6 — 2026-10-06
+
+- Scope warning-as-error and lint configuration to project-owned compile tasks
+  when a build graph also compiles generated platform or third-party source.
+- Require task-graph inspection, visible inherited-warning triage, and a subsequent
+  warning-free owned-source verification build.
+- Prevent global task matchers from breaking vendor compilation or pressuring an
+  agent to weaken the actual project warning gate.
+
 ## 5.2.5 — 2026-09-22
 
 - Validate explicit `PACK_ROOT` candidates and root environment variables before discovery can fall back to another local pack.

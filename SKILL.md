@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.5"
+  skill-version: "5.2.6"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -209,6 +209,25 @@ or other runtime assembled from third-party components:
 5. A complete dependency closure or successful catalog scan is preparation, not
    runtime acceptance. Credit the repair only after a clean relaunch and the
    relevant behavior flow pass.
+
+#### Warning-gate task ownership
+
+When a build graph compiles generated platform code or third-party source as an
+internal prerequisite in addition to project-owned source:
+
+1. Apply warning-as-error and lint flags to the **project-owned compile tasks**.
+   Do not attach them globally to every task of the same tool type unless all of
+   those tasks compile delivery-owned source.
+2. Inspect the actual task graph after configuring the gate. A broad task matcher
+   must not change vendor compilation semantics, make generated dependencies fail,
+   or tempt the agent to weaken the project warning policy.
+3. Keep inherited toolchain warnings visible and triage an authoritative upgrade,
+   targeted upstream repair, or version pin. Record any warning outside delivery
+   ownership as an inherited finding; never suppress or misreport it as clean.
+4. Require a subsequent project verification build in which project-owned compile,
+   lint, analysis, and test tasks are warning-free. Do not claim that a cached or
+   skipped owned-source task proves the warning gate unless the same source and
+   compiler inputs were already verified.
 
 ### Mode: `gate`
 
