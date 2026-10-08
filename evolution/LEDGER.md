@@ -2,6 +2,30 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-08 — Stacked-resource lifecycle acceptance
+
+**Observed issue:** a complete, higher-priority Minecraft data-map overlay used
+the framework's documented replacement flag and produced the correct final map,
+but the version-exact loader resolved every lower-priority value first. Static
+payload tests passed while the initial load and `/reload` each emitted the same
+23 targeted errors.
+
+**Meaningful improvement:** enforce mode now requires agents to inventory layered
+resources in actual resolver order, distinguish parse/decode/validate/merge/
+replace/apply phases, validate early observable side effects as well as final
+state, exercise initial and repeated lifecycle loads, and require exact event
+counts plus positive repair markers where appropriate.
+
+**Future failure reduced:** agents are less likely to accept a syntactically
+correct overlay or clean final state while a lower layer still emits the target
+warning, error, mutation, registration, or cache effect.
+
+**Changed paths:** `SKILL.md`, `VERSION`, `SOURCE.json`, `tools/validate-source.py`,
+`CHANGELOG.md`, `docs/ARCHITECTURE.md`, `evolution/LEDGER.md`.
+
+**Validation target:** `python tools/validate-source.py`, evolution guard against
+canonical `main`, and the binding pack's full self-run must pass before delivery.
+
 ## 2026-09-22 — Explicit PACK_ROOT validation cannot silently fall through
 
 **Meaningful improvement:** `resolve-pack.ps1` now validates a human-specified

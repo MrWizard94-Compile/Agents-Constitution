@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.2.6 — 2026-10-08
+
+- Added a stacked-resource acceptance rule that distinguishes final resolved
+  state from parse, decode, validation, merge, and replacement side effects.
+- Requires version-exact resolver-order evidence, initial-load and repeated-
+  lifecycle runtime checks, exact event counts, and positive repair markers.
+- Rejects overlays that make final data correct while lower layers still emit
+  the targeted warning, error, mutation, or registration side effect.
+
 ## 5.2.5 — 2026-09-22
 
 - Validate explicit `PACK_ROOT` candidates and root environment variables before discovery can fall back to another local pack.

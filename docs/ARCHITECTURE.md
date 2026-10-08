@@ -63,6 +63,20 @@ The qualifying change must reduce a concrete future failure, ambiguity,
 inefficiency, validation weakness, quality gap, or repeated manual step. Metadata
 churn never qualifies on its own.
 
+## Stacked-resource evidence boundary
+
+Layered loaders often expose a correct final state while still parsing,
+validating, or applying lower-priority data before a replacement takes effect.
+The skill therefore treats overlay syntax and static final-state tests as
+preparation. Acceptance requires version-exact resolver-order evidence and a
+runtime lifecycle that observes both initial load and repeated reload behavior.
+
+This boundary applies to data/resource packs, configuration overlays, container
+layers, plugin policy stacks, generated defaults, and similar precedence-based
+systems. It prevents a valid high-priority replacement from being mistaken for
+proof that lower-layer diagnostics, mutations, registrations, or cache effects
+were eliminated.
+
 ## Platform integration
 
 The source repository can be universal, but no Git repository can force every AI

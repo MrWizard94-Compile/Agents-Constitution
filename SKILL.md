@@ -12,7 +12,7 @@ description: >
   that must satisfy CONST-GATE-001 and CONST-DONE-001.
 metadata:
   short-description: "Enforce AGENTS Constitution pack"
-  skill-version: "5.2.5"
+  skill-version: "5.2.6"
   pack-version-pin: "5.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
@@ -209,6 +209,28 @@ or other runtime assembled from third-party components:
 5. A complete dependency closure or successful catalog scan is preparation, not
    runtime acceptance. Credit the repair only after a clean relaunch and the
    relevant behavior flow pass.
+
+#### Stacked resource override acceptance
+
+When a delivery claims that a higher-priority resource, configuration, policy,
+or data overlay eliminates defects from a lower layer:
+
+1. Inventory every contributing layer in the actual runtime resolver order,
+   including nested archives, generated resources, defaults, and user overlays.
+2. Inspect the version-exact loader contract and distinguish parse, decode,
+   validate, merge, replace, and apply phases. Do not infer that a replacement
+   prevents diagnostics or side effects merely because the final resolved state
+   is correct.
+3. Validate both the final state and every earlier phase capable of emitting a
+   warning, error, mutation, registration, cache entry, or other observable side
+   effect. Static overlay-schema tests are preparation, not runtime acceptance.
+4. Capture a pre-fix baseline, then exercise initial load and an explicit reload
+   or equivalent repeated lifecycle. Count exact targeted events and require a
+   positive repair marker when the intervention would otherwise be invisible.
+5. Reject the acceptance claim if the final state is repaired but a lower layer
+   still produces the targeted defect. Move the intervention to the earliest
+   version-pinned boundary that can prevent the defect without hiding unrelated
+   failures.
 
 ### Mode: `gate`
 
