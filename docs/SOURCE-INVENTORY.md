@@ -21,9 +21,13 @@ metadata stay in the ignored local inventory, not this public repository.
 | Open skill proposals (PRs #5, #7, #9, #10 at inventory time) | GitHub PR history | #5's live-entry requirement is generalized under `TEST-DOMAIN-001`; #10's lifecycle and intrusive-diagnostic lessons under `LOW-RISK-001` and `OBS-PRIV-001`. #7 and #9's resolver behavior becomes unnecessary when skill and law share one source snapshot. Leave these PRs untouched until their authorship and disposition are reviewed. |
 | Small `SOUL.md` pointers and generated skill mirrors | Exact paths and hashes in local inventory | Replace with pointers or regenerated verified mirrors, never edit as independent law. |
 
-The v2 files have the same 40-section structure; large line-diff counts are
-mostly Markdown wrapping and formatting, not proof of distinct law. The
-remaining variant-level semantic audit is a migration gate before physical
+Token-level comparisons against the archived v2 monolith found 99.1–99.5%
+sequence similarity across the representative variants. The material
+differences were moving or omitting the Rule of Three and one variant omitting
+a chat-silence instruction. The Rule of Three is retained in `ENG-CODE-001`;
+the chat-silence wording is not binding because it conflicts with current
+interaction requirements. Large line-diff counts were mostly Markdown
+wrapping. A further copy-level audit is still required before physical
 deletion. This document deliberately does not copy private project text or
 name private project folders in the public repository.
 

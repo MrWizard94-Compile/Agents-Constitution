@@ -33,8 +33,10 @@ when it would materially change the design. Date volatile sources.
 ### ENG-CODE-001 — Maintainable implementation
 
 Use clear names, small cohesive units, strong types and null safety, explicit
-errors, and established project style. Prefer the simplest correct design.
-Extract shared abstractions when repetition or complexity justifies them.
+errors, and established project style. Group by feature and give functions a
+single responsibility. Prefer the simplest correct design. Apply the Rule of
+Three: extract a generalized module on the third real use, or when a file is
+too unwieldy to read; extract sooner only for a concrete, documented need.
 Document invariants, unusual state machines, ownership, and failure behavior.
 
 ### ENG-FW-001 — Framework semantics
