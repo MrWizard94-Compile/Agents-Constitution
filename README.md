@@ -1,18 +1,50 @@
-# AGENTS Constitution
+# WPAI Constitution
 
-Canonical source repository for the AGENTS Constitution governance pack and the `agents-constitution` skill.
+The [canonical GitHub repository](https://github.com/MrWizard94-Compile/Agents-Constitution)
+is the single source of truth for WPAI's agent quality law, operating process,
+skill loader, and verification tools. The accepted `main` commit SHA, not a
+local folder name, identifies the binding revision. The prior SOUL and AGENTS
+Constitution files are historical inputs; they are not competing law.
 
-This repository is the **only editable source of truth**. Local installations, caches, vendored project copies, and release archives are generated distributions.
+Start with [`SKILL.md`](SKILL.md) for how an agent loads and evolves the law,
+[`AGENTS.md`](AGENTS.md) for the Definition of Done and 15-point Section 0
+gate, and [`SOP.md`](SOP.md) for execution. The applicability matrix selects
+scoped `law/*` files. [`governance/EVOLUTION.md`](governance/EVOLUTION.md)
+controls source freeze, one meaningful improvement per top-level call,
+review, and mirror propagation. [Architecture](docs/ARCHITECTURE.md) and the
+[historical-source record](docs/SOURCE-INVENTORY.md) explain the migration.
 
-## Core invariants
+## Verify source
 
-- `main` is accepted canonical source.
-- Versioned tags/releases are immutable distribution points.
-- A governed invocation resolves and freezes one verified revision before substantive work.
-- Every top-level invocation of the skill must produce at least one **meaningful, reusable improvement** to the canonical skill package.
-- Version/changelog/ledger-only churn does **not** count as meaningful evolution.
-- An invocation cannot use a change it authored during that same invocation to rewrite the rules governing itself; accepted evolution becomes active on a later invocation.
-- Concurrent agents evolve through isolated branches/pull requests rather than racing direct writes to `main`.
-- Binding-law changes remain human-controlled; operational skill improvements may be automated after validation.
+From a clean checkout, run:
 
-The canonical pack, skill source, validation tooling, distribution adapters, and evolution ledger will live together here so improvements can propagate across agents and workflows without local-source drift.
+```powershell
+python -m unittest discover -s tests -v
+python tools/validate-source.py
+```
+
+Both commands must exit 0. CI runs the same checks and checks each PR for a
+substantive change. A passing source check is not proof that a local mirror,
+project pointer, runtime, or published release has been updated.
+
+## Install generated local mirrors
+
+After the accepted `main` commit is verified:
+
+```powershell
+python distribution/sync.py --ref main
+```
+
+The defaults are in `SOURCE.json`. The sync resolves one immutable SHA,
+downloads all binding files before writing, records per-file hashes, and
+removes only files named in a previous generated manifest. Unknown local
+files are not deleted. A legacy `agents-constitution` install must be
+reviewed and retired separately; it is never silently promoted to source.
+
+Project adoption uses [`templates/PROJECT-POINTER.md`](templates/PROJECT-POINTER.md)
+with project mission, stack, and acceptance in that project's own repository.
+Do not vendor editable law into each project.
+
+The public repository deliberately omits raw private project variants,
+machine-specific paths, credentials, and local cleanup manifests. See the
+source inventory for what is and is not yet reconciled.

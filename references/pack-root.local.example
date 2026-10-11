@@ -1,3 +1,0 @@
-# Copy to pack-root.local (one absolute path, one line) only if discovery fails.
-# pack-root.local is optional and host-local; do not commit host paths into binding law.
-# /absolute/path/to/a/valid/constitution-pack

@@ -1,79 +1,32 @@
-# Canonical Source and Propagation Architecture
+# WPAI Constitution architecture
 
-## Authority model
+The canonical GitHub repository's accepted `main` is the only editable law
+source. A full commit SHA identifies an immutable snapshot. `SKILL.md`
+loads `AGENTS.md`, `SOP.md`, governance, and applicable `law/*` from that
+snapshot. Project pointers supply project-specific facts. Generated Codex,
+Grok, or other installs carry a source SHA and file hashes, not authority.
 
-`MrWizard94-Compile/Agents-Constitution` is the only editable source for the
-`agents-constitution` skill.
+```text
+accepted main commit
+  ├─ SKILL.md + SOURCE.json     loader and distribution manifest
+  ├─ AGENTS.md + SOP.md         quality law and operating process
+  ├─ law/*                      one canonical home per active rule
+  ├─ governance/*               amendment and registry
+  └─ generated mirrors          pinned, validated distributions
+        └─ project pointers     mission, stack, acceptance; never law fork
+```
 
-Canonical URL: https://github.com/MrWizard94-Compile/Agents-Constitution
+The source freezes at invocation start. An agent proposes one coherent,
+meaningful change on an isolated branch; validation and review precede
+acceptance. The new rule is eligible only on a later invocation. This avoids
+self-amendment and concurrent writes to `main`. Version, ledger, and
+changelog support traceability but never count as the substantive change.
 
-- `main` = accepted canonical source.
-- A commit SHA = exact source revision.
-- A tag/release = immutable distribution point.
-- Local agent skill folders = generated mirrors.
-- Vendored project copies = generated snapshots.
+The repository cannot force every AI platform to auto-load a skill. Local
+agents must install or sync the mirror through their supported mechanism;
+other agents may read the repository directly. A GitHub commit, local mirror,
+project adoption, and successful runtime use are separate acceptance gates.
 
-Local copies are never promoted to source by editing them. Persistent changes flow
-back through this repository.
-
-## Invocation lifecycle
-
-1. Resolve the latest authorized canonical revision for the configured channel.
-2. Verify source invariants and provenance.
-3. Record the exact revision/version.
-4. Freeze that revision for the entire top-level invocation.
-5. Load the AGENTS Constitution pack and perform governed work.
-6. If professional/final quality is implied, perform the quality-ceiling review.
-7. Derive one meaningful reusable skill improvement from the invocation.
-8. Submit that candidate on an isolated branch/PR.
-9. Update the evolution ledger and version as evidence, not as the qualifying change.
-10. Validate the candidate.
-11. Merge accepted source.
-12. Other agents receive it on their next sync/invocation.
-
-## Why the revision freezes
-
-An agent cannot legitimately change the rules by which its current work is judged.
-The invocation therefore runs under one immutable source revision. Any update it
-authors becomes active only on a later invocation.
-
-## Mandatory evolution without infinite recursion
-
-The evolution requirement applies once per **top-level skill invocation**. The
-required evolution subtask is part of that invocation and does not recursively
-create another evolution obligation.
-
-## Concurrency
-
-Multiple agents may discover useful improvements at the same time. They must not
-race edits directly onto `main`.
-
-Each agent:
-
-1. starts from the newest accepted `main`;
-2. creates an isolated branch;
-3. makes one coherent evolution;
-4. rebases/reconciles if canonical source moved;
-5. reruns validation;
-6. submits a PR.
-
-## What counts as meaningful
-
-The qualifying change must reduce a concrete future failure, ambiguity,
-inefficiency, validation weakness, quality gap, or repeated manual step. Metadata
-churn never qualifies on its own.
-
-## Platform integration
-
-The source repository can be universal, but no Git repository can force every AI
-product to load a skill. Each platform needs either:
-
-- a startup/bootstrap hook that runs `distribution/sync.py` or `sync.ps1`, or
-- a native connector that reads this repository when the skill is invoked.
-
-ChatGPT can use the connected GitHub repository directly. Local agents install
-generated mirrors into their own skill directories. Default paths are listed in
-`SOURCE.json` (`default_mirror_paths`):
-
-- Grok: `~/.grok/skills/agents-constitution`
-- Codex: `~/.codex/skills/agents-constitution`
+Historical SOUL and AGENTS copies are cataloged in `docs/SOURCE-INVENTORY.md`.
+Their unique requirements are mapped into active law, or marked as
+project-specific/archival. The archive is evidence, not a second source.

@@ -1,18 +1,32 @@
 {
-  "schema": 1,
-  "name": "agents-constitution",
-  "skill_version": "5.2.5",
-  "pack_version_pin": "5.1.0",
+  "schema": 2,
+  "name": "wpai-constitution",
+  "skill_version": "6.0.0",
   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
   "default_branch": "main",
-  "release_channel": "stable",
   "local_install_is_authoritative": false,
-  "sync_before_invoke": true,
   "freeze_revision_per_invocation": true,
   "mandatory_meaningful_evolution_per_invocation": true,
+  "mirror_files": [
+    "SKILL.md",
+    "AGENTS.md",
+    "SOP.md",
+    "VERSION",
+    "SOURCE.json",
+    "references/always-load.md",
+    "governance/EVOLUTION.md",
+    "governance/RULE-REGISTRY.md",
+    "law/ENGINEERING.md",
+    "law/SECURITY.md",
+    "law/OPERATIONS.md",
+    "law/COLLABORATION.md",
+    "law/SPECIALIST.md",
+    "templates/PROJECT-OVERRIDE.md",
+    "templates/PROJECT-POINTER.md"
+  ],
   "default_mirror_paths": [
-    "~/.grok/skills/agents-constitution",
-    "~/.codex/skills/agents-constitution"
+    "~/.grok/skills/wpai-constitution",
+    "~/.codex/skills/wpai-constitution"
   ]
 }

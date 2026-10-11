@@ -2,6 +2,24 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-11 — Bind skill and law to one verified snapshot
+
+**Observed gap:** the old canonical skill was current while the binding pack
+could be resolved from a separate, stale local folder. A sync could also
+prune unknown files in a legacy install, making cleanup difficult to audit.
+
+**Meaningful change:** the WPAI Constitution skill loads the law from the
+same frozen GitHub commit as its loader. `SOURCE.json` declares the full
+mirror file set. Sync records hashes and prunes only previously generated
+files. A project pointer adds local facts without becoming another law copy.
+
+**Future failure reduced:** a fresh skill cannot silently enforce an older
+pack, and mirror refresh cannot delete untracked user files as collateral.
+
+**Review oracle:** reject a mirror that omits a binding law file, combines
+revisions, has a mismatched hash, or prunes an unknown file; verify the
+invocation continues under its original commit after proposing an amendment.
+
 ## 2026-09-22 — Explicit PACK_ROOT validation cannot silently fall through
 
 **Meaningful improvement:** `resolve-pack.ps1` now validates a human-specified
