@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""Fail when a project still consumes a retired Constitution pack or SOUL copy.
+
+This is a read-only migration check. Run it after changing project entry points,
+CI, generators, and manifests, before removing a vendored pack. It inspects
+tracked text and the top-level old-pack directory; it never follows symlinks.
+"""
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+TEXT_SUFFIXES = {".md", ".mdc", ".json", ".toml", ".yaml", ".yml", ".ps1", ".py", ".js", ".mjs", ".cjs", ".ts", ".tsx"}
+LEGACY = re.compile(r"AGENTS Constitution|skills[\\/]+agents-constitution|name:\s*agents-constitution|SOULv2\.0\.0\.md|verify-pack\.ps1|gate_check\.py", re.IGNORECASE)
+FULL_SOUL = re.compile(r"(?:^# SOUL\.md\s*[—-]\s*The Constitution of an AI Empire|^## 40\. Constitutional Integrity)", re.MULTILINE)
+MAX_TEXT_BYTES = 4 * 1024 * 1024
+
+
+def project_files(root: Path) -> list[Path]:
+    result = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+    )
+    paths = [root / Path(item.decode("utf-8", errors="surrogateescape")) for item in result.stdout.split(b"\0") if item]
+    paths.extend(root / name for name in ("SOUL.md", "SOULv2.0.0.md") if (root / name).exists())
+    return sorted(set(paths))
+
+
+def inspect(root: Path) -> list[tuple[str, str, int]]:
+    root = root.resolve(strict=True)
+    git_root = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+    ).stdout.strip()
+    if not root.samefile(Path(git_root)):
+        raise ValueError("project path must be its Git repository root")
+
+    findings: list[tuple[str, str, int]] = []
+    old_pack = root / "AGENTS Constitution"
+    if old_pack.is_symlink() or (old_pack.is_dir() and any(path.is_file() or path.is_symlink() for path in old_pack.rglob("*"))):
+        findings.append(("OLD_PACK_DIRECTORY", "AGENTS Constitution", 0))
+
+    for path in project_files(root):
+        relative = path.relative_to(root).as_posix()
+        if "AGENTS Constitution" in path.parts and relative.startswith("AGENTS Constitution/"):
+            continue  # one directory finding is enough
+        if path.is_symlink():
+            if LEGACY.search(relative):
+                findings.append(("LEGACY_SYMLINK", relative, 0))
+            continue
+        if not path.is_file() or path.suffix.casefold() not in TEXT_SUFFIXES:
+            continue
+        if path.stat().st_size > MAX_TEXT_BYTES:
+            findings.append(("TEXT_TOO_LARGE_UNCHECKED", relative, 0))
+            continue
+        text = path.read_text(encoding="utf-8-sig", errors="replace")
+        if FULL_SOUL.search(text):
+            findings.append(("FULL_SOUL_COPY", relative, 1))
+        for number, line in enumerate(text.splitlines(), start=1):
+            if LEGACY.search(line):
+                findings.append(("LEGACY_REFERENCE", relative, number))
+    return findings
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("project", type=Path, help="exact project Git root")
+    args = parser.parse_args()
+    try:
+        findings = inspect(args.project)
+    except (OSError, ValueError, subprocess.CalledProcessError) as exc:
+        print(f"ERROR: adoption check could not complete: {exc}", file=sys.stderr)
+        return 2
+    for code, path, line in findings:
+        suffix = f":{line}" if line else ""
+        print(f"{code}: {path}{suffix}")
+    if findings:
+        print(f"FAIL: {len(findings)} unresolved Constitution adoption findings")
+        return 1
+    print("PASS: no tracked legacy Constitution consumer or top-level pack found")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,6 +1,19 @@
 # Changelog
 
-## 6.0.0 — 2026-10-11 (candidate)
+## 6.1.0 — 2026-10-12 (candidate)
+
+- Added an end-to-end evidence-integrity profile: verify generated API claims
+  against the installed stack, inspect test and CI diffs before trusting green
+  status, reproduce review findings, recheck context after compaction, and
+  withhold Done when a necessary independent oracle is unavailable. The
+  profile scales depth to risk but explicitly forbids shortcuts.
+- Added a read-only adoption audit for stale project consumers of vendored law
+  (CI, manifests, scripts, UI, and full SOUL copies), distinguishing the
+  canonical repository's legacy URL slug from the retired skill name.
+- Require consumer and pinned-CI migration before declaring a project copy
+  retired; this makes source provenance part of the same evidence chain.
+
+## 6.0.0 — 2026-10-11
 
 - Renamed the active law and loader **WPAI Constitution**; one repository
   snapshot now contains both skill and binding law.

@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.0.0"
+  skill-version: "6.1.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -34,7 +34,9 @@ manifest live in `SOURCE.json`.
    folder, old pack, or web search result for binding law.
 3. Identify the user-approved scope, current state, dependencies, risks,
    checks, and necessary authority. For a broad refactor, migration, or
-   cleanup, make a concise plan with rollback before mutating state.
+   cleanup, make a concise plan with rollback before mutating state. Establish
+   the risk-scaled quality profile in `SOP.md`; a missing required check is a
+   named acceptance gap, never a shortcut to Done.
 4. Execute the applicable SOP with production completeness, intended-behavior
    tests, root-cause warning repair, documentation, and honest evidence.
 5. Before claiming a delivery, score all 15 Section 0 checks in `AGENTS.md`.
@@ -74,12 +76,17 @@ fulfill evolution.
 |---|---|---|
 | Default implementation or delivery | Enforce | Completed work, Section 0 evidence, evolution status |
 | Section 0 or pre-delivery gate | Gate | 15 PASS/FAIL/N/A scores and 3–12 line audit |
-| Adopt into project | Adopt | Project pointer to pinned canonical revision; no law fork |
+| Adopt into project | Adopt | Project pointer, consumer audit, pinned CI source; no law fork |
 | Self-audit or verify Constitution | Self-run | Source validator, tests, links, and concrete findings |
 
 All modes owe one meaningful evolution for a top-level call. The director can
 limit a task to analysis; that limits publication authority, not the duty to
 prepare an honest candidate.
+
+For adoption or cleanup, run `python tools/check-adoption.py <project-root>`
+from a verified source checkout after updating project pointers, CI, and
+manifests. Resolve all findings before removing an old pack or claiming that
+the project has no shadow law.
 
 ## Runtime and quality checks
 

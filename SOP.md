@@ -1,6 +1,6 @@
 # WPAI delivery SOP
 
-**Version:** 3.0.0
+**Version:** 3.1.0
 
 **Authority:** `AGENTS.md`
 **Applies to:** Human-directed work under the WPAI Constitution
@@ -19,6 +19,17 @@ inspection, local mutation, publication, deployment, spending, external
 communication, and destructive cleanup. Record the canonical law commit SHA,
 project instructions, current branch, worktree state, and inherited findings.
 Ask the director when a missing choice would materially change the result.
+Create a risk-scaled quality profile for the deliverable: which dimensions of
+functional fit, correctness, reliability, security/privacy, usability and
+accessibility, maintainability, compatibility, performance/resources, and
+release or operational readiness matter; what the relevant industry's
+current standards are; and what independent observation would falsify each
+important claim. Mark inapplicable dimensions with a reason. See the
+[quality assurance map](docs/QUALITY-ASSURANCE-MAP.md) for examples, not a substitute for the
+project's actual requirements. Risk scaling changes the depth of relevant
+checks, not whether a known required check may be skipped. If a necessary
+oracle is unavailable, report the acceptance gate as unmet and arrange a
+safe next step; do not call the result Done.
 
 ## 2. Inventory and baseline
 
@@ -58,6 +69,11 @@ Exercise real runtime and device flows when acceptance requires them. Distinguis
 the first independent failure from downstream cascades. Fix causes, then rerun
 affected and broader gates. A successful catalog scan or artifact copy is
 preparation; runtime acceptance requires a clean launch and behavior flow.
+Verify generated API claims against the installed stack. Inspect changes to
+tests, fixtures, mocks, skips, and CI gates before trusting green status. Use
+an independent oracle for consequential behavior, such as a real consumer,
+reference implementation, measured workload, accessibility inspection, or
+human acceptance, selected by the quality profile.
 
 ## 7. Audit the evidence
 
@@ -65,6 +81,10 @@ Record exact commands, exit codes, versions, artifacts, and test scope. Report
 source QA, packaging, deployment, runtime behavior, and physical acceptance
 separately. Do not infer one from another. Keep inherited findings distinct from
 new defects, and do not call a release clean if a relevant blocker remains.
+Reconcile the evidence against the original quality profile and changed scope.
+Investigate contradictions and review-tool findings against the current tree;
+withdraw unsupported claims. A percentage, green badge, or polished artifact
+is not a substitute for evidence about the intended use.
 
 ## 8. Package and deliver
 

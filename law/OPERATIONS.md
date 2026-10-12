@@ -78,6 +78,14 @@ project copy, update its pointer and verify behavior before removing the old
 pack. Do not follow links or recursively delete a broad workspace target.
 Record what was removed and how to recover it.
 
+Before declaring project adoption complete, inspect every consumer of the
+retired pack—not only `AGENTS.md`: CI jobs, build/generator scripts, manifests,
+format exclusions, active verification commands, and product UI routes can
+keep an old copy operational. Pin a verified canonical source snapshot in
+reproducible CI, update those consumers, and run the read-only
+`tools/check-adoption.py` audit. Resolve its findings or explicitly retain
+and label historical evidence before deleting a vendored tree.
+
 ## Delivery and release
 
 ### OPS-DEL-001 — Complete package
@@ -131,3 +139,8 @@ project honestly rather than calling partial QA complete.
 Prefer free, open, offline-capable and reproducible tools when feasible.
 Document setup and verification so a fresh maintainer can reproduce the
 development environment.
+For a critical cloud or shared-service dependency, name an outage fallback:
+the last verified local source, a recoverable work checkpoint, a manual
+verification path, or an explicit pause. Budget API quotas, rate limits, and
+time for the next safe checkpoint before starting a long destructive or
+cross-repository operation. Never label an interrupted check as passed.

@@ -16,6 +16,11 @@ allow-lists.
 Use the smallest process, filesystem, account, and token privileges needed.
 Check the current action's exact target before a write. Credentials and
 permissions for one system do not authorize another.
+Do not disable approval, sandbox, audit, or permission controls for
+convenience. A constrained tool failure is not permission to retry with
+unrestricted access; identify the exact missing capability and use an
+authorized, narrower path. Where the host already supplies broad access,
+voluntarily keep reads and writes within the user's task scope.
 
 ### SEC-SURFACE-001 — Common failure modes
 
@@ -31,6 +36,9 @@ personal data. Use environment-specific secret storage and examples with
 placeholders. When a secret enters Git history, stop publication, rotate it,
 and coordinate history remediation. Do not use a public Constitution
 repository to archive private project records.
+Before scanning, packaging, or opening diagnostic files, identify sensitive
+paths and use metadata or redacted evidence when content is unnecessary.
+Agents must not copy production secrets into broadly readable workspaces.
 
 ### SEC-LIB-001 — Security mechanisms
 
