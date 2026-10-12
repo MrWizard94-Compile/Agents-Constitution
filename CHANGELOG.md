@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.4.0 — 2026-10-12 (candidate)
+
+- The local copy inventory now checkpoints completed directories atomically,
+  prints progress, and resumes only with matching scan parameters. Interrupted
+  scans cannot publish a partial final report or silently overwrite a prior
+  report. The retained checkpoint and final `status: complete` distinguish
+  recovery state from a completed inventory.
+
 ## 6.3.1 — 2026-10-12 (candidate)
 
 - The project adoption audit now rejects GitHub workflow checkouts of the

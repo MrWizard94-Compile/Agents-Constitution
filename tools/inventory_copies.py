@@ -58,6 +58,7 @@ TEXT_SUFFIXES = {
     ".py",
 }
 DEFAULT_MAX_TEXT_BYTES = 8 * 1024 * 1024
+DEFAULT_CHECKPOINT_DIRECTORIES = 1000
 
 
 @dataclass(frozen=True)
@@ -190,9 +191,174 @@ def scan(roots: Iterable[Path], max_text_bytes: int) -> tuple[list[Hit], list[Sc
     return hits, errors, examined
 
 
+def inspect_directory(
+    directory: Path, max_text_bytes: int, excluded_files: frozenset[str] = frozenset(),
+) -> tuple[list[Path], list[Hit], list[ScanError], int]:
+    """Inspect one directory as the atomic unit of resumable progress."""
+    children: list[Path] = []
+    hits: list[Hit] = []
+    errors: list[ScanError] = []
+    examined = 0
+    try:
+        metadata = os.lstat(directory)
+        if stat.S_ISLNK(metadata.st_mode) or bool(
+            getattr(metadata, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
+        ):
+            errors.append(ScanError(str(directory), "reparse", "directory became a link or reparse point"))
+            return children, hits, errors, examined
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                try:
+                    if is_link_or_reparse(entry):
+                        continue
+                    if entry.is_dir(follow_symlinks=False):
+                        children.append(Path(entry.path))
+                    elif entry.is_file(follow_symlinks=False):
+                        if os.path.normcase(os.path.abspath(entry.path)) in excluded_files:
+                            continue
+                        examined += 1
+                        try:
+                            hit = inspect_file(Path(entry.path), max_text_bytes)
+                            if hit:
+                                hits.append(hit)
+                        except OSError as exc:
+                            errors.append(ScanError(entry.path, "inspect", str(exc)))
+                except OSError as exc:
+                    errors.append(ScanError(entry.path, "stat", str(exc)))
+    except OSError as exc:
+        errors.append(ScanError(str(directory), "scandir", str(exc)))
+    return children, hits, errors, examined
+
+
+def _write_json_atomic(path: Path, payload: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    os.replace(temporary, path)
+
+
+def _fresh_progress(roots: list[Path], max_text_bytes: int, output: Path) -> dict[str, object]:
+    return {
+        "schema": 1,
+        "status": "partial",
+        "roots": [normalize_path(root) for root in roots],
+        "max_text_bytes": max_text_bytes,
+        "output": normalize_path(output),
+        "pending_directories": [normalize_path(root) for root in reversed(roots)],
+        "directories_completed": 0,
+        "files_examined": 0,
+        "hits": [],
+        "errors": [],
+    }
+
+
+def _load_progress(checkpoint: Path, roots: list[Path], max_text_bytes: int, output: Path) -> dict[str, object]:
+    try:
+        progress = json.loads(checkpoint.read_text(encoding="utf-8"))
+        expected = _fresh_progress(roots, max_text_bytes, output)
+        for key in ("schema", "roots", "max_text_bytes", "output"):
+            if progress[key] != expected[key]:
+                raise ValueError(f"checkpoint {key} does not match this scan")
+        if progress["status"] not in ("partial", "complete"):
+            raise ValueError("checkpoint has invalid status")
+        for key in ("files_examined", "directories_completed"):
+            if type(progress[key]) is not int or progress[key] < 0:
+                raise ValueError(f"checkpoint has invalid {key}")
+        if not isinstance(progress["hits"], list) or not isinstance(progress["errors"], list):
+            raise ValueError("checkpoint has invalid results")
+        pending = progress["pending_directories"]
+        if not isinstance(pending, list) or any(not isinstance(item, str) for item in pending):
+            raise ValueError("checkpoint has invalid pending directories")
+        normalized_roots = [os.path.normcase(os.path.abspath(root)) for root in roots]
+        for item in pending:
+            candidate = os.path.normcase(os.path.abspath(item))
+            if not any(os.path.commonpath((candidate, root)) == root for root in normalized_roots):
+                raise ValueError("checkpoint directory is outside scan roots")
+        for hit in progress["hits"]:
+            Hit(**hit)
+        for error in progress["errors"]:
+            ScanError(**error)
+        if progress["status"] == "complete" and pending:
+            raise ValueError("complete checkpoint still has pending directories")
+        return progress
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise ValueError(f"invalid checkpoint {checkpoint}: {exc}") from exc
+
+
+def scan_resumable(
+    roots: list[Path], max_text_bytes: int, output: Path, checkpoint: Path,
+    *, resume: bool, checkpoint_directories: int = DEFAULT_CHECKPOINT_DIRECTORIES,
+) -> tuple[list[Hit], list[ScanError], int]:
+    """Checkpoint only fully inspected directories; never publish a partial final report."""
+    if checkpoint_directories < 1:
+        raise ValueError("checkpoint_directories must be positive")
+    normalized_roots = [os.path.normcase(os.path.abspath(root)) for root in roots]
+    for index, root in enumerate(normalized_roots):
+        for earlier in normalized_roots[:index]:
+            try:
+                common = os.path.commonpath((root, earlier))
+            except ValueError:
+                # Distinct Windows drives have no common path.
+                continue
+            if common in (root, earlier):
+                raise ValueError("scan roots overlap; name each filesystem area once")
+    excluded_files = frozenset(
+        os.path.normcase(os.path.abspath(path))
+        for path in (output, checkpoint, output.with_suffix(output.suffix + ".tmp"),
+                     checkpoint.with_suffix(checkpoint.suffix + ".tmp"))
+    )
+    if resume:
+        progress = _load_progress(checkpoint, roots, max_text_bytes, output)
+        if progress["status"] == "partial" and output.exists():
+            raise ValueError(f"partial checkpoint conflicts with existing final report: {output}")
+    else:
+        if checkpoint.exists():
+            raise ValueError(f"checkpoint already exists; use --resume: {checkpoint}")
+        if output.exists():
+            raise ValueError(f"final report already exists; choose a new output: {output}")
+        progress = _fresh_progress(roots, max_text_bytes, output)
+        _write_json_atomic(checkpoint, progress)
+
+    pending = progress["pending_directories"]
+    assert isinstance(pending, list)
+    since_checkpoint = 0
+    while pending:
+        directory = Path(pending.pop())
+        try:
+            children, hits, errors, examined = inspect_directory(directory, max_text_bytes, excluded_files)
+        except BaseException:
+            pending.append(str(directory))
+            _write_json_atomic(checkpoint, progress)
+            raise
+        pending.extend(str(child) for child in children)
+        progress["hits"].extend(asdict(hit) for hit in hits)
+        progress["errors"].extend(asdict(error) for error in errors)
+        progress["files_examined"] += examined
+        progress["directories_completed"] += 1
+        since_checkpoint += 1
+        if since_checkpoint >= checkpoint_directories:
+            _write_json_atomic(checkpoint, progress)
+            print(
+                f"PROGRESS: {progress['directories_completed']} directories, "
+                f"{progress['files_examined']} files, {len(progress['hits'])} hits, "
+                f"{len(progress['errors'])} access errors",
+                flush=True,
+            )
+            since_checkpoint = 0
+    progress["status"] = "complete"
+    _write_json_atomic(checkpoint, progress)
+    hits = sorted((Hit(**item) for item in progress["hits"]), key=lambda item: item.path.casefold())
+    errors = sorted(
+        (ScanError(**item) for item in progress["errors"]),
+        key=lambda item: (item.path.casefold(), item.operation),
+    )
+    return hits, errors, progress["files_examined"]
+
+
 def write_report(output: Path, roots: list[Path], hits: list[Hit], errors: list[ScanError], examined: int) -> None:
     payload = {
-        "schema": 1,
+        "schema": 2,
+        "status": "complete",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "roots": [normalize_path(root) for root in roots],
         "files_examined": examined,
@@ -201,10 +367,7 @@ def write_report(output: Path, roots: list[Path], hits: list[Hit], errors: list[
         "hits": [asdict(hit) for hit in hits],
         "errors": [asdict(error) for error in errors],
     }
-    output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = output.with_suffix(output.suffix + ".tmp")
-    temporary.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    os.replace(temporary, output)
+    _write_json_atomic(output, payload)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -212,6 +375,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--root", action="append", default=[], help="root to scan; repeatable")
     parser.add_argument("--output", required=True, help="JSON report path")
     parser.add_argument("--max-text-bytes", type=int, default=DEFAULT_MAX_TEXT_BYTES)
+    parser.add_argument("--checkpoint", help="checkpoint path; defaults to <output>.checkpoint.json")
+    parser.add_argument("--resume", action="store_true", help="resume an existing matching checkpoint")
+    parser.add_argument("--checkpoint-directories", type=int, default=DEFAULT_CHECKPOINT_DIRECTORIES)
     return parser.parse_args(argv)
 
 
@@ -221,8 +387,22 @@ def main(argv: list[str] | None = None) -> int:
     missing = [str(root) for root in roots if not root.exists()]
     if missing:
         raise SystemExit(f"scan roots do not exist: {', '.join(missing)}")
-    hits, errors, examined = scan(roots, args.max_text_bytes)
+    if args.max_text_bytes < 0:
+        raise SystemExit("--max-text-bytes must be nonnegative")
     output = Path(args.output).resolve()
+    checkpoint = Path(args.checkpoint).resolve() if args.checkpoint else Path(str(output) + ".checkpoint.json")
+    if checkpoint == output:
+        raise SystemExit("checkpoint and final report must be different paths")
+    try:
+        hits, errors, examined = scan_resumable(
+            roots, args.max_text_bytes, output, checkpoint,
+            resume=args.resume, checkpoint_directories=args.checkpoint_directories,
+        )
+    except KeyboardInterrupt:
+        print(f"INTERRUPTED: resume with --resume; checkpoint: {checkpoint}", file=sys.stderr)
+        return 130
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     write_report(output, roots, hits, errors, examined)
     print(f"PASS: examined {examined} files; {len(hits)} candidates; {len(errors)} access errors")
     print(output)

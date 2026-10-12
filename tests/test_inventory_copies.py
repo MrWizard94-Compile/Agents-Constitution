@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import json
 from pathlib import Path
+from unittest.mock import patch
 
-from tools.inventory_copies import inspect_file, scan
+from tools import inventory_copies
+from tools.inventory_copies import inspect_file, scan, scan_resumable, write_report
 
 
 class InventoryCopiesTests(unittest.TestCase):
@@ -43,6 +46,85 @@ class InventoryCopiesTests(unittest.TestCase):
             self.assertEqual(1, examined)
             self.assertEqual(1, len(hits))
             self.assertEqual([], errors)
+
+    def test_interrupted_scan_resumes_without_partial_final_report_or_duplicate_hits(self) -> None:
+        with tempfile.TemporaryDirectory() as root_dir, tempfile.TemporaryDirectory() as audit_dir:
+            root = Path(root_dir)
+            (root / "first").mkdir()
+            (root / "second").mkdir()
+            (root / "first" / "AGENTS.md").write_text("project notes", encoding="utf-8")
+            (root / "second" / "copy.md").write_text("CONST-GATE-001", encoding="utf-8")
+            output = Path(audit_dir) / "inventory.json"
+            checkpoint = Path(audit_dir) / "inventory.checkpoint.json"
+            original = inventory_copies.inspect_directory
+            calls = 0
+
+            def interrupt_once(directory: Path, max_bytes: int, excluded_files: frozenset[str]):
+                nonlocal calls
+                calls += 1
+                if calls == 2:
+                    raise KeyboardInterrupt
+                return original(directory, max_bytes, excluded_files)
+
+            with patch.object(inventory_copies, "inspect_directory", side_effect=interrupt_once):
+                with self.assertRaises(KeyboardInterrupt):
+                    scan_resumable([root], 1024, output, checkpoint, resume=False, checkpoint_directories=1)
+            self.assertFalse(output.exists())
+            partial = json.loads(checkpoint.read_text(encoding="utf-8"))
+            self.assertEqual("partial", partial["status"])
+            self.assertTrue(partial["pending_directories"])
+
+            hits, errors, examined = scan_resumable(
+                [root], 1024, output, checkpoint, resume=True, checkpoint_directories=1,
+            )
+            expected_hits, expected_errors, expected_examined = scan([root], 1024)
+            self.assertEqual(expected_hits, sorted(hits, key=lambda hit: hit.path.casefold()))
+            self.assertEqual(expected_errors, errors)
+            self.assertEqual(expected_examined, examined)
+            write_report(output, [root], hits, errors, examined)
+            final = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual("complete", final["status"])
+            self.assertEqual(2, final["hit_count"])
+
+    def test_resume_rejects_changed_scan_parameters_and_escaped_frontier(self) -> None:
+        with tempfile.TemporaryDirectory() as root_dir, tempfile.TemporaryDirectory() as audit_dir:
+            root = Path(root_dir)
+            output = Path(audit_dir) / "inventory.json"
+            checkpoint = Path(audit_dir) / "inventory.checkpoint.json"
+            scan_resumable([root], 1024, output, checkpoint, resume=False, checkpoint_directories=1)
+            with self.assertRaisesRegex(ValueError, "max_text_bytes"):
+                scan_resumable([root], 2048, output, checkpoint, resume=True)
+            payload = json.loads(checkpoint.read_text(encoding="utf-8"))
+            payload["status"] = "partial"
+            payload["pending_directories"] = [str(Path(audit_dir))]
+            checkpoint.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "outside scan roots"):
+                scan_resumable([root], 1024, output, checkpoint, resume=True)
+
+    def test_overlapping_roots_are_rejected_before_checkpoint(self) -> None:
+        with tempfile.TemporaryDirectory() as root_dir, tempfile.TemporaryDirectory() as audit_dir:
+            root = Path(root_dir)
+            child = root / "child"
+            child.mkdir()
+            output = Path(audit_dir) / "inventory.json"
+            checkpoint = Path(audit_dir) / "inventory.checkpoint.json"
+            with self.assertRaisesRegex(ValueError, "overlap"):
+                scan_resumable([root, child], 1024, output, checkpoint, resume=False)
+            self.assertFalse(checkpoint.exists())
+
+    def test_scanner_excludes_its_own_checkpoint_inside_scanned_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "AGENTS.md").write_text("project notes", encoding="utf-8")
+            output = root / "WPAI Constitution" / "inventory.json"
+            checkpoint = Path(str(output) + ".checkpoint.json")
+            hits, errors, examined = scan_resumable(
+                [root], 1024, output, checkpoint, resume=False, checkpoint_directories=1,
+            )
+            self.assertEqual(1, examined)
+            self.assertEqual(1, len(hits))
+            self.assertEqual([], errors)
+            self.assertEqual("AGENTS.md", Path(hits[0].path).name)
 
 
 if __name__ == "__main__":
