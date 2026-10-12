@@ -22,6 +22,16 @@ HISTORICAL_RECOVERY = re.compile(
     r"^\s*(?:[-*]\s*)?Historical recovery \(not active law\):\s*`?git show [0-9a-f]{40}:[^`]+`?\s*$",
     re.IGNORECASE,
 )
+CANONICAL_CHECKOUT = re.compile(
+    r"^\s*repository\s*:\s*['\"]?MrWizard94-Compile/Agents-Constitution['\"]?\s*(?:#.*)?$",
+    re.IGNORECASE,
+)
+PINNED_REF = re.compile(r"^\s*ref\s*:\s*['\"]?[0-9a-f]{40}['\"]?\s*(?:#.*)?$", re.IGNORECASE)
+FLOATING_SOURCE_URL = re.compile(
+    r"https?://(?:raw\.githubusercontent\.com/MrWizard94-Compile/Agents-Constitution/"
+    r"|github\.com/MrWizard94-Compile/Agents-Constitution/(?:raw|blob)/)(?:main|master)/",
+    re.IGNORECASE,
+)
 MAX_TEXT_BYTES = 4 * 1024 * 1024
 
 
@@ -33,6 +43,34 @@ def project_files(root: Path) -> list[Path]:
     paths = [root / Path(item.decode("utf-8", errors="surrogateescape")) for item in result.stdout.split(b"\0") if item]
     paths.extend(root / name for name in ("SOUL.md", "SOULv2.0.0.md") if (root / name).exists())
     return sorted(set(paths))
+
+
+def workflow_source_findings(relative: str, lines: list[str]) -> list[tuple[str, str, int]]:
+    """Catch literal floating source references without interpreting arbitrary YAML."""
+    findings: list[tuple[str, str, int]] = []
+    for index, line in enumerate(lines):
+        if FLOATING_SOURCE_URL.search(line):
+            findings.append(("FLOATING_CANONICAL_URL", relative, index + 1))
+        if not CANONICAL_CHECKOUT.fullmatch(line):
+            continue
+        indentation = len(line) - len(line.lstrip(" \t"))
+        start = index
+        while start > 0:
+            candidate = lines[start - 1]
+            depth = len(candidate) - len(candidate.lstrip(" \t"))
+            if depth < indentation and candidate.lstrip().startswith("- "):
+                break
+            start -= 1
+        end = index + 1
+        while end < len(lines):
+            candidate = lines[end]
+            depth = len(candidate) - len(candidate.lstrip(" \t"))
+            if depth < indentation and candidate.lstrip().startswith("- "):
+                break
+            end += 1
+        if not any(PINNED_REF.fullmatch(candidate) for candidate in lines[start:end]):
+            findings.append(("UNPINNED_CANONICAL_CHECKOUT", relative, index + 1))
+    return findings
 
 
 def inspect(root: Path) -> list[tuple[str, str, int]]:
@@ -63,12 +101,15 @@ def inspect(root: Path) -> list[tuple[str, str, int]]:
             findings.append(("TEXT_TOO_LARGE_UNCHECKED", relative, 0))
             continue
         text = path.read_text(encoding="utf-8-sig", errors="replace")
+        lines = text.splitlines()
         if FULL_SOUL.search(text):
             findings.append(("FULL_SOUL_COPY", relative, 1))
+        if relative.startswith(".github/workflows/") and path.suffix.casefold() in {".yml", ".yaml"}:
+            findings.extend(workflow_source_findings(relative, lines))
         if path.suffix.casefold() in {".js", ".mjs", ".cjs", ".ts", ".tsx"} and PROMPT_CONSUMER.search(text):
             for match in ACTIVE_SOUL_READ.finditer(text):
                 findings.append(("ACTIVE_LEGACY_PROMPT", relative, text.count("\n", 0, match.start()) + 1))
-        for number, line in enumerate(text.splitlines(), start=1):
+        for number, line in enumerate(lines, start=1):
             if LEGACY.search(line) and not (path.suffix.casefold() == ".md" and HISTORICAL_RECOVERY.fullmatch(line)):
                 findings.append(("LEGACY_REFERENCE", relative, number))
     return findings

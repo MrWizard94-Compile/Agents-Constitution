@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.3.1 — 2026-10-12 (candidate)
+
+- The project adoption audit now rejects GitHub workflow checkouts of the
+  canonical repository without a literal 40-character commit pin and detects
+  floating `main`/`master` raw-source URLs in workflows. This closes an SSOT
+  drift path while leaving ordinary documentation links untouched.
+- Documented the audit's static limit: dynamic source fetches and acceptance
+  of a syntactically pinned SHA still require human/source verification.
+
 ## 6.3.0 — 2026-10-12 (candidate)
 
 - Added protected `CONST-CRAFT-001` against AI slop across code, documents,
