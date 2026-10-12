@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.2.1"
+  skill-version: "6.3.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 

@@ -18,6 +18,18 @@ class SourceValidationTests(unittest.TestCase):
     def test_current_source_valid(self):
         self.assertEqual(VALIDATOR.validate(ROOT), [])
 
+    def test_craft_rule_rejects_missing_or_self_certified_oracle(self):
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.craft_contract_errors(agents), [])
+        self.assertIn(
+            "CONST-CRAFT-001 detailed rule missing",
+            VALIDATOR.craft_contract_errors(agents.replace("### CONST-CRAFT-001", "### Retired rule")),
+        )
+        self.assertIn(
+            "CONST-CRAFT-001 missing operational safeguard: independent oracle",
+            VALIDATOR.craft_contract_errors(agents.replace("independent oracle", "self review")),
+        )
+
     def test_missing_binding_file_fails(self):
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary) / "source"

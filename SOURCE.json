@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "name": "wpai-constitution",
-  "skill_version": "6.2.1",
+  "skill_version": "6.3.0",
   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
   "default_branch": "main",
