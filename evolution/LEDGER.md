@@ -2,6 +2,28 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Reject floating constitutional source in project CI
+
+**Observed gap:** a migrated project could pass the old-copy audit while its
+CI fetched `MrWizard94-Compile/Agents-Constitution` from a floating branch.
+The governing source could change between otherwise identical project builds,
+undermining the frozen-invocation and one-SSOT contract.
+
+**Meaningful change:** `tools/check-adoption.py` now inspects GitHub workflow
+steps for literal canonical-repository checkouts and fails when the same step
+lacks a full commit SHA. It also flags floating `main`/`master` canonical raw
+URLs in workflows. Tests cover an unrelated sibling-step pin, a genuine pin,
+and a documentation link that must remain permissible.
+
+**Future failure reduced:** project adoption CI cannot silently track a moving
+constitutional branch while claiming a reproducible, validated law snapshot.
+
+**Review oracle:** an unpinned canonical checkout or raw `main` URL must fail;
+a same-step 40-hex ref must pass, while an unrelated step's ref must not rescue
+the unpinned checkout. The static check cannot prove that a full SHA is an
+accepted `main` commit or detect every dynamic fetch, so source validation and
+manual CI review remain necessary.
+
 ## 2026-10-12 — Require purpose-fit substance in every agent artifact
 
 **Observed gap:** completeness, zero warnings, test evidence, and a quality

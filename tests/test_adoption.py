@@ -90,6 +90,40 @@ class AdoptionCheckTests(unittest.TestCase):
             source.write_text("export const legacyDraft = localStorage.getItem('soul_config');\n", encoding="utf-8")
             self.assertEqual(ADOPTION.inspect(root), [])
 
+    def test_requires_literal_commit_pin_for_canonical_workflow_checkout(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            workflow = root / ".github" / "workflows" / "ci.yml"
+            workflow.parent.mkdir(parents=True)
+            workflow.write_text(
+                "jobs:\n  verify:\n    steps:\n"
+                "      - uses: actions/checkout@v4\n"
+                "        with:\n          repository: MrWizard94-Compile/Agents-Constitution\n"
+                "          ref: main\n"
+                "      - uses: actions/checkout@v4\n"
+                "        with:\n          ref: " + "a" * 40 + "\n",
+                encoding="utf-8",
+            )
+            self.assertIn(("UNPINNED_CANONICAL_CHECKOUT", ".github/workflows/ci.yml", 6), ADOPTION.inspect(root))
+            workflow.write_text(workflow.read_text(encoding="utf-8").replace("          ref: main\n", ""), encoding="utf-8")
+            self.assertIn(("UNPINNED_CANONICAL_CHECKOUT", ".github/workflows/ci.yml", 6), ADOPTION.inspect(root))
+            workflow.write_text(workflow.read_text(encoding="utf-8").replace("          repository: MrWizard94-Compile/Agents-Constitution\n", "          repository: MrWizard94-Compile/Agents-Constitution\n          ref: ${{ env.CONSTITUTION_REF }}\n"), encoding="utf-8")
+            self.assertIn(("UNPINNED_CANONICAL_CHECKOUT", ".github/workflows/ci.yml", 6), ADOPTION.inspect(root))
+            workflow.write_text(workflow.read_text(encoding="utf-8").replace("ref: ${{ env.CONSTITUTION_REF }}", "ref: " + "b" * 40), encoding="utf-8")
+            self.assertEqual(ADOPTION.inspect(root), [])
+
+    def test_detects_floating_canonical_raw_url_only_in_workflows(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            url = "https://raw.githubusercontent.com/MrWizard94-Compile/Agents-Constitution/main/SKILL.md"
+            (root / "README.md").write_text(url + "\n", encoding="utf-8")
+            workflow = root / ".github" / "workflows" / "ci.yml"
+            workflow.parent.mkdir(parents=True)
+            workflow.write_text("run: curl " + url + "\n", encoding="utf-8")
+            self.assertEqual(ADOPTION.inspect(root), [("FLOATING_CANONICAL_URL", ".github/workflows/ci.yml", 1)])
+
 
 if __name__ == "__main__":
     unittest.main()
