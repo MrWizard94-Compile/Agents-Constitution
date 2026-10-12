@@ -3,6 +3,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 import json
+import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -98,6 +99,54 @@ class InventoryCopiesTests(unittest.TestCase):
             payload["status"] = "partial"
             payload["pending_directories"] = [str(Path(audit_dir))]
             checkpoint.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "outside scan roots"):
+                scan_resumable([root], 1024, output, checkpoint, resume=True)
+
+    def test_resume_accepts_a_frontier_on_another_windows_drive(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            first = base / "first"
+            second = base / "second"
+            first.mkdir()
+            second.mkdir()
+            output = base / "inventory.json"
+            checkpoint = base / "inventory.checkpoint.json"
+            progress = inventory_copies._fresh_progress([first, second], 1024, output)
+            checkpoint.write_text(json.dumps(progress), encoding="utf-8")
+            original_commonpath = os.path.commonpath
+            normalized_first = os.path.normcase(os.path.realpath(first))
+
+            def distinct_drives(paths: tuple[str, str]) -> str:
+                if paths[1] == normalized_first and paths[0] != normalized_first:
+                    raise ValueError("Paths don't have the same drive")
+                return original_commonpath(paths)
+
+            with patch.object(inventory_copies.os.path, "commonpath", side_effect=distinct_drives):
+                hits, errors, examined = scan_resumable(
+                    [first, second], 1024, output, checkpoint, resume=True,
+                    checkpoint_directories=1,
+                )
+            self.assertEqual([], hits)
+            self.assertEqual([], errors)
+            self.assertEqual(0, examined)
+            final_checkpoint = json.loads(checkpoint.read_text(encoding="utf-8"))
+            self.assertEqual("complete", final_checkpoint["status"])
+
+    def test_resume_rejects_a_frontier_through_a_parent_link(self) -> None:
+        with tempfile.TemporaryDirectory() as root_dir, tempfile.TemporaryDirectory() as outside_dir:
+            root = Path(root_dir)
+            outside = Path(outside_dir)
+            (outside / "child").mkdir()
+            link = root / "link"
+            try:
+                link.symlink_to(outside, target_is_directory=True)
+            except OSError:
+                self.skipTest("directory symlinks are unavailable")
+            output = root / "inventory.json"
+            checkpoint = root / "inventory.checkpoint.json"
+            progress = inventory_copies._fresh_progress([root], 1024, output)
+            progress["pending_directories"] = [str(link / "child")]
+            checkpoint.write_text(json.dumps(progress), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "outside scan roots"):
                 scan_resumable([root], 1024, output, checkpoint, resume=True)
 

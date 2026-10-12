@@ -81,6 +81,10 @@ as recovery evidence. Access errors and skipped filesystem links still bound
 the completeness claim; inspect them before any cleanup. Use a new output name
 for a new scan, rather than replacing a prior report.
 
+Resume validates each queued directory against every named root independently;
+unrelated Windows drive letters do not abort the scan, while a queued path
+outside all roots (including through a reparse-point parent) is rejected.
+
 The public repository deliberately omits raw private project variants,
 machine-specific paths, credentials, and local cleanup manifests. See the
 source inventory for what is and is not yet reconciled.

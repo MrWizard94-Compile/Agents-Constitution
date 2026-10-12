@@ -2,6 +2,28 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Resume a checkpoint across Windows drive roots
+
+**Observed gap:** a real `C:\`, `D:\`, `E:\` copy inventory saved 94,000
+completed directories, but `--resume` failed with `Paths don't have the same
+drive` while checking the pending frontier against the first nonmatching root.
+The checkpoint was intact; restarting the all-drive scan would waste work and
+weaken cleanup evidence.
+
+**Meaningful change:** each pending path is checked against the named roots
+independently. A cross-drive comparison is a nonmatch, not an abort. Resume
+also resolves parent links before containment checking and rejects relative or
+out-of-root frontier entries.
+
+**Future failure reduced:** interrupted multi-volume inventories recover from
+their checkpoint without repeating completed traversal or relaxing the
+frontier's filesystem boundary.
+
+**Review oracle:** simulate a Windows cross-drive `commonpath` error for the
+first root with a pending path under the second. Resume must complete; an
+outside or link-escaped path must still fail. Then resume the real retained
+checkpoint and inspect the final report and access-error count.
+
 ## 2026-10-12 — Make PC copy inventory resumable and completion-safe
 
 **Observed gap:** an all-drive inventory that examined millions of files

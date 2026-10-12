@@ -269,10 +269,22 @@ def _load_progress(checkpoint: Path, roots: list[Path], max_text_bytes: int, out
         pending = progress["pending_directories"]
         if not isinstance(pending, list) or any(not isinstance(item, str) for item in pending):
             raise ValueError("checkpoint has invalid pending directories")
-        normalized_roots = [os.path.normcase(os.path.abspath(root)) for root in roots]
+        normalized_roots = [os.path.normcase(os.path.realpath(root)) for root in roots]
         for item in pending:
-            candidate = os.path.normcase(os.path.abspath(item))
-            if not any(os.path.commonpath((candidate, root)) == root for root in normalized_roots):
+            if not os.path.isabs(item):
+                raise ValueError("checkpoint directory is outside scan roots")
+            candidate = os.path.normcase(os.path.realpath(item))
+            within_root = False
+            for root in normalized_roots:
+                try:
+                    common = os.path.commonpath((candidate, root))
+                except ValueError:
+                    # Windows drives have no common path; another root may match.
+                    continue
+                if common == root:
+                    within_root = True
+                    break
+            if not within_root:
                 raise ValueError("checkpoint directory is outside scan roots")
         for hit in progress["hits"]:
             Hit(**hit)

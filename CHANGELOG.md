@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.4.1 — 2026-10-12 (candidate)
+
+- Corrected resumable inventory validation for multiple Windows drive roots.
+  A queued directory on `D:` or `E:` now continues past a nonmatching `C:`
+  root; an out-of-root or link-escaped frontier is still rejected. Added a
+  cross-drive regression test so a long scan's checkpoint remains usable.
+
 ## 6.4.0 — 2026-10-12 (candidate)
 
 - The local copy inventory now checkpoints completed directories atomically,
