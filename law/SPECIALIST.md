@@ -76,6 +76,11 @@ For mixins, bytecode, reflection, unsafe memory, native code, and similarly
 fragile techniques, inspect exact-version call paths, arguments, ordering,
 and real lifecycle entry points before installation. Compilation does not
 prove execution.
+Include alternate methods and direct state assignments that bypass the
+named target method. Where practical, lock the path and argument contract
+in a versioned integration test. For teardown or reload repairs, verify the
+hook executes on normal exit and that re-entry still works; helper tests and
+a clean build alone are not runtime acceptance.
 
 ### LOW-REASON-001 — Justify the technique
 

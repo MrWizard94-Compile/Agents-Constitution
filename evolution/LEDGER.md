@@ -2,6 +2,36 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Close runtime claims against the actual consumer
+
+**Observed gap:** legacy PR #10 recorded several real failure modes, but it
+targeted the retired 5.x skill architecture and conflicted with accepted 6.x
+`main`. The 6.1 law retained its lifecycle and diagnostic principles while
+omitting concrete capacity/fallback, serialized and declarative asset,
+mutable-cache, sample-attribution, and indivisible-work checks. Closing the
+old PR without porting those would lose useful quality protections.
+
+**Meaningful change:** the existing engineering, security, and specialist
+homes now require exact-version consumer limits and fallback semantics,
+minimal digest-guarded asset repair, real packaged and lifecycle behavior,
+mutation-complete cache invalidation, sample and workload attribution, and
+capture-specific safeguards. The skill points to those homes rather than
+copying a large case-specific checklist into its root.
+
+**Future failure reduced:** an agent is less likely to ship a serializable but
+unusable conversion, dead lifecycle hook, stale cache, content-deleting warning
+fix, unsupported optimization claim, or intrusive diagnostic leak while
+calling source QA runtime acceptance.
+
+**Review oracle:** in a representative fixture, boundary inputs must preserve
+the converter's original fallback and load in the actual consumer; a rebuild
+must invalidate a cache without changing equality semantics; normal exit and
+re-entry must execute a low-level hook; and a truncated profiler stack must
+remain unattributed. If the rule text permits a Done claim from only unit
+tests, package parsing, or selected samples in those cases, this port is
+insufficient. Source validation and unit tests protect structure, not these
+runtime truths.
+
 ## 2026-10-12 — Trace quality claims to source and independent evidence
 
 **Observed gap:** plausible generated code, green test badges, polished review

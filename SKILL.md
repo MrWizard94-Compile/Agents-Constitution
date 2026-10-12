@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.1.0"
+  skill-version: "6.2.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -97,6 +97,12 @@ third-party fixture without the product under test before attributing its
 failure or success. Separate first independent load failures from cascades.
 A copied dependency or catalog scan is not runtime acceptance; relaunch and
 exercise the relevant flow.
+
+For generated or serialized content, declarative assets, low-level hooks,
+mutable hot-path caches, and intrusive diagnostics, apply the scoped consumer
+and lifecycle checks in `law/ENGINEERING.md`, `law/SECURITY.md`, and
+`law/SPECIALIST.md`. Keep source, packaged bytes, live consumer behavior,
+and performance attribution separate; none proves the others by itself.
 
 When the user requests a final, professional, or production-ready result,
 target the highest quality reasonably achievable within the authorized scope

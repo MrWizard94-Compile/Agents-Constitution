@@ -1,6 +1,16 @@
 # Changelog
 
-## 6.1.0 — 2026-10-12 (candidate)
+## 6.2.0 — 2026-10-12 (candidate)
+
+- Ported the useful, still-unmerged runtime integrity safeguards from legacy
+  PR #10 into current one-home law: generated-content capacity and fallback,
+  serialized/declarative asset closure, low-level lifecycle paths, mutable
+  hot-path caches, intrusive diagnostic hygiene, and defensible performance
+  attribution. These are scoped obligations, not a return to the 5.x loader.
+- Clarified that a build, synthetic fixture, selected profiler stack, source
+  package, or benchmark cannot stand in for the actual runtime consumer.
+
+## 6.1.0 — 2026-10-12
 
 - Added an end-to-end evidence-integrity profile: verify generated API claims
   against the installed stack, inspect test and CI diffs before trusting green
