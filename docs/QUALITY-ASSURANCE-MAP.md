@@ -14,6 +14,7 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
 
 | Dimension | A useful falsification question | Constitutional home |
 |---|---|---|
+| Purpose-fit and craft | If presentation and volume are stripped away, does each material part still serve the brief and real intended use, without invented detail or generic filler? Has the delivered form been examined? | `CONST-CRAFT-001`; `CONST-COMPLETE-001` |
 | Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |
 | Stack and factual correctness | Do the imports, symbols, versions, contracts, and actual runtime match the implementation's claims? | `ENG-STACK-001`; `ENG-RESEARCH-001`; `ENG-FW-001` |
 | Test integrity | Would the suite still fail if the defect were reintroduced, or has a skip, fixture, mock, assertion, or CI gate concealed it? | `TEST-QUALITY-001`; `TEST-REGRESSION-001` |
@@ -40,8 +41,9 @@ test method, and result for every actual conformance claim.
   product-quality model for requirements and evaluation. This map is an
   adaptation, not a reproduction or certification of that standard.
 - [NIST AI 600-1](https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence)
-  identifies confident false content as a generative-AI risk; this motivates
-  independent verification of generated technical claims.
+  identifies confident false content, including output that diverges from a
+  prompt, as a generative-AI risk; this motivates independent verification of
+  generated claims and brief fidelity.
 - [NIST SP 800-218](https://csrc.nist.gov/pubs/sp/800/218/final) provides a
   secure-development framework; the Constitution applies its risk-reduction
   logic to agent-authored work without asserting NIST endorsement.

@@ -1,6 +1,15 @@
 # Changelog
 
-## 6.2.0 — 2026-10-12 (candidate)
+## 6.3.0 — 2026-10-12 (candidate)
+
+- Added protected `CONST-CRAFT-001` against AI slop across code, documents,
+  designs, data, and media. Purpose-fit, substantive content, delivered-form
+  inspection, and an independent or human review oracle are now explicit
+  before a Done claim; superficial polish and volume cannot substitute.
+- Connected the rule to the quality profile, Section 0 gate, source validator,
+  and regression test without adding a parallel rule home.
+
+## 6.2.0 — 2026-10-12
 
 - Ported the useful, still-unmerged runtime integrity safeguards from legacy
   PR #10 into current one-home law: generated-content capacity and fallback,

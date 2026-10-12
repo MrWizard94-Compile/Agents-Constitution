@@ -1,6 +1,6 @@
 # WPAI delivery SOP
 
-**Version:** 3.1.0
+**Version:** 3.2.0
 
 **Authority:** `AGENTS.md`
 **Applies to:** Human-directed work under the WPAI Constitution
@@ -30,6 +30,8 @@ project's actual requirements. Risk scaling changes the depth of relevant
 checks, not whether a known required check may be skipped. If a necessary
 oracle is unavailable, report the acceptance gate as unmet and arrange a
 safe next step; do not call the result Done.
+For every medium, include the intended-use and substance check in
+`CONST-CRAFT-001`; a polished surface is not an acceptance criterion by itself.
 
 ## 2. Inventory and baseline
 
@@ -74,6 +76,8 @@ tests, fixtures, mocks, skips, and CI gates before trusting green status. Use
 an independent oracle for consequential behavior, such as a real consumer,
 reference implementation, measured workload, accessibility inspection, or
 human acceptance, selected by the quality profile.
+Inspect non-code work in its delivered form as well; a source file or prompt
+alone cannot establish the quality of a rendered, heard, or experienced result.
 
 ## 7. Audit the evidence
 

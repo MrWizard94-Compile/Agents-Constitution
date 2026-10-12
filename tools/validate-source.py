@@ -15,7 +15,7 @@ HEADING_ID_RE = re.compile(r"^#{2,3} ([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-\d{3})\b", r
 LINK_RE = re.compile(r"(?<!!)\[[^]]+\]\(([^)]+)\)")
 PROTECTED = {
     "CONST-AUTH-001", "CONST-COMPLETE-001", "CONST-DEP-001",
-    "CONST-DONE-001", "CONST-GATE-001", "ENG-WARN-001",
+    "CONST-DONE-001", "CONST-GATE-001", "CONST-CRAFT-001", "ENG-WARN-001",
     "TEST-BEHAVIOR-001", "DOC-SYNC-001", "SEC-INPUT-001",
     "GOV-SSOT-001", "GOV-EVOLVE-001",
 }
@@ -38,6 +38,20 @@ def local_links(path: Path, root: Path, body: str) -> list[str]:
         if not resolved.is_relative_to(root.resolve()) or not resolved.exists():
             errors.append(f"broken local link in {path.relative_to(root)}: {raw}")
     return errors
+
+
+def craft_contract_errors(agents: str) -> list[str]:
+    """Guard the operational anti-slop rule, not just its registry entry."""
+    section = re.search(
+        r"^### CONST-CRAFT-001\b.*?\n(.*?)(?=^## |\Z)",
+        agents,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["CONST-CRAFT-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = ("ai slop", "generic filler", "real intended use", "independent oracle", "human-accepted")
+    return [f"CONST-CRAFT-001 missing operational safeguard: {term}" for term in required if term not in normalized]
 
 
 def validate(root: Path = ROOT) -> list[str]:
@@ -99,6 +113,7 @@ def validate(root: Path = ROOT) -> list[str]:
     for rule in PROTECTED:
         if rule not in agents or rule not in registry:
             errors.append(f"protected rule missing from entry/registry: {rule}")
+    errors.extend(craft_contract_errors(agents))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
         errors.append("ledger must say ledger-only edits never count")
 

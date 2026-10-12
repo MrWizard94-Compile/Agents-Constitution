@@ -2,6 +2,33 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Require purpose-fit substance in every agent artifact
+
+**Observed gap:** completeness, zero warnings, test evidence, and a quality
+profile can still yield a superficially polished artifact that misses the
+director's actual brief, contains invented details, or pads the delivery with
+generic filler. The existing rules do not explicitly reject this failure
+across creative and non-code media as well as software.
+
+**Meaningful change:** protected `CONST-CRAFT-001` defines AI slop as a
+purpose-fit and substance defect, requires review of the delivered form and
+material claims against the brief, and ties consequential claims to an
+independent oracle. It distinguishes a review-ready artifact from one the
+director has accepted when taste or lived use is decisive. The Section 0 gate,
+SOP, and quality map reference this one canonical home.
+
+**Future failure reduced:** agents are less likely to trade working substance
+for plausible prose, ornament, volume, or invented specificity, or to claim
+human acceptance from their own self-review.
+
+**Review oracle:** give an agent a brief for a functioning UI and a beautiful
+but nonfunctional mockup, or a source-constrained report with a plausible
+invented fact. In either case it must withhold Done and name the failed
+real-use or independent-source check. For a subjective media brief, it must
+deliver an inspectable asset and call it review-ready until the director's
+feedback is incorporated. The validator test guards the clause's core
+operational wording but does not claim to evaluate artistic merit.
+
 ## 2026-10-12 — Close runtime claims against the actual consumer
 
 **Observed gap:** legacy PR #10 recorded several real failure modes, but it
