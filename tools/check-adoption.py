@@ -16,6 +16,12 @@ from pathlib import Path
 TEXT_SUFFIXES = {".md", ".mdc", ".json", ".toml", ".yaml", ".yml", ".ps1", ".py", ".js", ".mjs", ".cjs", ".ts", ".tsx"}
 LEGACY = re.compile(r"AGENTS Constitution|skills[\\/]+agents-constitution|name:\s*agents-constitution|SOULv2\.0\.0\.md|verify-pack\.ps1|gate_check\.py", re.IGNORECASE)
 FULL_SOUL = re.compile(r"(?:^# SOUL\.md\s*[—-]\s*The Constitution of an AI Empire|^## 40\. Constitutional Integrity)", re.MULTILINE)
+ACTIVE_SOUL_READ = re.compile(r"(?:localStorage|sessionStorage)\.getItem\(\s*['\"]soul_config['\"]\s*\)")
+PROMPT_CONSUMER = re.compile(r"\bsystemPrompt\b|\brole\s*:\s*['\"]system['\"]|\.chat\.completions\.create\(")
+HISTORICAL_RECOVERY = re.compile(
+    r"^\s*(?:[-*]\s*)?Historical recovery \(not active law\):\s*`?git show [0-9a-f]{40}:[^`]+`?\s*$",
+    re.IGNORECASE,
+)
 MAX_TEXT_BYTES = 4 * 1024 * 1024
 
 
@@ -59,8 +65,11 @@ def inspect(root: Path) -> list[tuple[str, str, int]]:
         text = path.read_text(encoding="utf-8-sig", errors="replace")
         if FULL_SOUL.search(text):
             findings.append(("FULL_SOUL_COPY", relative, 1))
+        if path.suffix.casefold() in {".js", ".mjs", ".cjs", ".ts", ".tsx"} and PROMPT_CONSUMER.search(text):
+            for match in ACTIVE_SOUL_READ.finditer(text):
+                findings.append(("ACTIVE_LEGACY_PROMPT", relative, text.count("\n", 0, match.start()) + 1))
         for number, line in enumerate(text.splitlines(), start=1):
-            if LEGACY.search(line):
+            if LEGACY.search(line) and not (path.suffix.casefold() == ".md" and HISTORICAL_RECOVERY.fullmatch(line)):
                 findings.append(("LEGACY_REFERENCE", relative, number))
     return findings
 
@@ -80,7 +89,7 @@ def main() -> int:
     if findings:
         print(f"FAIL: {len(findings)} unresolved Constitution adoption findings")
         return 1
-    print("PASS: no tracked legacy Constitution consumer or top-level pack found")
+    print("PASS: no detected active legacy Constitution consumer or top-level pack; indirect data flow still requires review")
     return 0
 
 

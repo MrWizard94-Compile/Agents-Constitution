@@ -2,6 +2,29 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Detect active browser-stored shadow law
+
+**Observed gap:** a project could delete its full SOUL file yet still read a
+browser-stored `soul_config` value into a model's system prompt. The existing
+adoption audit saw the old filename but missed this live consumer. Conversely,
+an exact Git-history recovery instruction was reported as a live reference.
+
+**Meaningful change:** `tools/check-adoption.py` now fails on a direct legacy
+storage read in a JavaScript/TypeScript prompt-consuming module. It permits a
+narrowly labeled, full-commit Git recovery instruction in Markdown while
+continuing to flag ordinary legacy references. Browser data may be preserved
+for export without remaining active agent law.
+
+**Future failure reduced:** a migration cannot pass merely by removing the
+tracked monolith while a local runtime keeps enforcing it; projects also
+retain a precise rollback path without hiding active consumers.
+
+**Review oracle:** a fixture with `localStorage.getItem('soul_config')` and a
+system prompt in the same module must fail, while an inert export helper and
+explicit commit-pinned historical recovery line pass. This static check does
+not prove absence of indirect data flow; consumer review and runtime testing
+remain required.
+
 ## 2026-10-12 — Close runtime claims against the actual consumer
 
 **Observed gap:** legacy PR #10 recorded several real failure modes, but it
