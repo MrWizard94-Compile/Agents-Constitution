@@ -9,6 +9,14 @@
 - Connected the rule to the quality profile, Section 0 gate, source validator,
   and regression test without adding a parallel rule home.
 
+## 6.2.1 — 2026-10-12
+
+- Strengthened the read-only project adoption audit to identify old
+  browser-stored SOUL text used as a live model system prompt, even when the
+  old file is no longer present. Precisely marked, commit-pinned historical
+  recovery instructions remain allowed so cleanup does not erase the
+  rollback path.
+
 ## 6.2.0 — 2026-10-12
 
 - Ported the useful, still-unmerged runtime integrity safeguards from legacy

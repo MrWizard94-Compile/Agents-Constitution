@@ -62,6 +62,34 @@ class AdoptionCheckTests(unittest.TestCase):
             (root / "AGENTS Constitution" / "docs" / "migration").mkdir(parents=True)
             self.assertEqual(ADOPTION.inspect(root), [])
 
+    def test_detects_legacy_storage_sent_to_runtime_prompt(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            source = root / "src" / "chat.ts"
+            source.parent.mkdir()
+            source.write_text(
+                "const soul = localStorage.getItem('soul_config');\n"
+                "const systemPrompt = `Bound by this constitution: ${soul}`;\n"
+                "engine.chat.completions.create({messages: [{role: 'system', content: systemPrompt}]});\n",
+                encoding="utf-8",
+            )
+            findings = ADOPTION.inspect(root)
+            self.assertIn(("ACTIVE_LEGACY_PROMPT", "src/chat.ts", 1), findings)
+
+    def test_allows_explicit_historical_recovery_and_inert_legacy_export(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            (root / "README.md").write_text(
+                "Historical recovery (not active law): `git show " + "a" * 40 + ":public/SOULv2.0.0.md`\n",
+                encoding="utf-8",
+            )
+            source = root / "src" / "persona.ts"
+            source.parent.mkdir()
+            source.write_text("export const legacyDraft = localStorage.getItem('soul_config');\n", encoding="utf-8")
+            self.assertEqual(ADOPTION.inspect(root), [])
+
 
 if __name__ == "__main__":
     unittest.main()
