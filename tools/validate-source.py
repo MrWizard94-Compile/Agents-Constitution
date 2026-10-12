@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -20,7 +21,8 @@ PROTECTED = {
 }
 MINIMUM_MIRROR = {
     "SKILL.md", "AGENTS.md", "SOP.md", "VERSION", "SOURCE.json",
-    "references/always-load.md", "governance/EVOLUTION.md",
+    "references/always-load.md", "docs/QUALITY-ASSURANCE-MAP.md",
+    "governance/EVOLUTION.md",
     "governance/RULE-REGISTRY.md", "law/ENGINEERING.md", "law/SECURITY.md",
     "law/OPERATIONS.md", "law/COLLABORATION.md", "law/SPECIALIST.md",
 }
@@ -136,8 +138,17 @@ def validate(root: Path = ROOT) -> list[str]:
     for path in docs:
         if path.is_file():
             errors.extend(local_links(path, root, path.read_text(encoding="utf-8-sig")))
-    if list(root.rglob(".GENERATED-MIRROR.json")):
-        errors.append("generated mirror provenance must not enter canonical source")
+    if (root / ".GENERATED-MIRROR.json").exists():
+        errors.append("canonical root contains generated mirror provenance")
+    try:
+        tracked = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "--cached", "-z"],
+            check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        ).stdout
+        if any(Path(item.decode("utf-8", errors="surrogateescape")).name == ".GENERATED-MIRROR.json" for item in tracked.split(b"\0") if item):
+            errors.append("generated mirror provenance is tracked in canonical source")
+    except (OSError, subprocess.CalledProcessError):
+        pass  # Archive/fixture validation can run without Git metadata.
     return errors
 
 

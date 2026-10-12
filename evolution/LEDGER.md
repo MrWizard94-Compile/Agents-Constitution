@@ -2,6 +2,34 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Trace quality claims to source and independent evidence
+
+**Observed gap:** plausible generated code, green test badges, polished review
+findings, and a canonical pointer can all be false assurance. An agent could
+reference an invented API, weaken tests, repeat a phantom finding, drift after
+compaction, or leave CI and a UI consuming an obsolete vendored pack while
+reporting a high-quality result.
+
+**Meaningful change:** the SOP now starts with a risk-scaled quality profile
+and requires independent evidence for consequential claims; relevant law
+requires installed-version API checks, test/gate diff review, reproduced
+review findings, context reconciliation, least privilege, and outage
+checkpoints. `MIG-CLEAN-001` closes the source end of this evidence chain with
+a consumer sweep and pinned canonical CI source. The read-only
+`tools/check-adoption.py` checks project files and full SOUL copies without
+confusing the unchanged GitHub repository URL with the retired skill name.
+
+**Future failure reduced:** agents are less likely to present an apparently
+clean but unverified result, silently skip a required acceptance check, retain
+shadow law, or break quality gates while removing a duplicate pack.
+
+**Review oracle:** a fixture with a vendored folder or stale CI command must
+fail; a pointer containing only the canonical repository URL must pass. In a
+project review, an invented API, hidden test skip, unreproduced finding, or
+missing required live flow must prevent a Done claim even if formatting and
+unit tests are green. If the profile permits such a claim, this amendment
+failed its purpose.
+
 ## 2026-10-11 — Bind skill and law to one verified snapshot
 
 **Observed gap:** the old canonical skill was current while the binding pack

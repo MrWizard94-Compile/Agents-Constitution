@@ -45,6 +45,21 @@ Project adoption uses [`templates/PROJECT-POINTER.md`](templates/PROJECT-POINTER
 with project mission, stack, and acceptance in that project's own repository.
 Do not vendor editable law into each project.
 
+The [quality assurance map](docs/QUALITY-ASSURANCE-MAP.md) helps select
+domain-specific evidence and independent oracles. It does not waive Section 0
+or turn a green test result into a claim of complete acceptance.
+
+Before retiring an old project pack, run the read-only consumer audit:
+
+```powershell
+python tools/check-adoption.py <project-git-root>
+```
+
+It checks tracked and unignored project files, the top-level retired-pack
+folder, and full SOUL copies. Resolve old CI, generator, manifest, pointer,
+and UI references before the old tree is removed. A clean audit is not a
+substitute for the project's build and runtime checks.
+
 The public repository deliberately omits raw private project variants,
 machine-specific paths, credentials, and local cleanup manifests. See the
 source inventory for what is and is not yet reconciled.

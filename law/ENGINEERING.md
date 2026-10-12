@@ -29,6 +29,11 @@ For uncertain APIs, security, performance, concurrency, lifecycle, or
 deprecation behavior, consult version-specific official documentation and
 source. Cross-check conflicting claims. Mark remaining uncertainty and ask
 when it would materially change the design. Date volatile sources.
+Before relying on generated or remembered code, verify imports, symbols,
+parameters, return types, and lifecycle claims against the installed version
+or authoritative source. Syntax, plausible naming, and a clean formatter do
+not prove that an API exists or behaves as claimed. Compile or type-check the
+actual integration and exercise its relevant behavior.
 
 ### ENG-CODE-001 — Maintainable implementation
 
@@ -84,6 +89,12 @@ synthetic fixture outside the interactive entry is not runtime acceptance.
 Do not delete or weaken a valid test to make a build green. Flakiness is a
 defect; quarantine only with visible tracking and a repair plan. Retest
 affected and full suites after a correction.
+Review the test and gate diff as well as the green result: newly skipped,
+excluded, or quarantined tests; reduced assertions; altered fixtures;
+overbroad mocks of the behavior under test; relaxed thresholds; and removed
+CI jobs are potential regressions. Explain each intentional change against
+the approved contract and use an independent oracle for critical behavior.
+An all-green suite with a weakened safety net is not a pass.
 
 ## Documentation
 
