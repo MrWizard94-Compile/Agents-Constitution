@@ -49,6 +49,24 @@ Document invariants, unusual state machines, ownership, and failure behavior.
 Respect framework lifecycle, registration, event, threading, I/O, memory,
 configuration, and error propagation contracts. For a port, map behavior
 semantically rather than transplanting an incompatible pattern.
+For generated or converted content, verify the actual consumer's capacity,
+schema, and fallback policy before constructing output. A serializable value
+may still be unusable. Preserve every required input and the original
+all-or-partial conversion behavior; do not widen only a validator, discard an
+ingredient, or suppress a warning to obtain a green result. Test capacity
+boundaries and the real consumer, including reload where applicable.
+For declarative assets, trace the exact-version producer, executable program,
+dependency chain, and consumer lookup. An inactive declaration is not the
+same as missing active content. Prove absence behavior before deletion;
+verify package bytes, override precedence, and affected visuals or flows.
+For serialized fixture repair, identify the exact source entry and all fields
+representing the same logical value. Pin the original digest, make the
+smallest approved decoded change, guard the supported version, and verify
+the replacement's runtime availability, final packaged payload, and live
+load. Compose multiple approved, digest-guarded transformations explicitly;
+reject unknown conflicting copies instead of relying on filename order or
+silent last-wins selection. A no-match scan is not evidence of absence when
+encodings, keys, or entries were excluded.
 
 ### ENG-REPRO-001 — Reproducibility
 
@@ -148,6 +166,14 @@ dependency must not silently expand permissions or network access.
 
 Avoid unnecessary allocation, I/O, reflection, regular expressions, copies,
 and contention in measured hot paths. Protect correctness before speed.
+Before caching a mutable third-party lookup, enumerate the exact-version read
+and mutation surface, including public rebuilds, alternate writes, missing
+values, and equality semantics. Update or invalidate at every supported
+mutation, publish only after a successful write, and define reader/writer
+visibility. Prove stronger identity-key assumptions or retain a correct
+fallback. Verify the real transformed call path; a lookup-only benchmark
+does not establish application latency. Lock mutation coverage in executable
+contract tests and check behavior when an optional dependency is absent.
 
 ### PERF-REASON-001 — Measure before optimizing
 
@@ -155,6 +181,15 @@ State the workload and baseline, profile the real bottleneck, change one
 factor at a time when possible, compare equivalent windows, and document
 tradeoffs. An accumulated backlog is not proof of one long stall; sampled
 frames are not elapsed time.
+Align observations, logs, and traces by process and time. Classify the
+relevant samples, not just a representative stack; account for truncated
+stack depth and shared utility frames before assigning ownership. Separate
+startup, generation, settled idle, and the target interaction. For a
+component trial, pin baseline versions and configuration, install only the
+tested artifact, preserve rollback, and defer unrelated fixes until after
+the paired run. Before spreading work over ticks or batches, measure the
+largest indivisible unit and preserve ordering, ownership, completion, and
+cancellation; yielding between expensive units does not bound one unit.
 
 ### PERF-BUDGET-001 — Real constraints
 

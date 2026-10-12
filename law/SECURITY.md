@@ -80,6 +80,15 @@ environment variables, heap dumps, session files, and traces may contain
 credentials or personal data. Choose the least intrusive capture that answers
 the question, budget storage, and retain or remove artifacts only within
 authorized scope.
+For a heap/core dump, full-GC histogram, long trace, or similar intrusive
+capture, estimate pause and storage cost, check free space with margin, and
+obtain capture-specific human approval. Identify a process without exposing
+its arguments or environment when an ID suffices. Keep raw evidence out of
+commits and PRs until reviewed. Compare memory evidence at equivalent
+lifecycle points using exact class or root identities; clearing selected
+objects does not prove the whole process leak-free. Preserve material
+diagnostics unless cleanup is authorized and confirm normal re-entry after a
+retention repair. A failed observation poll does not prove a process stopped.
 
 ### OBS-NOVEL-001 — Invariant metrics
 

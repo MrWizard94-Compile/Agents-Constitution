@@ -22,6 +22,7 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
 | Reliability and operations | Does the system recover from faults, interruption, restart, and unavailable shared services without data loss or false success? | `OBS-FAIL-001`; `LIFE-TOOL-001`; `REL-UPGRADE-001` |
 | Performance and resources | Does a realistic constrained workload meet explicit time, memory, energy, and cost budgets without sacrificing correctness? | `PERF-REASON-001`; `PERF-BUDGET-001` |
 | Provenance and reproducibility | Can the delivered artifact be traced to the intended source, dependencies, build environment, and approval? | `ENG-REPRO-001`; `DEP-REPRO-001`; `REL-DETERM-001`; `GOV-SSOT-001` |
+| Runtime consumer closure | Does the actual shipped consumer load the verified bytes and exercise the proposed hook, conversion, or cache through normal lifecycle and failure paths? | `ENG-FW-001`; `TEST-DOMAIN-001`; `LOW-RISK-001`; `PERF-HOT-001` |
 | Scope and human control | Was each dependent action gated by its prerequisite, and were material architecture or public-contract changes reviewed? | `CONST-AUTH-001`; `SEC-AUTHZ-001`; `CTX-ASSUME-001` |
 | Evidence and handoff | Are findings reproduced, status claims limited to observed stages, and resumption possible after context or service loss? | `REV-PACK-002`; `CTX-SELF-001`; `CONST-DONE-001` |
 
