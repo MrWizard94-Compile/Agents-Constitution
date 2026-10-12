@@ -60,6 +60,27 @@ folder, and full SOUL copies. Resolve old CI, generator, manifest, pointer,
 and UI references before the old tree is removed. A clean audit is not a
 substitute for the project's build and runtime checks.
 
+## Inventory local Constitution copies
+
+The read-only scanner hashes candidates and records access errors. For a broad
+PC inventory, name each intended root and choose an output outside the scanned
+roots when practical:
+
+```powershell
+python -u tools/inventory_copies.py --root C:\ --root D:\ --root E:\ --output "C:\WPAI\WPAI Constitution\.local-audit\inventory-2026-10-12.json"
+```
+
+The scanner excludes its own output and checkpoint files when they sit inside
+a scanned root. It writes `<output>.checkpoint.json` atomically after each
+1,000 completed directories and prints durable progress. If interrupted, rerun the
+same command with `--resume`; root order, output, and text-size limit must
+match. `--checkpoint-directories` adjusts the interval when a shorter recovery
+window is needed. A final report is created **only** after every root has been
+traversed and has `status: complete`. The checkpoint is intentionally retained
+as recovery evidence. Access errors and skipped filesystem links still bound
+the completeness claim; inspect them before any cleanup. Use a new output name
+for a new scan, rather than replacing a prior report.
+
 The public repository deliberately omits raw private project variants,
 machine-specific paths, credentials, and local cleanup manifests. See the
 source inventory for what is and is not yet reconciled.

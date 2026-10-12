@@ -2,6 +2,30 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Make PC copy inventory resumable and completion-safe
+
+**Observed gap:** an all-drive inventory that examined millions of files
+ended without a final report. The old scanner wrote only at the end, so an
+interruption discarded its evidence and could encourage cleanup from a stale
+or incomplete snapshot.
+
+**Meaningful change:** the scanner now commits progress after fully inspected
+directories to an atomic checkpoint, reports file/directory/hit/error counts,
+and resumes only when roots, output, and text-size settings match. It refuses
+to overwrite an existing final report and writes one only after traversal
+finishes. The checkpoint remains for recovery and the final report identifies
+itself as complete.
+
+**Future failure reduced:** a long PC scan can recover from interruption without
+repeating completed directories or misrepresenting partial output as a
+complete inventory.
+
+**Review oracle:** interrupt a nested scan after a checkpoint: no final report
+must exist, resume must produce the same hit set and file count as an
+uninterrupted scan, and changed parameters or a frontier outside the requested
+roots must be rejected. Access errors and intentionally skipped links remain
+explicit limitations, not proof of absence.
+
 ## 2026-10-12 — Reject floating constitutional source in project CI
 
 **Observed gap:** a migrated project could pass the old-copy audit while its
