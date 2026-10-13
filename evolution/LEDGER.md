@@ -2,6 +2,21 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-13 — Correct the retired-artifact audit during migration
+
+**Observed gap:** the v6.5.1 path check classified OmniFix's deleted but
+unstaged `SOUL.md` and pre-pack backup paths as retained artifacts, because
+`git ls-files --cached` still listed those index entries. The files were
+already absent from the working tree.
+
+**Meaningful correction:** skip a cached path when it no longer exists,
+while retaining checks for live files and symlinks. This repairs the same
+adoption-integrity change so projects can verify cleanup before staging.
+
+**Review oracle:** a fixture with a tracked then deleted `SOUL.md` must
+produce no finding before `git add -u`; a live retired pointer and backup
+must still fail. OmniFix's unstaged migration should then pass static audit.
+
 ## 2026-10-13 — Detect retired law artifacts after project pointer migration
 
 **Observed gap:** OmniFix retained short `SOUL.md` pointers, tracked
