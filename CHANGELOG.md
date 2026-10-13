@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.5.0 — 2026-10-12 (candidate)
+
+- Separated inventory traversal completion from coverage. Final schema-3
+  reports classify each named root as scanned, partial, or inaccessible and
+  disclose the scanner's no-link policy. A scan with access errors still
+  preserves its report but exits 2 with `INCOMPLETE COVERAGE`, rather than
+  printing a misleading `PASS`. Existing schema-1 checkpoints remain
+  resumable; older schema-2 reports remain readable with their errors treated
+  as coverage gaps.
+
 ## 6.4.1 — 2026-10-12 (candidate)
 
 - Corrected resumable inventory validation for multiple Windows drive roots.

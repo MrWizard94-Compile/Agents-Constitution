@@ -75,11 +75,20 @@ a scanned root. It writes `<output>.checkpoint.json` atomically after each
 1,000 completed directories and prints durable progress. If interrupted, rerun the
 same command with `--resume`; root order, output, and text-size limit must
 match. `--checkpoint-directories` adjusts the interval when a shorter recovery
-window is needed. A final report is created **only** after every root has been
-traversed and has `status: complete`. The checkpoint is intentionally retained
-as recovery evidence. Access errors and skipped filesystem links still bound
-the completeness claim; inspect them before any cleanup. Use a new output name
-for a new scan, rather than replacing a prior report.
+window is needed. A final report is created **only** after traversal has
+finished. Its `status: complete` means the traversal attempt ended, **not**
+that all paths were readable. Report schema 3 has a separate
+`coverage.status`, per-root `root_results`, and an explicit no-link-traversal
+scope. An inaccessible named root is marked `inaccessible`; an error below a
+root marks it `partial`. When any access error remains, the final report is
+still retained for triage, but the command prints `INCOMPLETE COVERAGE` and
+exits 2 instead of printing `PASS`. Inspect those gaps before any cleanup or
+absence claim. A no-error result says only that no access gaps were recorded
+under the declared no-link policy; it does not prove linked targets or
+excluded content absent. Older schema-2 reports have no coverage field: use
+their error list to assess gaps, never interpret `status: complete` as full-PC
+coverage. The checkpoint is intentionally retained as recovery evidence. Use
+a new output name for a new scan, rather than replacing a prior report.
 
 Resume validates each queued directory against every named root independently;
 unrelated Windows drive letters do not abort the scan, while a queued path

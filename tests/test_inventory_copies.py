@@ -4,6 +4,8 @@ import tempfile
 import unittest
 import json
 import os
+import io
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -85,7 +87,77 @@ class InventoryCopiesTests(unittest.TestCase):
             write_report(output, [root], hits, errors, examined)
             final = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual("complete", final["status"])
+            self.assertEqual("no_recorded_access_gaps", final["coverage"]["status"])
             self.assertEqual(2, final["hit_count"])
+
+    def test_report_identifies_an_inaccessible_root_without_claiming_absence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            readable = base / "readable"
+            blocked = base / "blocked"
+            readable.mkdir()
+            blocked.mkdir()
+            candidate = readable / "AGENTS.md"
+            candidate.write_text("project instructions", encoding="utf-8")
+            hit = inspect_file(candidate, 1024)
+            assert hit is not None
+            error = inventory_copies.ScanError(str(blocked), "scandir", "access denied")
+            output = base / "report.json"
+
+            coverage = write_report(output, [readable, blocked], [hit], [error], 1)
+            report = json.loads(output.read_text(encoding="utf-8"))
+
+            self.assertEqual(3, report["schema"])
+            self.assertEqual("complete", report["status"])  # traversal finished
+            self.assertEqual("incomplete", coverage["status"])
+            self.assertEqual(coverage, report["coverage"])
+            self.assertEqual("scanned", coverage["root_results"][0]["status"])
+            self.assertEqual(1, coverage["root_results"][0]["candidate_count"])
+            self.assertEqual("inaccessible", coverage["root_results"][1]["status"])
+            self.assertEqual(1, coverage["root_results"][1]["error_count"])
+            self.assertEqual(0, coverage["root_results"][1]["candidate_count"])
+
+    def test_cli_returns_nonzero_after_writing_a_report_with_access_gaps(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "report.json"
+            error = inventory_copies.ScanError(str(root), "scandir", "access denied")
+            with patch.object(inventory_copies, "scan_resumable", return_value=([], [error], 0)):
+                with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()) as stderr:
+                    code = inventory_copies.main(["--root", str(root), "--output", str(output)])
+            self.assertEqual(2, code)
+            self.assertIn("INCOMPLETE COVERAGE", stderr.getvalue())
+            report = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual("inaccessible", report["coverage"]["root_results"][0]["status"])
+
+    def test_cli_succeeds_only_for_a_readable_root(self) -> None:
+        with tempfile.TemporaryDirectory() as root_dir, tempfile.TemporaryDirectory() as audit_dir:
+            root = Path(root_dir)
+            (root / "AGENTS.md").write_text("project instructions", encoding="utf-8")
+            output = Path(audit_dir) / "report.json"
+            with redirect_stdout(io.StringIO()) as stdout:
+                code = inventory_copies.main(["--root", str(root), "--output", str(output)])
+            self.assertEqual(0, code)
+            self.assertIn("no recorded access gaps", stdout.getvalue())
+            report = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual("no_recorded_access_gaps", report["coverage"]["status"])
+            self.assertEqual("scanned", report["coverage"]["root_results"][0]["status"])
+
+    def test_child_failure_marks_its_root_partial_not_inaccessible(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            error = inventory_copies.ScanError(str(root / "private"), "scandir", "access denied")
+            coverage = inventory_copies.summarize_coverage([root], [], [error])
+            self.assertEqual("incomplete", coverage["status"])
+            self.assertEqual("partial", coverage["root_results"][0]["status"])
+
+    def test_cli_rejects_an_empty_default_root_list(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "report.json"
+            with patch.object(inventory_copies, "windows_fixed_roots", return_value=[]):
+                with self.assertRaisesRegex(SystemExit, "no scan roots"):
+                    inventory_copies.main(["--output", str(output)])
+            self.assertFalse(output.exists())
 
     def test_resume_rejects_changed_scan_parameters_and_escaped_frontier(self) -> None:
         with tempfile.TemporaryDirectory() as root_dir, tempfile.TemporaryDirectory() as audit_dir:
