@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.7.0 — 2026-10-13 (candidate)
+
+- Required byte-exact reads of the frozen revision and made loader drift
+  explicit. `tools/check-frozen-load.py` confirms a full-SHA checkout, an
+  unmodified tracked tree, and raw-byte hashes for every binding file, and
+  compares the running loader's `skill-version` numerically with the frozen
+  law. GOV-FREEZE-001 demotes summarized page text to orientation, makes the
+  frozen `SKILL.md` govern a stale or newer loader, and requires both facts in
+  the handoff. The source validator guards the contract text.
+
 ## 6.6.1 — 2026-10-13 (candidate)
 
 - Prevented overlapping mirror installations and offline recovery from racing

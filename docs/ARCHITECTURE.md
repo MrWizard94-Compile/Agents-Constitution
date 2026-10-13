@@ -21,6 +21,8 @@ meaningful change on an isolated branch; validation and review precede
 acceptance. The new rule is eligible only on a later invocation. This avoids
 self-amendment and concurrent writes to `main`. Version, ledger, and
 changelog support traceability but never count as the substantive change.
+The frozen revision is read byte-exact (`tools/check-frozen-load.py`), and a
+running loader that differs from it is disclosed, not obeyed.
 
 The repository cannot force every AI platform to auto-load a skill. Local
 agents must install or sync the mirror through their supported mechanism;

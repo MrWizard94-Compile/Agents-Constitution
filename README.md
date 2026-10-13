@@ -27,6 +27,23 @@ Both commands must exit 0. CI runs the same checks and checks each PR for a
 substantive change. A passing source check is not proof that a local mirror,
 project pointer, runtime, or published release has been updated.
 
+## Verify the frozen revision
+
+A top-level skill call reads binding law from one frozen commit. Confirm that
+a checkout is that commit, byte for byte, before relying on it:
+
+```powershell
+python tools/check-frozen-load.py --sha <full-40-hex-sha> --loader <running-SKILL.md>
+```
+
+It exits 1 unless HEAD is the full SHA, tracked files are unmodified, and every
+`SOURCE.json` binding file has the exact bytes of its Git blob. The optional
+loader comparison prints `STALE LOADER` or `LOADER AHEAD` when the running
+`skill-version` differs from the frozen law; follow the frozen `SKILL.md` and
+name both versions in the handoff. Text from a summarizing page reader or
+search snippet is orientation only. A pass proves the text is faithful to that
+commit, not that the commit is accepted `main` or that any mirror uses it.
+
 ## Install generated local mirrors
 
 After the accepted `main` commit is verified:
