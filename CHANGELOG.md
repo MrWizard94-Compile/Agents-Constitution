@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.6.0 — 2026-10-13 (candidate)
+
+- Made mirror installation recoverable across all targets in one invocation.
+  The installer preflights every target, stages an undo journal before the
+  first generated-file write, rolls back ordinary failures, and resumes an
+  interrupted rollback or committed cleanup on the next same-target run.
+  Recovery refuses post-interruption user edits and damaged backups. Fault-
+  injection tests cover a failing second target, process interruption, and
+  cleanup interruption. `--recover-only` works without GitHub access.
+  Per-file replacement is atomic; simultaneous readers are not promised an
+  instantaneous multi-file snapshot.
+
 ## 6.5.2 — 2026-10-13 (candidate)
 
 - Corrected the retired-artifact audit to ignore tracked paths already deleted
