@@ -8,11 +8,13 @@ roll back every target in the invocation. Unknown files are never pruned.
 from __future__ import annotations
 
 import argparse
+from contextlib import ExitStack, contextmanager
 import hashlib
 import json
 import os
 import re
 import shutil
+import stat
 import tempfile
 import urllib.parse
 import urllib.request
@@ -22,6 +24,7 @@ DEFAULT_REPO = "MrWizard94-Compile/Agents-Constitution"
 MANIFEST_NAME = ".GENERATED-MIRROR.json"
 JOURNAL_NAME = ".GENERATED-MIRROR-UNDO"
 PREPARING_NAME = ".GENERATED-MIRROR-PREPARING"
+LOCK_NAME = ".GENERATED-MIRROR.lock"
 PREPARING_MARKER = b"wpai-constitution-sync-prepare-v1\n"
 COMMITTED_NAME = "COMMITTED.json"
 ROLLED_BACK_NAME = "ROLLED-BACK.json"
@@ -51,7 +54,7 @@ def relative_file(value: str) -> str:
     path = PurePosixPath(value)
     if not value or value.startswith("/") or "\\" in value or any(p in ("", ".", "..") for p in value.split("/")):
         raise ValueError(f"unsafe manifest path: {value!r}")
-    if path.as_posix() != value or path.name == MANIFEST_NAME or path.parts[0] in (JOURNAL_NAME, PREPARING_NAME):
+    if path.as_posix() != value or path.name == MANIFEST_NAME or path.parts[0] in (JOURNAL_NAME, PREPARING_NAME, LOCK_NAME):
         raise ValueError(f"unsafe manifest path: {value!r}")
     return value
 
@@ -138,6 +141,59 @@ def check_target_root(target: Path) -> None:
             raise ValueError(f"refusing symlinked mirror path: {ancestor}")
     if target.exists() and not target.is_dir():
         raise ValueError(f"mirror target is not a directory: {target}")
+
+
+@contextmanager
+def mirror_lock(target: Path):
+    """Hold an OS-owned lock; leave its stable empty file in place after exit."""
+    check_target_root(target)
+    target.mkdir(parents=True, exist_ok=True)
+    check_target_root(target)
+    path = target / LOCK_NAME
+    if path.is_symlink():
+        raise ValueError(f"refusing symlinked mirror lock: {path}")
+    flags = os.O_CREAT | os.O_RDWR | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(path, flags, 0o600)
+    with os.fdopen(descriptor, "r+b", buffering=0) as lock_file:
+        opened = os.fstat(lock_file.fileno())
+        current = path.lstat()
+        if (not stat.S_ISREG(opened.st_mode) or opened.st_size != 0 or
+                stat.S_ISLNK(current.st_mode) or
+                (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino)):
+            raise ValueError(f"invalid mirror lock file: {path}")
+        if os.name == "nt":
+            import msvcrt
+
+            lock_file.seek(0)
+            try:
+                msvcrt.locking(lock_file.fileno(), msvcrt.LK_NBLCK, 1)
+            except OSError as error:
+                raise RuntimeError(f"cannot lock mirror target {target}; another sync may be active") from error
+            try:
+                yield
+            finally:
+                lock_file.seek(0)
+                msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+
+            try:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError as error:
+                raise RuntimeError(f"cannot lock mirror target {target}; another sync may be active") from error
+            try:
+                yield
+            finally:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+
+@contextmanager
+def mirror_locks(targets: list[Path]):
+    """Lock every target in stable order so overlapping batches cannot race."""
+    with ExitStack() as stack:
+        for target in sorted(targets, key=lambda path: (str(path).casefold(), str(path))):
+            stack.enter_context(mirror_lock(target))
+        yield
 
 
 def preflight_target(target: Path, source: dict, version: str, commit: str,
@@ -351,48 +407,55 @@ def normalized_targets(targets: list[Path]) -> list[Path]:
         raise ValueError("nested mirror targets are not supported")
     for target in normalized:
         check_target_root(target)
-    for target in normalized[1:]:
+    return normalized
+
+
+def check_coordinator_journals(targets: list[Path]) -> None:
+    for target in targets[1:]:
         if (target / JOURNAL_NAME).exists() or (target / JOURNAL_NAME).is_symlink():
             raise ValueError(f"mirror transaction at non-coordinator target {target}; rerun with original target order")
-    return normalized
 
 
 def recover_only(targets: list[Path]) -> None:
     normalized = normalized_targets(targets)
-    coordinator = normalized[0]
-    discard_preparing(coordinator)
-    recover_batch(coordinator, normalized)
+    with mirror_locks(normalized):
+        check_coordinator_journals(normalized)
+        coordinator = normalized[0]
+        discard_preparing(coordinator)
+        recover_batch(coordinator, normalized)
 
 
 def sync_targets(targets: list[Path], source: dict, version: str, commit: str,
                  payload: dict[str, bytes]) -> None:
     normalized = normalized_targets(targets)
-    coordinator = normalized[0]
-    discard_preparing(coordinator)
-    recover_batch(coordinator, normalized)
-    plans = [(target, *preflight_target(target, source, version, commit, payload)) for target in normalized]
-    metadata = prepare_journal(plans, commit)
-    try:
-        for target, _original, incoming in plans:
-            for rel, data in incoming.items():
-                if rel == MANIFEST_NAME:
-                    continue
-                path = target_path(target, rel)
-                if data is None:
-                    if path.is_file():
-                        path.unlink()
-                else:
-                    atomic_write(path, data)
-            atomic_write(target / MANIFEST_NAME, incoming[MANIFEST_NAME])
-            verify_target(target)
-        atomic_write(coordinator / JOURNAL_NAME / COMMITTED_NAME, journal_bytes(metadata))
-    except Exception as failure:
+    with mirror_locks(normalized):
+        check_coordinator_journals(normalized)
+        coordinator = normalized[0]
+        discard_preparing(coordinator)
+        recover_batch(coordinator, normalized)
+        plans = [(target, *preflight_target(target, source, version, commit, payload)) for target in normalized]
+        metadata = prepare_journal(plans, commit)
         try:
-            recover_batch(coordinator, normalized)
-        except Exception as recovery_error:
-            raise RuntimeError(f"mirror install failed and rollback needs inspection: {recovery_error}") from failure
-        raise
-    cleanup_journal(coordinator, metadata)
+            for target, _original, incoming in plans:
+                for rel, data in incoming.items():
+                    if rel == MANIFEST_NAME:
+                        continue
+                    path = target_path(target, rel)
+                    if data is None:
+                        if path.is_file():
+                            path.unlink()
+                    else:
+                        atomic_write(path, data)
+                atomic_write(target / MANIFEST_NAME, incoming[MANIFEST_NAME])
+                verify_target(target)
+            atomic_write(coordinator / JOURNAL_NAME / COMMITTED_NAME, journal_bytes(metadata))
+        except Exception as failure:
+            try:
+                recover_batch(coordinator, normalized)
+            except Exception as recovery_error:
+                raise RuntimeError(f"mirror install failed and rollback needs inspection: {recovery_error}") from failure
+            raise
+        cleanup_journal(coordinator, metadata)
 
 
 def sync_target(target: Path, source: dict, version: str, commit: str, payload: dict[str, bytes]) -> None:

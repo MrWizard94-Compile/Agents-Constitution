@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.6.1 — 2026-10-13 (candidate)
+
+- Prevented overlapping mirror installations and offline recovery from racing
+  the same target. Stable-order, non-blocking OS file locks cover every target
+  through journal recovery, installation, verification, and cleanup. A real
+  second-process test confirms that reordered, overlapping batches fail
+  without changing generated content, then succeed after holder termination.
+  Persistent empty lock files are reserved control files, not binding mirrors.
+
 ## 6.6.0 — 2026-10-13 (candidate)
 
 - Made mirror installation recoverable across all targets in one invocation.

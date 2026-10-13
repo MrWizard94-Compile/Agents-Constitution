@@ -2,6 +2,25 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-13 — Exclude concurrent mirror writers during recovery
+
+**Observed gap:** the v6.6.0 undo journal made interruption recoverable, but
+another sync process could misidentify an active batch as crashed and begin
+rollback. Locking only the journal coordinator would not protect overlapping
+batches whose target order differed.
+
+**Meaningful change:** sync and offline recovery acquire non-blocking,
+process-owned locks for every target in stable path order before inspecting
+transaction state. A contending run fails without changing generated files.
+The stable empty lock file remains after exit so a new process cannot lock a
+different inode while another still uses the old one. Unknown nonempty and
+symlinked lock files are preserved and rejected.
+
+**Review oracle:** hold two targets in a separate process and attempt an
+overlapping batch in a different order; both install and recovery must fail
+without a manifest or journal change, and a retry must work after the holder
+is terminated. Existing interruption and rollback tests must continue passing.
+
 ## 2026-10-13 — Recover interrupted generated-mirror installations
 
 **Observed gap:** `distribution/sync.py` wrote generated files one at a time

@@ -60,11 +60,20 @@ a conflict or damaged backup, preserve the journal and inspect the affected
 files before any manual change.
 
 Each file replacement is atomic, but a concurrent reader can observe a
-temporary mixture of revisions during installation. Do not run simultaneous
-sync processes against the same targets or treat an unverified in-progress
-mirror as binding law. The batch journal protects against ordinary exceptions
-and interrupted processes; it is not a guarantee against filesystem corruption
-or lost writes after a power failure. A legacy `agents-constitution` install
+temporary mixture of revisions during installation. Sync and `--recover-only`
+hold non-blocking, process-owned locks on **every** target, acquired in stable
+path order. An overlapping batch fails before recovery or generated-file
+writes, even if it lists the targets in a different order. Retry after the
+other process exits; do not manually remove a journal while a process is
+running. Each target retains an empty `.GENERATED-MIRROR.lock` control file;
+its presence alone is not a stale lock, and it must not be deleted because a
+concurrent process could then lock a different file. The control file is not
+binding law or part of the generated manifest. A nonempty or symlinked file
+at that name is preserved and rejected for inspection. Do not treat an
+unverified in-progress mirror as binding law. Locks coordinate this installer,
+not arbitrary readers or third-party writers. The batch journal protects
+against ordinary exceptions and interrupted processes; it is not a guarantee
+against filesystem corruption or lost writes after a power failure. A legacy `agents-constitution` install
 must be reviewed and retired separately; it is never silently promoted to
 source.
 
