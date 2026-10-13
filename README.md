@@ -56,9 +56,12 @@ python tools/check-adoption.py <project-git-root>
 ```
 
 It checks tracked and unignored project files, the top-level retired-pack
-folder, and full SOUL copies. Resolve old CI, generator, manifest, pointer,
-and UI references before the old tree is removed. A clean audit is not a
-substitute for the project's build and runtime checks.
+folder, full and short SOUL files, pre-pack backups, and explicit declarations
+of active SOUL law. Resolve old CI, generator, manifest, pointer, and UI
+references before the old tree is removed. Keep recovery in Git history, not
+in a second active working-tree law copy. A clean static audit is not a
+substitute for indirect-consumer review or the project's build and runtime
+checks.
 
 ## Inventory local Constitution copies
 
