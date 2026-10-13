@@ -55,6 +55,39 @@ class AdoptionCheckTests(unittest.TestCase):
             codes = [code for code, _, _ in ADOPTION.inspect(root)]
             self.assertIn("FULL_SOUL_COPY", codes)
 
+    def test_detects_retired_pointer_and_pre_pack_backups_by_path(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            (root / "SOUL.md").write_text("# SOUL.md — Superseded\n", encoding="utf-8")
+            (root / "SOULv2.0.0.md").write_text("# Prior law\n", encoding="utf-8")
+            legacy = root / ".claude" / "SOUL.md.legacy-pre-pack-20260727-205752"
+            legacy.parent.mkdir()
+            legacy.write_text("# SOUL.md — Claude Code Constitution\n", encoding="utf-8")
+            old_agents = root / "AGENTS.md.legacy-pre-pack-20260727-205752"
+            old_agents.write_text("# SOUL.md — Constitution\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(root), "add", "-A"], check=True)
+            findings = ADOPTION.inspect(root)
+            self.assertIn(("RETIRED_SOUL_FILE", "SOUL.md", 0), findings)
+            self.assertIn(("RETIRED_SOUL_FILE", "SOULv2.0.0.md", 0), findings)
+            self.assertIn(("RETIRED_LAW_BACKUP", ".claude/SOUL.md.legacy-pre-pack-20260727-205752", 0), findings)
+            self.assertIn(("RETIRED_LAW_BACKUP", "AGENTS.md.legacy-pre-pack-20260727-205752", 0), findings)
+
+    def test_detects_active_soul_law_reference_without_flagging_history(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            (root / "README.md").write_text(
+                "**Law:** `SOUL.md`\n"
+                "SOUL.md is law.\n"
+                "The retired SOUL.md copy is not active law.\n",
+                encoding="utf-8",
+            )
+            findings = ADOPTION.inspect(root)
+            self.assertIn(("ACTIVE_LEGACY_LAW", "README.md", 1), findings)
+            self.assertIn(("ACTIVE_LEGACY_LAW", "README.md", 2), findings)
+            self.assertNotIn(("ACTIVE_LEGACY_LAW", "README.md", 3), findings)
+
     def test_empty_retired_directory_is_not_shadow_law(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

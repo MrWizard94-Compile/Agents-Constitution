@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.5.1 — 2026-10-13 (candidate)
+
+- Closed a project-adoption audit blind spot: short retired `SOUL.md` and
+  `SOULv2.0.0.md` files, pre-pack `SOUL.md`/`AGENTS.md` backups, and explicit
+  claims that SOUL remains active law now produce findings. This prevents a
+  false clean result after only the primary project pointer is migrated.
+
 ## 6.5.0 — 2026-10-12 (candidate)
 
 - Separated inventory traversal completion from coverage. Final schema-3

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Fail when a project still consumes a retired Constitution pack or SOUL copy.
+"""Fail when a project retains retired law artifacts or active consumers.
 
 This is a read-only migration check. Run it after changing project entry points,
 CI, generators, and manifests, before removing a vendored pack. It inspects
-tracked text and the top-level old-pack directory; it never follows symlinks.
+tracked and unignored files plus the top-level old-pack directory; it never
+follows symlinks. A clean static result still needs consumer review.
 """
 from __future__ import annotations
 
@@ -16,6 +17,12 @@ from pathlib import Path
 TEXT_SUFFIXES = {".md", ".mdc", ".json", ".toml", ".yaml", ".yml", ".ps1", ".py", ".js", ".mjs", ".cjs", ".ts", ".tsx"}
 LEGACY = re.compile(r"AGENTS Constitution|skills[\\/]+agents-constitution|name:\s*agents-constitution|SOULv2\.0\.0\.md|verify-pack\.ps1|gate_check\.py", re.IGNORECASE)
 FULL_SOUL = re.compile(r"(?:^# SOUL\.md\s*[—-]\s*The Constitution of an AI Empire|^## 40\. Constitutional Integrity)", re.MULTILINE)
+RETIRED_LAW_BACKUP = re.compile(r"^(?:soul|agents)\.md\.legacy-pre-pack-[\w.-]+$", re.IGNORECASE)
+ACTIVE_SOUL_LAW = re.compile(
+    r"(?:\b(?:law|binding\s+constitution|governing\s+standard)\s*:\s*[\s*`]*\bSOUL\.md\b"
+    r"|\bSOUL\.md\b[`*\s]*(?:is|remains)\s+(?:the\s+)?(?:immutable\s+)?law\b)",
+    re.IGNORECASE,
+)
 ACTIVE_SOUL_READ = re.compile(r"(?:localStorage|sessionStorage)\.getItem\(\s*['\"]soul_config['\"]\s*\)")
 PROMPT_CONSUMER = re.compile(r"\bsystemPrompt\b|\brole\s*:\s*['\"]system['\"]|\.chat\.completions\.create\(")
 HISTORICAL_RECOVERY = re.compile(
@@ -91,6 +98,10 @@ def inspect(root: Path) -> list[tuple[str, str, int]]:
         relative = path.relative_to(root).as_posix()
         if "AGENTS Constitution" in path.parts and relative.startswith("AGENTS Constitution/"):
             continue  # one directory finding is enough
+        if path.name.casefold() in {"soul.md", "soulv2.0.0.md"}:
+            findings.append(("RETIRED_SOUL_FILE", relative, 0))
+        elif RETIRED_LAW_BACKUP.fullmatch(path.name):
+            findings.append(("RETIRED_LAW_BACKUP", relative, 0))
         if path.is_symlink():
             if LEGACY.search(relative):
                 findings.append(("LEGACY_SYMLINK", relative, 0))
@@ -110,6 +121,8 @@ def inspect(root: Path) -> list[tuple[str, str, int]]:
             for match in ACTIVE_SOUL_READ.finditer(text):
                 findings.append(("ACTIVE_LEGACY_PROMPT", relative, text.count("\n", 0, match.start()) + 1))
         for number, line in enumerate(lines, start=1):
+            if ACTIVE_SOUL_LAW.search(line):
+                findings.append(("ACTIVE_LEGACY_LAW", relative, number))
             if LEGACY.search(line) and not (path.suffix.casefold() == ".md" and HISTORICAL_RECOVERY.fullmatch(line)):
                 findings.append(("LEGACY_REFERENCE", relative, number))
     return findings
@@ -130,7 +143,7 @@ def main() -> int:
     if findings:
         print(f"FAIL: {len(findings)} unresolved Constitution adoption findings")
         return 1
-    print("PASS: no detected active legacy Constitution consumer or top-level pack; indirect data flow still requires review")
+    print("PASS: no detected retired law artifact, active legacy consumer, or top-level pack; indirect data flow still requires review")
     return 0
 
 

@@ -2,6 +2,29 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-13 — Detect retired law artifacts after project pointer migration
+
+**Observed gap:** OmniFix retained short `SOUL.md` pointers, tracked
+`*.legacy-pre-pack-*` law backups, and documents still calling SOUL active
+law. The v6.5.0 adoption audit missed these artifacts and declarations after
+the primary pointers were changed, so it could falsely report a clean
+project while shadow law remained in the working tree.
+
+**Meaningful change:** the read-only audit now flags exact retired SOUL
+filenames, known pre-pack backup filenames, and explicit active-law claims.
+It still leaves historical prose and product terms alone. This is one
+adoption-integrity improvement, not a new constitutional rule.
+
+**Future failure reduced:** a project migration cannot pass the static
+adoption check merely by replacing its main entry points while retaining
+old law artifacts or declaring them binding elsewhere.
+
+**Review oracle:** a fixture with short pointers and pre-pack backups must
+produce path findings, and `Law: SOUL.md` must produce an active-law finding.
+Historical text saying the old copy is not active law must not be classified
+as active. After OmniFix migration, the audit must be clean without deleting
+any unreconciled source; Git history must retain recovery.
+
 ## 2026-10-12 — Make inventory coverage failures impossible to mistake for a pass
 
 **Observed gap:** the completed C:/D:/E: inventory examined 4,804,532 files
