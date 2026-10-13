@@ -74,9 +74,12 @@ moves, reconcile the branch and rerun validation.
 ## GOV-MIRROR-001 — Distribution
 
 A mirror records canonical repository, source SHA, version, and a manifest
-of generated files. Sync downloads all files from one resolved SHA, writes
-atomically, validates before declaring success, and prunes only previously
-identified generated files. Preserve local user data and unknown files.
+of generated files. Sync downloads all files from one resolved SHA, preflights
+every target, replaces individual files atomically, and validates before
+declaring success. A batch undo journal permits rollback after a failed or
+interrupted install; it does not make the multi-file view instantaneous to
+concurrent readers. Prune only previously identified generated files.
+Preserve local user data and unknown files.
 The old `agents-constitution` install is a compatibility entry only until
 the new skill is installed and verified; retire it through a recorded,
 recoverable migration.

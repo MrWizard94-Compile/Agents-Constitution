@@ -2,6 +2,27 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-13 — Recover interrupted generated-mirror installations
+
+**Observed gap:** `distribution/sync.py` wrote generated files one at a time
+and its provenance manifest last. A write failure or interruption could leave
+one mirror internally mixed; a failure in the second target could also leave
+the first mirror updated while the second remained old.
+
+**Meaningful change:** preflight all targets, stage their original bytes in a
+single batch undo journal, and restore all targets on ordinary failure. A
+subsequent run with the same ordered targets rolls back an uncommitted
+interruption or finishes cleanup of a fully verified committed batch. Any
+unexpected user edit or damaged backup stops recovery rather than overwriting
+data. `--recover-only` allows that recovery without GitHub access. The
+installer still preserves unknown files and refuses dirty generated files.
+This is recoverable installation, not instantaneous multi-file reads.
+
+**Review oracle:** injected failures in the second mirror and during journal
+preparation must leave old manifests and content intact; simulated process
+interruption must recover on retry; a post-interruption user edit must remain
+untouched; and interruption after commit must finalize without rollback.
+
 ## 2026-10-13 — Correct the retired-artifact audit during migration
 
 **Observed gap:** the v6.5.1 path check classified OmniFix's deleted but
