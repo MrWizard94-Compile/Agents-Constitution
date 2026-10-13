@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.5.2 — 2026-10-13 (candidate)
+
+- Corrected the retired-artifact audit to ignore tracked paths already deleted
+  from the working tree but not yet staged. Such paths are not retained local
+  copies; a migration can now be audited before staging its cleanup commit.
+
 ## 6.5.1 — 2026-10-13 (candidate)
 
 - Closed a project-adoption audit blind spot: short retired `SOUL.md` and

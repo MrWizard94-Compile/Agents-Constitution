@@ -96,6 +96,8 @@ def inspect(root: Path) -> list[tuple[str, str, int]]:
 
     for path in project_files(root):
         relative = path.relative_to(root).as_posix()
+        if not path.exists() and not path.is_symlink():
+            continue  # git ls-files still names deleted paths until their deletion is staged
         if "AGENTS Constitution" in path.parts and relative.startswith("AGENTS Constitution/"):
             continue  # one directory finding is enough
         if path.name.casefold() in {"soul.md", "soulv2.0.0.md"}:

@@ -88,6 +88,16 @@ class AdoptionCheckTests(unittest.TestCase):
             self.assertIn(("ACTIVE_LEGACY_LAW", "README.md", 2), findings)
             self.assertNotIn(("ACTIVE_LEGACY_LAW", "README.md", 3), findings)
 
+    def test_deleted_tracked_soul_file_is_not_a_retained_artifact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            retired = root / "SOUL.md"
+            retired.write_text("# Former pointer\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(root), "add", "SOUL.md"], check=True)
+            retired.unlink()
+            self.assertEqual(ADOPTION.inspect(root), [])
+
     def test_empty_retired_directory_is_not_shadow_law(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
