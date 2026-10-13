@@ -78,7 +78,10 @@ of generated files. Sync downloads all files from one resolved SHA, preflights
 every target, replaces individual files atomically, and validates before
 declaring success. A batch undo journal permits rollback after a failed or
 interrupted install; it does not make the multi-file view instantaneous to
-concurrent readers. Prune only previously identified generated files.
+concurrent readers. Process-owned locks on every target prevent overlapping
+installer batches from treating an active journal as an interruption. They do
+not lock out arbitrary readers or third-party writers. Prune only previously
+identified generated files.
 Preserve local user data and unknown files.
 The old `agents-constitution` install is a compatibility entry only until
 the new skill is installed and verified; retire it through a recorded,

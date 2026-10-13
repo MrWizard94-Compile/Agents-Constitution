@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -51,6 +53,8 @@ class DistributionTests(unittest.TestCase):
             manifest = json.loads((target / SYNC.MANIFEST_NAME).read_text())
             self.assertEqual(manifest["source_commit"], COMMIT)
             self.assertEqual(set(manifest["file_sha256"]), set(payload))
+            self.assertNotIn(SYNC.LOCK_NAME, manifest["file_sha256"])
+            self.assertEqual((target / SYNC.LOCK_NAME).read_bytes(), b"")
             SYNC.verify_target(target)
             (target / "AGENTS.md").write_text("tampered", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "integrity mismatch"):
@@ -70,11 +74,67 @@ class DistributionTests(unittest.TestCase):
     def test_rejects_traversal_and_foreign_manifest(self):
         with self.assertRaisesRegex(ValueError, "unsafe manifest path"):
             SYNC.relative_file("../outside.md")
+        with self.assertRaisesRegex(ValueError, "unsafe manifest path"):
+            SYNC.relative_file(SYNC.LOCK_NAME)
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary)
             (target / SYNC.MANIFEST_NAME).write_text('{"generated": true, "canonical_repository": "other/repo"}')
             with self.assertRaisesRegex(ValueError, "noncanonical provenance"):
                 SYNC.prior_generated_hashes(target)
+
+    def test_rejects_foreign_lock_file_without_overwriting_it(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "mirror"
+            target.mkdir()
+            lock = target / SYNC.LOCK_NAME
+            lock.write_bytes(b"user data")
+            with self.assertRaisesRegex(ValueError, "invalid mirror lock file"):
+                SYNC.recover_only([target])
+            self.assertEqual(lock.read_bytes(), b"user data")
+
+    def test_overlapping_processes_cannot_recover_or_install_out_of_order(self):
+        payload = {name: name.encode() for name in ("SKILL.md", "AGENTS.md", "SOP.md", "SOURCE.json", "VERSION")}
+        holder_code = (
+            "import runpy, sys\n"
+            "from pathlib import Path\n"
+            "locks = runpy.run_path(sys.argv[1])['mirror_locks']\n"
+            "with locks([Path(value) for value in sys.argv[3:]]):\n"
+            "    Path(sys.argv[2]).touch()\n"
+            "    sys.stdin.readline()\n"
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            shared, other, newcomer = (base / name for name in ("shared", "other", "newcomer"))
+            ready = base / "ready"
+            child = subprocess.Popen(
+                [sys.executable, "-c", holder_code, str(Path(SYNC.__file__)), str(ready), str(shared), str(other)],
+                stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                deadline = time.monotonic() + 10
+                while not ready.exists() and child.poll() is None and time.monotonic() < deadline:
+                    time.sleep(0.05)
+                self.assertTrue(ready.exists(), child.stderr.read() if child.poll() is not None else "lock holder did not become ready")
+                with self.assertRaisesRegex(RuntimeError, "cannot lock mirror target"):
+                    SYNC.sync_targets([newcomer, shared], self.source(list(payload)), "6.0.0", COMMIT, payload)
+                with self.assertRaisesRegex(RuntimeError, "cannot lock mirror target"):
+                    SYNC.recover_only([newcomer, shared])
+                for target in (newcomer, shared):
+                    self.assertFalse((target / SYNC.MANIFEST_NAME).exists())
+                    self.assertFalse((target / SYNC.JOURNAL_NAME).exists())
+                child.kill()
+                child.wait(timeout=10)
+                self.assertNotEqual(child.returncode, 0)
+                SYNC.sync_targets([newcomer, shared], self.source(list(payload)), "6.0.0", COMMIT, payload)
+                for target in (newcomer, shared):
+                    SYNC.verify_target(target)
+            finally:
+                if child.poll() is None:
+                    child.kill()
+                    child.wait(timeout=10)
+                child.stdin.close()
+                child.stderr.close()
 
     def test_rejects_modified_or_unknown_files_before_writing(self):
         base = {name: name.encode() for name in ("SKILL.md", "AGENTS.md", "SOP.md", "SOURCE.json", "VERSION")}
