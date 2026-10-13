@@ -367,19 +367,65 @@ def scan_resumable(
     return hits, errors, progress["files_examined"]
 
 
-def write_report(output: Path, roots: list[Path], hits: list[Hit], errors: list[ScanError], examined: int) -> None:
+def _path_within_root(path: str, root: str) -> bool:
+    candidate = os.path.normcase(os.path.abspath(path))
+    normalized_root = os.path.normcase(os.path.abspath(root))
+    try:
+        return os.path.commonpath((candidate, normalized_root)) == normalized_root
+    except ValueError:
+        # Distinct Windows volumes have no common path.
+        return False
+
+
+def summarize_coverage(roots: list[Path], hits: list[Hit], errors: list[ScanError]) -> dict[str, object]:
+    """Separate completed traversal from evidence that every named root was readable.
+
+    Links and reparse points are intentionally not traversed. Even a result
+    without recorded errors is not an absence proof for their targets.
+    """
+    root_results: list[dict[str, object]] = []
+    attributed_errors = 0
+    for root in roots:
+        named_root = normalize_path(root)
+        root_errors = [error for error in errors if _path_within_root(error.path, named_root)]
+        attributed_errors += len(root_errors)
+        root_inaccessible = any(
+            error.operation == "scandir"
+            and os.path.normcase(os.path.abspath(error.path)) == os.path.normcase(os.path.abspath(named_root))
+            for error in root_errors
+        )
+        root_results.append({
+            "root": named_root,
+            "status": "inaccessible" if root_inaccessible else "partial" if root_errors else "scanned",
+            "candidate_count": sum(_path_within_root(hit.path, named_root) for hit in hits),
+            "error_count": len(root_errors),
+        })
+    return {
+        "status": "incomplete" if errors or not roots else "no_recorded_access_gaps",
+        "scope": "named_roots_without_link_or_reparse_traversal",
+        "root_results": root_results,
+        "unattributed_error_count": len(errors) - attributed_errors,
+    }
+
+
+def write_report(
+    output: Path, roots: list[Path], hits: list[Hit], errors: list[ScanError], examined: int,
+) -> dict[str, object]:
+    coverage = summarize_coverage(roots, hits, errors)
     payload = {
-        "schema": 2,
+        "schema": 3,
         "status": "complete",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "roots": [normalize_path(root) for root in roots],
         "files_examined": examined,
         "hit_count": len(hits),
         "error_count": len(errors),
+        "coverage": coverage,
         "hits": [asdict(hit) for hit in hits],
         "errors": [asdict(error) for error in errors],
     }
     _write_json_atomic(output, payload)
+    return coverage
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -396,6 +442,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv or sys.argv[1:])
     roots = [Path(item).resolve() for item in args.root] if args.root else windows_fixed_roots()
+    if not roots:
+        raise SystemExit("no scan roots are available; name at least one --root")
     missing = [str(root) for root in roots if not root.exists()]
     if missing:
         raise SystemExit(f"scan roots do not exist: {', '.join(missing)}")
@@ -415,8 +463,16 @@ def main(argv: list[str] | None = None) -> int:
         return 130
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
-    write_report(output, roots, hits, errors, examined)
-    print(f"PASS: examined {examined} files; {len(hits)} candidates; {len(errors)} access errors")
+    coverage = write_report(output, roots, hits, errors, examined)
+    if coverage["status"] == "incomplete":
+        print(
+            f"INCOMPLETE COVERAGE: examined {examined} files; {len(hits)} candidates; "
+            f"{len(errors)} access errors. Inspect report root_results before cleanup.",
+            file=sys.stderr,
+        )
+        print(output)
+        return 2
+    print(f"PASS: examined {examined} files; {len(hits)} candidates; no recorded access gaps")
     print(output)
     return 0
 

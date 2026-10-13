@@ -2,6 +2,32 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-12 — Make inventory coverage failures impossible to mistake for a pass
+
+**Observed gap:** the completed C:/D:/E: inventory examined 4,804,532 files
+and retained 130 access errors, including denial at the D: root. The scanner
+still printed `PASS`, exited 0, and wrote `status: complete`. That status
+correctly described traversal termination but could be misread as evidence
+that all named roots were inspected before cleanup.
+
+**Meaningful change:** a final report now separately states coverage and
+classifies each named root as scanned, partial, or inaccessible. The command
+preserves a useful report when errors occur, but prints `INCOMPLETE COVERAGE`
+and exits 2. No-root invocations are rejected. Checkpoint schema and
+cross-drive resume remain compatible; skipped links are explicitly outside
+the reported traversal scope.
+
+**Future failure reduced:** a denied drive or protected subtree cannot yield
+a green inventory command or an unqualified absence claim just because the
+scanner finished attempting traversal.
+
+**Review oracle:** with one readable root and one root whose `scandir` fails,
+the report must keep both results, label the denied root `inaccessible`, and
+the CLI must exit 2. A fully readable fixture must exit 0; an empty default
+root set must not create a report. Resume tests must still pass. A live
+all-drive scan would still require review of access errors, excluded links,
+and candidate ownership before any physical cleanup claim.
+
 ## 2026-10-12 — Resume a checkpoint across Windows drive roots
 
 **Observed gap:** a real `C:\`, `D:\`, `E:\` copy inventory saved 94,000
