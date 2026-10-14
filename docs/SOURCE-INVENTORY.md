@@ -55,6 +55,8 @@ name private project folders in the public repository.
    involved. Re-scan paths before mutation because the inventory is dated.
 2. Publish and verify accepted canonical `main`; install a complete new mirror
    and verify its manifest. Update project pointers in their own Git roots.
+   Probe active agent hooks and onboarding tools after deploying and restarting
+   them; a source-only check cannot establish their emitted routing text.
 3. Preserve unique project clauses locally. Move old full packs and historical
    SOUL texts to recoverable archives only after their semantic differences
    are accounted for. Do not recursively delete broad folders or follow links.

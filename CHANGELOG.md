@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.11.0 — 2026-10-14 (candidate)
+
+- Closed a migration evidence gap for agent-facing context providers. Project
+  adoption now includes hooks and tool-emitted onboarding responses, with a
+  probe of the installed entry point after process restart. Source changes or
+  a clean static audit alone cannot establish that a live agent stopped
+  receiving retired-law instructions.
+
 ## 6.10.0 — 2026-10-14 (candidate)
 
 - Closed two residual-discovery blind spots: the all-drive inventory now

@@ -80,11 +80,16 @@ Record what was removed and how to recover it.
 
 Before declaring project adoption complete, inspect every consumer of the
 retired pack—not only `AGENTS.md`: CI jobs, build/generator scripts, manifests,
-format exclusions, active verification commands, and product UI routes can
-keep an old copy operational. Pin a verified canonical source snapshot in
-reproducible CI, update those consumers, and run the read-only
-`tools/check-adoption.py` audit. Resolve its findings or explicitly retain
-and label historical evidence before deleting a vendored tree.
+format exclusions, active verification commands, product UI routes, agent
+hooks, and tool-provided onboarding responses can keep an old copy operational.
+Pin a verified canonical source snapshot in reproducible CI, update those
+consumers, and run the read-only `tools/check-adoption.py` audit. Where a
+consumer emits instructions to an agent, inspect the actual response from its
+installed entry point as well as its source and tests. A rebuilt file does not
+replace an already-running process; restart and re-probe it before claiming
+the live route migrated. If restart is unavailable, report live acceptance as
+open. Resolve audit findings or explicitly retain and label historical
+evidence before deleting a vendored tree.
 
 ## Delivery and release
 
