@@ -122,9 +122,13 @@ Before retiring an old project pack, run the read-only consumer audit:
 python tools/check-adoption.py <project-git-root>
 ```
 
-It checks tracked and unignored project files, the top-level retired-pack
-folder, full and short SOUL files, pre-pack backups, and explicit declarations
-of active SOUL law. Resolve old CI, generator, manifest, pointer, and UI
+It checks tracked and unignored project files plus bounded ignored `.agents`,
+`.claude`, `.codex`, and `.grok` locations for retired SOUL files, pre-pack
+backups, old-pack loaders, and old packs. It does not crawl arbitrary ignored
+dependency trees or follow linked agent directories; a linked directory is
+reported for review.
+It also detects explicit declarations of active SOUL law. Resolve old CI,
+generator, manifest, pointer, and UI
 references before the old tree is removed. Keep recovery in Git history, not
 in a second active working-tree law copy. A clean static audit is not a
 substitute for indirect-consumer review or the project's build and runtime
@@ -159,6 +163,11 @@ excluded content absent. Older schema-2 reports have no coverage field: use
 their error list to assess gaps, never interpret `status: complete` as full-PC
 coverage. The checkpoint is intentionally retained as recovery evidence. Use
 a new output name for a new scan, rather than replacing a prior report.
+
+The scanner now recognizes pre-pack `SOUL.md` and `AGENTS.md` backups by
+filename even if their bodies contain no known Constitution signature. Older
+reports may have omitted such copies. Re-scan relevant roots with this version
+before claiming their backups absent; do not rewrite a dated report in place.
 
 Resume validates each queued directory against every named root independently;
 unrelated Windows drive letters do not abort the scan, while a queued path

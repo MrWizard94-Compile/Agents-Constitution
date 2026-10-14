@@ -45,6 +45,7 @@ EXACT_NAMES = {
     "soul-v2.md",
     "soulv2.0.0.md",
 }
+RETIRED_LAW_BACKUP = re.compile(r"^(?:soul|agents)\.md\.legacy-pre-pack-[\w.-]+$", re.IGNORECASE)
 TEXT_SUFFIXES = {
     ".md",
     ".mdc",
@@ -144,7 +145,7 @@ def inspect_file(path: Path, max_text_bytes: int) -> Hit | None:
     markers: list[str] = []
     if any(marker in lowered_path for marker in PATH_MARKERS):
         reasons.append("path")
-    if path.name.casefold() in EXACT_NAMES:
+    if path.name.casefold() in EXACT_NAMES or RETIRED_LAW_BACKUP.fullmatch(path.name):
         reasons.append("name")
 
     size = path.stat().st_size

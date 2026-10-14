@@ -34,6 +34,20 @@ class InventoryCopiesTests(unittest.TestCase):
             assert hit is not None
             self.assertEqual(("path",), hit.reasons)
 
+    def test_detects_pre_pack_backup_without_constitution_content_marker(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for filename in ("SOUL.md.legacy-pre-pack-20260727-205752", "AGENTS.md.legacy-pre-pack-local"):
+                candidate = root / filename
+                candidate.write_text("Distinct historical wording without scanner signatures.\n", encoding="utf-8")
+                hit = inspect_file(candidate, 1024)
+                self.assertIsNotNone(hit)
+                assert hit is not None
+                self.assertEqual(("name",), hit.reasons)
+            unrelated = root / "SOUL.md.tmp"
+            unrelated.write_text("ordinary scratch file\n", encoding="utf-8")
+            self.assertIsNone(inspect_file(unrelated, 1024))
+
     def test_scan_does_not_follow_directory_symlink(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

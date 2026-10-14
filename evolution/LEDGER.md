@@ -2,6 +2,29 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Find ignored and filename-only residual law before cleanup
+
+**Observed gap:** the dated all-drive report omitted two ignored root pre-pack
+SOUL variants whose exact names carried the only scanner signal. Separately,
+the project adoption audit excluded ignored `.agents` and `.claude` trees,
+reporting their retired pointers and backups only when a separate manual check
+was performed. A clean adoption result or zero inventory hit was therefore
+too weak to justify deletion or a no-shadow-law claim.
+
+**Meaningful change:** inventory recognizes `SOUL.md` and `AGENTS.md`
+`legacy-pre-pack-*` filenames independent of content. Adoption inspects the
+root and four known agent-config directories for retired SOUL names, backups,
+instruction loaders, and old pack directories, including when Git ignores
+them. It does not crawl arbitrary ignored dependency trees or follow links;
+linked agent directories produce an explicit unresolved finding.
+
+**Review oracle:** fixtures with ignored `.agents` SOUL, `.claude` backup,
+`.codex` SOUL variant, `.grok` pack, ignored old-pack loader, and a linked
+agent directory must fail the adoption audit, while an ignored
+`node_modules/SOUL.md` stays outside the bounded scope. A filename-only
+backup must appear in a fresh inventory. The old dated report remains an
+incomplete historical snapshot, not rewritten.
+
 ## 2026-10-14 — Require linkage-complete class-transform caches
 
 **Observed gap:** a warm class-transform cache stored an outer class that

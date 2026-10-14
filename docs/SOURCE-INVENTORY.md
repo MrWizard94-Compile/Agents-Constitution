@@ -6,6 +6,9 @@ and 535 access errors, mostly protected directories. Candidate hits include
 false positives; this is **not** a claim that every hit is a Constitution copy
 or that inaccessible paths were inspected. Exact paths and machine-specific
 metadata stay in the ignored local inventory, not this public repository.
+That scan predates filename detection for pre-pack backups whose bodies lack
+the scanner's markers; it cannot prove those variants absent. A new bounded
+scan is required before their physical cleanup.
 
 ## Distinct source families
 

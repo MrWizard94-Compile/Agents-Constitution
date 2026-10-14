@@ -73,6 +73,59 @@ class AdoptionCheckTests(unittest.TestCase):
             self.assertIn(("RETIRED_LAW_BACKUP", ".claude/SOUL.md.legacy-pre-pack-20260727-205752", 0), findings)
             self.assertIn(("RETIRED_LAW_BACKUP", "AGENTS.md.legacy-pre-pack-20260727-205752", 0), findings)
 
+    def test_detects_ignored_agent_artifacts_without_crawling_ignored_dependencies(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            (root / ".gitignore").write_text(
+                "/.agents/\n/.claude/\n/.codex/\n/.grok/\n/node_modules/\n"
+                "/SOUL.md.legacy-pre-pack-local\n", encoding="utf-8",
+            )
+            for directory, filename in (
+                (".agents", "SOUL.md"),
+                (".claude", "SOUL.md.legacy-pre-pack-20260727-205752"),
+                (".codex", "SOUL-v2.md"),
+            ):
+                target = root / directory / filename
+                target.parent.mkdir()
+                target.write_text("historical pointer\n", encoding="utf-8")
+            old_pack = root / ".grok" / "AGENTS Constitution"
+            old_pack.mkdir(parents=True)
+            (old_pack / "PACK.md").write_text("old pack\n", encoding="utf-8")
+            (root / ".claude" / "AGENTS.md").write_text(
+                "Load ../../AGENTS Constitution/AGENTS.md\n", encoding="utf-8",
+            )
+            (root / "SOUL.md.legacy-pre-pack-local").write_text("old root copy\n", encoding="utf-8")
+            unrelated = root / "node_modules" / "SOUL.md"
+            unrelated.parent.mkdir()
+            unrelated.write_text("third-party file\n", encoding="utf-8")
+
+            findings = ADOPTION.inspect(root)
+            self.assertIn(("RETIRED_SOUL_FILE", ".agents/SOUL.md", 0), findings)
+            self.assertIn(("RETIRED_LAW_BACKUP", ".claude/SOUL.md.legacy-pre-pack-20260727-205752", 0), findings)
+            self.assertIn(("RETIRED_SOUL_FILE", ".codex/SOUL-v2.md", 0), findings)
+            self.assertIn(("OLD_PACK_DIRECTORY", ".grok/AGENTS Constitution", 0), findings)
+            self.assertIn(("LEGACY_REFERENCE", ".claude/AGENTS.md", 1), findings)
+            self.assertIn(("RETIRED_LAW_BACKUP", "SOUL.md.legacy-pre-pack-local", 0), findings)
+            self.assertFalse(any(path == "node_modules/SOUL.md" for _, path, _ in findings))
+
+    def test_linked_agent_directory_is_reported_without_reading_target(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "repo"
+            outside = Path(temporary) / "outside"
+            root.mkdir()
+            outside.mkdir()
+            self.make_repo(root)
+            (root / ".gitignore").write_text("/.claude/\n", encoding="utf-8")
+            (outside / "SOUL.md").write_text("outside law\n", encoding="utf-8")
+            try:
+                (root / ".claude").symlink_to(outside, target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(f"directory symlink unavailable: {exc}")
+            findings = ADOPTION.inspect(root)
+            self.assertIn(("AGENT_DIR_SYMLINK_UNINSPECTED", ".claude", 0), findings)
+            self.assertNotIn(("RETIRED_SOUL_FILE", ".claude/SOUL.md", 0), findings)
+
     def test_detects_active_soul_law_reference_without_flagging_history(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
