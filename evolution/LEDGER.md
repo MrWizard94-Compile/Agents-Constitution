@@ -2,6 +2,25 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Detect canonical repository protection drift
+
+**Observed gap:** the Constitution requires PR review and green validation, but
+the canonical `main` branch had no active GitHub ruleset. A repository setting
+can later change without a source diff, and source validation cannot see it.
+
+**Meaningful change:** `tools/check-repository-ruleset.py` reads the authenticated
+repository ruleset and effective branch rules, and checks the approved active
+policy: PRs, strict GitHub Actions `validate`, no review approvals or bypass
+actors, and no force-push or branch deletion. It distinguishes drift from an
+unverified API read. The tool is distributed with the source so future calls
+can check the external control without modifying repository settings.
+
+**Review oracle:** an approved live ruleset passes; fixtures with an added
+bypass actor, required approval, unexpected unattributed-change approval,
+wrong branch, loose status gate, incorrect check-source app, or missing
+effective rule fail. An outage must produce `UNVERIFIED`, never `PASS`.
+The source suite remains network-free.
+
 ## 2026-10-13 — Verify the frozen load and disclose loader drift
 
 **Observed gap:** during a 2026-10-13 call the running loader was v6.5.0 while

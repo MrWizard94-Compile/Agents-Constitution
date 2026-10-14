@@ -27,6 +27,20 @@ Both commands must exit 0. CI runs the same checks and checks each PR for a
 substantive change. A passing source check is not proof that a local mirror,
 project pointer, runtime, or published release has been updated.
 
+The canonical `main` ruleset is a GitHub repository setting, not a Git file.
+Audit its live, effective controls separately with an authenticated `gh` CLI
+session (the public API omits bypass-actor details):
+
+```powershell
+python tools/check-repository-ruleset.py
+```
+
+Exit 0 means the active ruleset requires a pull request and a strict passing
+`validate` check from the GitHub Actions app, blocks force-push and deletion,
+and requires zero approvals with no bypass actors. Exit 1 means policy drift.
+Exit 2 means GitHub could not be verified; neither source CI nor an offline
+fixture proves the live setting.
+
 ## Verify the frozen revision
 
 A top-level skill call reads binding law from one frozen commit. Confirm that

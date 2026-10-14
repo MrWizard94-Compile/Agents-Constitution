@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.8.0 — 2026-10-14 (candidate)
+
+- Added a read-only live audit of the canonical GitHub `main` ruleset. It
+  detects missing or inactive PR, strict `validate`, force-push, and deletion
+  gates, check-source spoofing, bypass actors, unintended approval requirements,
+  and branch-target drift. API failure is reported as unverified, never a pass.
+
 ## 6.7.0 — 2026-10-13 (candidate)
 
 - Required byte-exact reads of the frozen revision and made loader drift
