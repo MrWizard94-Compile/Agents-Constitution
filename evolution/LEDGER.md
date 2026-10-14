@@ -2,6 +2,26 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Verify live agent-onboarding routes during adoption
+
+**Observed gap:** a local read-only WPAI intake tool still emitted a directive
+to load the retired pack after the root entry and canonical skill had moved to
+GitHub. Its source tests and build passed because they checked only document
+discovery, not the emitted constitutional route. The existing adoption audit
+could not inspect a long-running tool process.
+
+**Meaningful change:** `MIG-CLEAN-001` now includes agent hooks and tool-provided
+onboarding output among old-pack consumers. An adoption must inspect the
+installed entry point's actual response after restart, or report live
+acceptance open when restart is unavailable. The skill and cleanup gate link
+to that same operational rule; they do not establish another law home.
+
+**Review oracle:** a fixture or live tool that still tells an agent to load
+the retired pack after source migration disproves adoption. A passing source
+test with a stale pre-restart process is insufficient. The local intake
+consumer's regression test asserts the canonical route and a missing-root
+negative path; a newly built process is probed separately.
+
 ## 2026-10-14 — Find ignored and filename-only residual law before cleanup
 
 **Observed gap:** the dated all-drive report omitted two ignored root pre-pack

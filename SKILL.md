@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.10.0"
+  skill-version: "6.11.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -98,6 +98,9 @@ copies. A clean static audit does not replace a review of indirect consumers.
 The audit checks literal canonical source pins in GitHub workflows; review
 dynamic fetches separately and verify that the pinned SHA was accepted on
 `main`. A syntactically pinned but unvalidated commit is not enough.
+For agent hooks or onboarding tools, inspect a response from the installed
+entry point after restart; source edits and a green static audit cannot prove
+that a long-running process stopped telling agents to load retired law.
 
 ## Runtime and quality checks
 
