@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.13.0 — 2026-10-14 (candidate)
+
+- Required a bounded freshness and stale-path recovery contract for
+  agent-facing file indexes. Owned writes invalidate immediately; external
+  removals cannot leave supposedly current links; additions and edits become
+  visible within a stated bound or explicit refresh. Tests must exercise
+  create, edit, delete, installed-consumer behavior, and realistic refresh
+  cost. This extends `ENG-FW-001` rather than introducing duplicate law.
+
 ## 6.12.0 — 2026-10-14 (candidate)
 
 - Added an explicit, bounded filesystem adoption audit for ignored or

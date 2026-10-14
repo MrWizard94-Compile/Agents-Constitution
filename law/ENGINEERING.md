@@ -67,6 +67,14 @@ load. Compose multiple approved, digest-guarded transformations explicitly;
 reject unknown conflicting copies instead of relying on filename order or
 silent last-wins selection. A no-match scan is not evidence of absence when
 encodings, keys, or entries were excluded.
+For an agent-facing index or context provider over files that other processes
+can change, define and document a bounded freshness contract. Invalidate on
+owned writes; detect external removals before presenting cached links or
+source paths as current, and discover additions or edits within the stated
+bound or after an explicit refresh. Retry a transient stale-path failure from
+a rebuilt index, or report an actionable incomplete result rather than a
+false clean graph. Test create, edit, delete, and the installed consumer's
+response; measure refresh cost on a representative workspace.
 
 ### ENG-REPRO-001 — Reproducibility
 

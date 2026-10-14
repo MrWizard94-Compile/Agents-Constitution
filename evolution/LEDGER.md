@@ -2,6 +2,29 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Make externally mutable context indexes honest about freshness
+
+**Observed gap:** a live vault MCP context provider reported a deleted
+temporary checkout as an indexed note and then failed its stats call with
+`ENOENT`. The provider's own writes invalidated its cache, but external
+filesystem changes did not. Source tests had missed the installed stdio
+consumer path.
+
+**Meaningful change:** `ENG-FW-001` now requires a documented bounded
+freshness contract for agent-facing indexes, immediate invalidation on owned
+writes, detection of external removals before claiming cached links or paths
+are current, and an explicit retry or incomplete result on stale-path
+failure. It requires create/edit/delete and installed-consumer tests plus a
+refresh-cost measurement. The skill points callers to that one rule home.
+
+**Review oracle:** after an external deletion, an installed context provider
+must not return a supposedly current link to the removed file or crash on a
+stale path; after an addition or edit it must expose the change within its
+declared bound or after refresh. A representative workspace measurement must
+make the cost of that guarantee visible. The rule is wrong if it requires an
+unbounded scan for each small read or treats a source-only unit test as live
+acceptance.
+
 ## 2026-10-14 — Audit ignored non-Git project directories without false clean claims
 
 **Observed gap:** the adoption checker required an exact Git root. An ignored
