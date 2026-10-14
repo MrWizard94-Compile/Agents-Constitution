@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import importlib.util
+import io
+import subprocess
 import unittest
+from contextlib import redirect_stdout
 from copy import deepcopy
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,6 +71,21 @@ class RulesetAuditTests(unittest.TestCase):
         listing, detail, effective = fixture()
         self.assertTrue(AUDIT.audit(listing + listing, detail, effective))
         self.assertTrue(AUDIT.audit(listing * 100, detail, effective))
+
+    def test_cli_distinguishes_redaction_outage_and_policy_drift(self):
+        listing, detail, effective = fixture()
+        scenarios = (
+            (subprocess.CalledProcessError(1, ["gh", "api"]), 2, "UNVERIFIED:"),
+            ([listing, {key: value for key, value in detail.items() if key != "bypass_actors"}], 2, "UNVERIFIED:"),
+            ([listing, {**detail, "bypass_actors": [{"actor_id": 1}]}, effective], 1, "DRIFT:"),
+            ([listing, detail, effective], 0, "PASS:"),
+        )
+        for responses, expected_code, prefix in scenarios:
+            with self.subTest(prefix=prefix, code=expected_code):
+                output = io.StringIO()
+                with patch.object(AUDIT, "fetch_json", side_effect=responses), redirect_stdout(output):
+                    self.assertEqual(AUDIT.main(), expected_code)
+                self.assertTrue(output.getvalue().startswith(prefix))
 
 
 if __name__ == "__main__":

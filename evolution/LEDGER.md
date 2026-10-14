@@ -2,6 +2,20 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Correct the ruleset audit's missing-evidence outcome
+
+**Observed gap:** a GitHub response without `bypass_actors` cannot establish
+whether the approved ruleset has a bypass, yet the v6.8.0 audit described the
+missing field as policy drift. Public unauthenticated responses omit it.
+
+**Meaningful correction:** the live audit now reports `UNVERIFIED` and exits 2
+before making a policy claim when the field is absent or redacted. CLI-level
+tests cover an API outage, redaction, real bypass drift, and a clean result.
+
+**Review oracle:** a redacted fixture must never return drift or pass, while a
+present nonempty bypass list must return drift and an authenticated empty list
+must pass. Network failure must remain unverified.
+
 ## 2026-10-14 — Detect canonical repository protection drift
 
 **Observed gap:** the Constitution requires PR review and green validation, but

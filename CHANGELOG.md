@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.8.1 — 2026-10-14 (candidate)
+
+- Corrected the live ruleset audit to classify a redacted bypass-actor field
+  as unverified, not policy drift. Added CLI-level outage, redaction, drift,
+  and passing-path tests so the tool cannot misreport missing evidence.
+
 ## 6.8.0 — 2026-10-14 (candidate)
 
 - Added a read-only live audit of the canonical GitHub `main` ruleset. It
