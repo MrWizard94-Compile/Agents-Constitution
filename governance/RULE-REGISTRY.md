@@ -29,7 +29,7 @@ home. A reference here is not a second rule definition. IDs are never reused.
 | `RND-INVAR-001`, `RND-CORE-001`, `RND-DOC-001`, `RND-SPIKE-001` | `law/SPECIALIST.md` |
 | `IP-INVENTION-001`, `IP-PATENT-001`, `IP-SECRET-001` | `law/SPECIALIST.md` |
 | `NET-PROTO-001`, `NET-AUTH-001`, `NET-DOC-001`, `NET-CHATTY-001` | `law/SPECIALIST.md` |
-| `LOW-RISK-001`, `LOW-REASON-001`, `LOW-TEMP-001` | `law/SPECIALIST.md` |
+| `LOW-RISK-001`, `LOW-REASON-001`, `LOW-TEMP-001`, `LOW-CACHE-001` | `law/SPECIALIST.md` |
 | `HW-RESPECT-001`, `HW-MEM-001`, `HW-ALT-001` | `law/SPECIALIST.md` |
 | `COST-TOKEN-001`, `COST-CACHE-001` | `law/SPECIALIST.md` |
 
