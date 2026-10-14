@@ -1,6 +1,6 @@
 # Changelog
 
-## 6.9.0 — 2026-10-14 (candidate)
+## 6.10.0 — 2026-10-14 (candidate)
 
 - Closed two residual-discovery blind spots: the all-drive inventory now
   recognizes `SOUL.md` and `AGENTS.md` pre-pack backups by filename even when
@@ -8,6 +8,16 @@
   ignored retired law in bounded agent-config locations without crawling
   arbitrary ignored dependencies or following links. A dated inventory must
   be refreshed before it can support an absence or cleanup claim.
+
+## 6.9.0 — 2026-10-14 (candidate)
+
+- Required a persistent class-transform cache to be linkage-complete.
+  `LOW-CACHE-001` forbids returning a hit whose missing dependency was
+  defined only as a side effect of the original transform, unless that
+  dependency is defined before the hit is returned. Skipping only the class
+  that names the missing type, while a cached caller of a symbol from the
+  same pass remains a hit, is a defect. The source validator guards the
+  rule text. `COST-CACHE-001` stays the home for an agent's working notes.
 
 ## 6.8.1 — 2026-10-14 (candidate)
 

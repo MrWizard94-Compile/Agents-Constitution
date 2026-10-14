@@ -93,6 +93,19 @@ possible.
 Do not leave untracked, temporary, or version-fragile patches in production.
 Track compatibility and removal conditions.
 
+### LOW-CACHE-001 — Linkage-complete transform cache
+
+A persistent cache of bytes that already passed a class transform MUST NOT
+return a hit when linkage of those bytes depends on a class the original
+transform defined only as a side effect, unless that class is defined before
+the hit is returned. Recomputing or skipping only the cached class that
+names the missing type, while a cached caller of a symbol produced in the
+same original pass remains a hit, is a defect: the two results can disagree.
+Identity entries and unrelated cache contexts stay valid. A test must show
+that a hit either defines the missing dependency or misses together with
+the cached caller. `COST-CACHE-001` covers an agent's working notes, not
+this bytecode cache.
+
 ## Hardware, cost, and cognition
 
 ### HW-RESPECT-001 — Design for actual limits

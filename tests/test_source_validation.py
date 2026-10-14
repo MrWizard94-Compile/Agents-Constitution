@@ -47,6 +47,18 @@ class SourceValidationTests(unittest.TestCase):
             ["GOV-FREEZE-001 section missing"],
         )
 
+    def test_cache_link_rule_rejects_a_one_sided_miss(self):
+        specialist = (ROOT / "law" / "SPECIALIST.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.cache_link_contract_errors(specialist), [])
+        self.assertIn(
+            "LOW-CACHE-001 detailed rule missing",
+            VALIDATOR.cache_link_contract_errors(specialist.replace("### LOW-CACHE-001", "### Retired rule")),
+        )
+        self.assertIn(
+            "LOW-CACHE-001 missing linkage safeguard: cached caller",
+            VALIDATOR.cache_link_contract_errors(specialist.replace("cached caller", "other class")),
+        )
+
     def test_missing_binding_file_fails(self):
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary) / "source"

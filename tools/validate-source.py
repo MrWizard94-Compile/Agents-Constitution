@@ -54,6 +54,20 @@ def craft_contract_errors(agents: str) -> list[str]:
     return [f"CONST-CRAFT-001 missing operational safeguard: {term}" for term in required if term not in normalized]
 
 
+def cache_link_contract_errors(specialist: str) -> list[str]:
+    """Guard the transform-cache linkage rule, not just its registry entry."""
+    section = re.search(
+        r"^### LOW-CACHE-001\b.*?\n(.*?)(?=^### |\Z)",
+        specialist,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["LOW-CACHE-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = ("side effect", "cached caller", "defined before")
+    return [f"LOW-CACHE-001 missing linkage safeguard: {term}" for term in required if term not in normalized]
+
+
 def freeze_contract_errors(evolution: str, skill: str) -> list[str]:
     """Guard the frozen-load integrity contract, not just the freeze heading."""
     section = re.search(
@@ -132,6 +146,7 @@ def validate(root: Path = ROOT) -> list[str]:
             errors.append(f"protected rule missing from entry/registry: {rule}")
     errors.extend(craft_contract_errors(agents))
     errors.extend(freeze_contract_errors(evolution, skill))
+    errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
         errors.append("ledger must say ledger-only edits never count")
 

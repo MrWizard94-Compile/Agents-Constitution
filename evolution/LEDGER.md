@@ -21,9 +21,31 @@ linked agent directories produce an explicit unresolved finding.
 **Review oracle:** fixtures with ignored `.agents` SOUL, `.claude` backup,
 `.codex` SOUL variant, `.grok` pack, ignored old-pack loader, and a linked
 agent directory must fail the adoption audit, while an ignored
-`node_modules/SOUL.md` stays outside the
-bounded scope. A filename-only backup must appear in a fresh inventory. The
-old dated report remains an incomplete historical snapshot, not rewritten.
+`node_modules/SOUL.md` stays outside the bounded scope. A filename-only
+backup must appear in a fresh inventory. The old dated report remains an
+incomplete historical snapshot, not rewritten.
+
+## 2026-10-14 — Require linkage-complete class-transform caches
+
+**Observed gap:** a warm class-transform cache stored an outer class that
+named a mixin anonymous class defined only while the transform ran, and
+stored a separate caller of a method that existed only on that cached outer
+class. Treating the outer class as a miss, while leaving the caller cached,
+made the recomputed outer class disagree with the caller (`NoSuchMethodError`).
+Returning the outer bytes without defining the anonymous class failed later
+with `NoClassDefFoundError`. `COST-CACHE-001` concerns an agent's notes, not
+this bytecode cache, so it did not forbid the split.
+
+**Meaningful change:** `LOW-CACHE-001` requires a hit either to define that
+side-effect dependency before the hit is returned, or to miss together with
+the cached caller. Identity entries and unrelated contexts stay valid. The
+source validator fails if the operational wording is removed.
+
+**Review oracle:** a cache test that returns the outer hit and leaves the
+caller cached, with the dependency still undefined, violates the rule. A
+validator fixture that deletes "cached caller" from `law/SPECIALIST.md`
+must fail. If a later call treats a one-sided miss as a complete fix, this
+change failed.
 
 ## 2026-10-14 — Correct the ruleset audit's missing-evidence outcome
 
