@@ -90,6 +90,11 @@ replace an already-running process; restart and re-probe it before claiming
 the live route migrated. If restart is unavailable, report live acceptance as
 open. Resolve audit findings or explicitly retain and label historical
 evidence before deleting a vendored tree.
+For an ignored or standalone project directory without its own Git root, use
+the checker's explicit `--filesystem` mode on that exact directory; a scan of
+the parent Git repository does not establish the child project's status.
+Treat excluded dependency caches, linked paths, nested repositories, and scan
+limits as coverage boundaries, not proof of absence.
 
 ## Delivery and release
 

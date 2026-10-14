@@ -53,6 +53,8 @@ name private project folders in the public repository.
    mirror, pointer, cache, or unrelated false positive. Confirm exact path,
    hash, owner repository, dirty state, and whether a symlink or worktree is
    involved. Re-scan paths before mutation because the inventory is dated.
+   Audit an ignored non-Git project with the explicit filesystem mode on its
+   own directory; the parent repository's tracked-file view omits it.
 2. Publish and verify accepted canonical `main`; install a complete new mirror
    and verify its manifest. Update project pointers in their own Git roots.
    Probe active agent hooks and onboarding tools after deploying and restarting

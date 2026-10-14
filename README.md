@@ -122,17 +122,28 @@ Before retiring an old project pack, run the read-only consumer audit:
 python tools/check-adoption.py <project-git-root>
 ```
 
-It checks tracked and unignored project files plus bounded ignored `.agents`,
-`.claude`, `.codex`, and `.grok` locations for retired SOUL files, pre-pack
-backups, old-pack loaders, and old packs. It does not crawl arbitrary ignored
-dependency trees or follow linked agent directories; a linked directory is
-reported for review.
+For a local project directory that is ignored by its parent Git repository or
+has no Git root of its own, target the exact directory explicitly:
+
+```powershell
+python tools/check-adoption.py <project-directory> --filesystem
+```
+
+Filesystem mode scans first-party source and built output regardless of the
+parent ignore rules. It excludes known dependency caches; linked paths,
+nested Git repositories, and scan limits prevent a clean result. Do not use
+a parent repository scan as proof that an ignored child was inspected.
+
+The default Git mode checks tracked and unignored project files plus bounded
+ignored `.agents`, `.claude`, `.codex`, and `.grok` locations for retired SOUL
+files, pre-pack backups, old-pack loaders, and old packs. It does not crawl
+arbitrary ignored dependency trees or follow linked agent directories; a
+linked directory is reported for review.
 It also detects explicit declarations of active SOUL law. Resolve old CI,
-generator, manifest, pointer, and UI
-references before the old tree is removed. Keep recovery in Git history, not
-in a second active working-tree law copy. A clean static audit is not a
-substitute for indirect-consumer review or the project's build and runtime
-checks.
+generator, manifest, pointer, and UI references before the old tree is removed.
+Keep recovery in Git history, not in a second active working-tree law copy.
+A clean static audit is not a substitute for indirect-consumer review or the
+project's build and runtime checks.
 
 ## Inventory local Constitution copies
 

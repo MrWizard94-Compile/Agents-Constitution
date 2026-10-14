@@ -2,6 +2,28 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Audit ignored non-Git project directories without false clean claims
+
+**Observed gap:** the adoption checker required an exact Git root. An ignored
+local MCP project had a migrated pointer and live route, but its parent
+repository tracked none of its source. The checker refused the project path;
+auditing the parent would omit the project's first-party files and built
+response. No static adoption result could be claimed for that directory.
+
+**Meaningful change:** `check-adoption.py --filesystem` explicitly scans the
+named directory without Git, including built output and ignored first-party
+files. It skips only named dependency caches and returns unresolved findings
+for linked paths and nested repositories; an entry limit or read failure
+aborts without a pass. The default Git-root mode is unchanged. `MIG-CLEAN-001`
+and the skill route non-Git projects to the exact-directory mode instead of
+the parent repository.
+
+**Review oracle:** a fixture ignored by its parent must reveal old-pack text
+in source and built files, while the default mode must reject the child.
+Linked and nested repository paths must not be followed or silently passed;
+the limit must error. The real local MCP project currently produces specific
+historical/fixture reference findings, not a misleading clean result.
+
 ## 2026-10-14 — Verify live agent-onboarding routes during adoption
 
 **Observed gap:** a local read-only WPAI intake tool still emitted a directive

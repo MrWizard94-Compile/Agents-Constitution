@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.12.0 — 2026-10-14 (candidate)
+
+- Added an explicit, bounded filesystem adoption audit for ignored or
+  standalone project directories without their own Git root. It inspects
+  first-party source and built output regardless of a parent ignore rule,
+  excludes named dependency caches, and refuses a clean result when a link,
+  nested repository, or scan limit leaves coverage unresolved. The default
+  exact-Git-root audit remains unchanged.
+
 ## 6.11.0 — 2026-10-14 (candidate)
 
 - Closed a migration evidence gap for agent-facing context providers. Project

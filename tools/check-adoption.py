@@ -6,6 +6,11 @@ CI, generators, and manifests, before removing a vendored pack. It inspects
 tracked and unignored files plus bounded ignored agent-config locations; it
 never follows symlinks or crawls arbitrary ignored caches. A clean static
 result still needs consumer review.
+
+Use --filesystem for an explicit project directory that is not its own Git
+root. This mode audits first-party files, including built output, without
+consulting a parent repository's ignore rules. Known dependency caches are
+excluded; links, nested repositories, and scan limits cannot yield a pass.
 """
 from __future__ import annotations
 
@@ -46,6 +51,8 @@ FLOATING_SOURCE_URL = re.compile(
     re.IGNORECASE,
 )
 MAX_TEXT_BYTES = 4 * 1024 * 1024
+MAX_FILESYSTEM_ENTRIES = 100_000
+DEPENDENCY_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 
 
 def is_link_or_reparse(path: Path) -> bool:
@@ -71,6 +78,35 @@ def project_files(root: Path) -> list[Path]:
             if child.name.casefold() in AUDITED_NAMES or RETIRED_LAW_BACKUP.fullmatch(child.name):
                 paths.append(child)
     return sorted(set(paths))
+
+
+def filesystem_files(root: Path) -> tuple[list[Path], list[tuple[str, str, int]]]:
+    """Audit one explicit tree without Git, never following a linked path."""
+    paths: list[Path] = []
+    findings: list[tuple[str, str, int]] = []
+    pending = [root]
+    entries = 0
+    while pending:
+        for child in sorted(pending.pop().iterdir()):
+            entries += 1
+            if entries > MAX_FILESYSTEM_ENTRIES:
+                raise ValueError("filesystem scan limit reached; no clean result is possible")
+            relative = child.relative_to(root).as_posix()
+            if child.name.casefold() in DEPENDENCY_DIRS:
+                continue
+            if is_link_or_reparse(child):
+                findings.append(("LINKED_PATH_UNINSPECTED", relative, 0))
+            elif child.is_dir():
+                if (child / ".git").exists():
+                    findings.append(("NESTED_GIT_REPOSITORY_UNINSPECTED", relative, 0))
+                elif child.name.casefold() == "agents constitution":
+                    if contains_pack_file(child):
+                        findings.append(("OLD_PACK_DIRECTORY", relative, 0))
+                else:
+                    pending.append(child)
+            elif child.is_file():
+                paths.append(child)
+    return sorted(paths), findings
 
 
 def contains_pack_file(path: Path) -> bool:
@@ -117,25 +153,34 @@ def workflow_source_findings(relative: str, lines: list[str]) -> list[tuple[str,
     return findings
 
 
-def inspect(root: Path) -> list[tuple[str, str, int]]:
+def inspect(root: Path, *, filesystem: bool = False) -> list[tuple[str, str, int]]:
+    if filesystem and is_link_or_reparse(root):
+        raise ValueError("filesystem project root must not be a link or reparse point")
     root = root.resolve(strict=True)
-    git_root = subprocess.run(
-        ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
-        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-    ).stdout.strip()
-    if not root.samefile(Path(git_root)):
-        raise ValueError("project path must be its Git repository root")
+    if not root.is_dir():
+        raise ValueError("project path must be a directory")
+    if filesystem:
+        paths, findings = filesystem_files(root)
+    else:
+        git_root = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+            check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        ).stdout.strip()
+        if not root.samefile(Path(git_root)):
+            raise ValueError("project path must be its Git repository root")
+        paths = project_files(root)
+        findings = []
 
-    findings: list[tuple[str, str, int]] = []
-    for directory in (root, *(root / name for name in AGENT_CONFIG_DIRS)):
-        if directory != root and is_link_or_reparse(directory):
-            findings.append(("AGENT_DIR_SYMLINK_UNINSPECTED", directory.relative_to(root).as_posix(), 0))
-            continue
-        old_pack = directory / "AGENTS Constitution"
-        if contains_pack_file(old_pack):
-            findings.append(("OLD_PACK_DIRECTORY", old_pack.relative_to(root).as_posix(), 0))
+    if not filesystem:
+        for directory in (root, *(root / name for name in AGENT_CONFIG_DIRS)):
+            if directory != root and is_link_or_reparse(directory):
+                findings.append(("AGENT_DIR_SYMLINK_UNINSPECTED", directory.relative_to(root).as_posix(), 0))
+                continue
+            old_pack = directory / "AGENTS Constitution"
+            if contains_pack_file(old_pack):
+                findings.append(("OLD_PACK_DIRECTORY", old_pack.relative_to(root).as_posix(), 0))
 
-    for path in project_files(root):
+    for path in paths:
         relative = path.relative_to(root).as_posix()
         if not path.exists() and not is_link_or_reparse(path):
             continue  # git ls-files still names deleted paths until their deletion is staged
@@ -173,10 +218,11 @@ def inspect(root: Path) -> list[tuple[str, str, int]]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("project", type=Path, help="exact project Git root")
+    parser.add_argument("project", type=Path, help="exact project directory (Git root by default)")
+    parser.add_argument("--filesystem", action="store_true", help="audit an exact first-party directory without Git; known dependency caches are excluded")
     args = parser.parse_args()
     try:
-        findings = inspect(args.project)
+        findings = inspect(args.project, filesystem=args.filesystem)
     except (OSError, ValueError, subprocess.CalledProcessError) as exc:
         print(f"ERROR: adoption check could not complete: {exc}", file=sys.stderr)
         return 2
@@ -186,7 +232,8 @@ def main() -> int:
     if findings:
         print(f"FAIL: {len(findings)} unresolved Constitution adoption findings")
         return 1
-    print("PASS: no detected retired law artifact, active legacy consumer, or pack in audited locations; indirect data flow still requires review")
+    scope = "first-party filesystem (dependency caches excluded)" if args.filesystem else "Git project and bounded agent-config locations"
+    print(f"PASS: no detected retired law artifact, active legacy consumer, or pack in {scope}; indirect data flow still requires review")
     return 0
 
 
