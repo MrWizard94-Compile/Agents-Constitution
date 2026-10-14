@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.9.0 — 2026-10-14 (candidate)
+
+- Closed two residual-discovery blind spots: the all-drive inventory now
+  recognizes `SOUL.md` and `AGENTS.md` pre-pack backups by filename even when
+  their bodies lack scanner signatures; the project adoption audit checks
+  ignored retired law in bounded agent-config locations without crawling
+  arbitrary ignored dependencies or following links. A dated inventory must
+  be refreshed before it can support an absence or cleanup claim.
+
 ## 6.8.1 — 2026-10-14 (candidate)
 
 - Corrected the live ruleset audit to classify a redacted bypass-actor field

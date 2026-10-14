@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.8.1"
+  skill-version: "6.9.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -91,8 +91,9 @@ For adoption or cleanup, run `python tools/check-adoption.py <project-root>`
 from a verified source checkout after updating project pointers, CI, and
 manifests. Resolve all findings before removing an old pack or claiming that
 the project has no shadow law. The audit also identifies retired `SOUL.md`
-pointers, pre-pack backups, and explicit declarations that `SOUL.md` is still
-active law; preserve recoverability in Git history while retiring working-tree
+pointers and pre-pack backups even in bounded ignored agent-config directories,
+plus explicit declarations that `SOUL.md` is still active law; preserve
+recoverability in Git history while retiring working-tree
 copies. A clean static audit does not replace a review of indirect consumers.
 The audit checks literal canonical source pins in GitHub workflows; review
 dynamic fetches separately and verify that the pinned SHA was accepted on

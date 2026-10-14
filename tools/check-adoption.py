@@ -3,18 +3,24 @@
 
 This is a read-only migration check. Run it after changing project entry points,
 CI, generators, and manifests, before removing a vendored pack. It inspects
-tracked and unignored files plus the top-level old-pack directory; it never
-follows symlinks. A clean static result still needs consumer review.
+tracked and unignored files plus bounded ignored agent-config locations; it
+never follows symlinks or crawls arbitrary ignored caches. A clean static
+result still needs consumer review.
 """
 from __future__ import annotations
 
 import argparse
 import re
+import stat
 import subprocess
 import sys
 from pathlib import Path
 
 TEXT_SUFFIXES = {".md", ".mdc", ".json", ".toml", ".yaml", ".yml", ".ps1", ".py", ".js", ".mjs", ".cjs", ".ts", ".tsx"}
+AGENT_CONFIG_DIRS = (".agents", ".claude", ".codex", ".grok")
+RETIRED_SOUL_NAMES = {"soul.md", "soulv2.0.0.md", "soulv2.md", "soul-v2.md"}
+INSTRUCTION_NAMES = {"agents.md", "claude.md"}
+AUDITED_NAMES = RETIRED_SOUL_NAMES | INSTRUCTION_NAMES
 LEGACY = re.compile(r"AGENTS Constitution|skills[\\/]+agents-constitution|name:\s*agents-constitution|SOULv2\.0\.0\.md|verify-pack\.ps1|gate_check\.py", re.IGNORECASE)
 FULL_SOUL = re.compile(r"(?:^# SOUL\.md\s*[—-]\s*The Constitution of an AI Empire|^## 40\. Constitutional Integrity)", re.MULTILINE)
 RETIRED_LAW_BACKUP = re.compile(r"^(?:soul|agents)\.md\.legacy-pre-pack-[\w.-]+$", re.IGNORECASE)
@@ -42,14 +48,45 @@ FLOATING_SOURCE_URL = re.compile(
 MAX_TEXT_BYTES = 4 * 1024 * 1024
 
 
+def is_link_or_reparse(path: Path) -> bool:
+    try:
+        metadata = path.lstat()
+    except FileNotFoundError:
+        return False
+    return stat.S_ISLNK(metadata.st_mode) or bool(
+        getattr(metadata, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
+    )
+
+
 def project_files(root: Path) -> list[Path]:
     result = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
         check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
     )
     paths = [root / Path(item.decode("utf-8", errors="surrogateescape")) for item in result.stdout.split(b"\0") if item]
-    paths.extend(root / name for name in ("SOUL.md", "SOULv2.0.0.md") if (root / name).exists())
+    for directory in (root, *(root / name for name in AGENT_CONFIG_DIRS)):
+        if is_link_or_reparse(directory) or not directory.is_dir():
+            continue
+        for child in directory.iterdir():
+            if child.name.casefold() in AUDITED_NAMES or RETIRED_LAW_BACKUP.fullmatch(child.name):
+                paths.append(child)
     return sorted(set(paths))
+
+
+def contains_pack_file(path: Path) -> bool:
+    """Check a known pack location without entering a linked directory."""
+    if is_link_or_reparse(path):
+        return True
+    if not path.is_dir():
+        return path.is_file()
+    pending = [path]
+    while pending:
+        for child in pending.pop().iterdir():
+            if is_link_or_reparse(child) or child.is_file():
+                return True
+            if child.is_dir():
+                pending.append(child)
+    return False
 
 
 def workflow_source_findings(relative: str, lines: list[str]) -> list[tuple[str, str, int]]:
@@ -90,21 +127,25 @@ def inspect(root: Path) -> list[tuple[str, str, int]]:
         raise ValueError("project path must be its Git repository root")
 
     findings: list[tuple[str, str, int]] = []
-    old_pack = root / "AGENTS Constitution"
-    if old_pack.is_symlink() or (old_pack.is_dir() and any(path.is_file() or path.is_symlink() for path in old_pack.rglob("*"))):
-        findings.append(("OLD_PACK_DIRECTORY", "AGENTS Constitution", 0))
+    for directory in (root, *(root / name for name in AGENT_CONFIG_DIRS)):
+        if directory != root and is_link_or_reparse(directory):
+            findings.append(("AGENT_DIR_SYMLINK_UNINSPECTED", directory.relative_to(root).as_posix(), 0))
+            continue
+        old_pack = directory / "AGENTS Constitution"
+        if contains_pack_file(old_pack):
+            findings.append(("OLD_PACK_DIRECTORY", old_pack.relative_to(root).as_posix(), 0))
 
     for path in project_files(root):
         relative = path.relative_to(root).as_posix()
-        if not path.exists() and not path.is_symlink():
+        if not path.exists() and not is_link_or_reparse(path):
             continue  # git ls-files still names deleted paths until their deletion is staged
         if "AGENTS Constitution" in path.parts and relative.startswith("AGENTS Constitution/"):
             continue  # one directory finding is enough
-        if path.name.casefold() in {"soul.md", "soulv2.0.0.md"}:
+        if path.name.casefold() in RETIRED_SOUL_NAMES:
             findings.append(("RETIRED_SOUL_FILE", relative, 0))
         elif RETIRED_LAW_BACKUP.fullmatch(path.name):
             findings.append(("RETIRED_LAW_BACKUP", relative, 0))
-        if path.is_symlink():
+        if is_link_or_reparse(path):
             if LEGACY.search(relative):
                 findings.append(("LEGACY_SYMLINK", relative, 0))
             continue
