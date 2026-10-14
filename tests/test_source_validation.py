@@ -30,6 +30,23 @@ class SourceValidationTests(unittest.TestCase):
             VALIDATOR.craft_contract_errors(agents.replace("independent oracle", "self review")),
         )
 
+    def test_freeze_rule_rejects_lost_load_integrity_safeguards(self):
+        evolution = (ROOT / "governance/EVOLUTION.md").read_text(encoding="utf-8")
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.freeze_contract_errors(evolution, skill), [])
+        self.assertIn(
+            "GOV-FREEZE-001 missing load-integrity safeguard: byte-exact",
+            VALIDATOR.freeze_contract_errors(evolution.replace("byte-exact", "careful"), skill),
+        )
+        self.assertIn(
+            "SKILL.md must point to tools/check-frozen-load.py",
+            VALIDATOR.freeze_contract_errors(evolution, skill.replace("check-frozen-load", "checker")),
+        )
+        self.assertEqual(
+            VALIDATOR.freeze_contract_errors(evolution.replace("## GOV-FREEZE-001", "## Retired"), skill),
+            ["GOV-FREEZE-001 section missing"],
+        )
+
     def test_missing_binding_file_fails(self):
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary) / "source"

@@ -2,6 +2,32 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-13 — Verify the frozen load and disclose loader drift
+
+**Observed gap:** during a 2026-10-13 call the running loader was v6.5.0 while
+accepted `main` was v6.6.1. Nothing said which `SKILL.md` governs or required
+the mismatch to be disclosed. The same call first read binding law through a
+summarizing web-page reader whose output looked verbatim; the step "read from
+that same revision" did not require exact bytes, so a faithful read could not
+be told apart from a paraphrase or truncation.
+
+**Meaningful change:** GOV-FREEZE-001 now requires byte-exact reads (a checkout
+confirmed by the new `tools/check-frozen-load.py`, or a hash-verified sync),
+treats summarized readers as orientation with an "unverified" handoff, and
+makes the frozen `SKILL.md` govern when the running loader's `skill-version`
+differs, with both versions disclosed. The tool checks full-SHA HEAD, an
+unmodified tracked tree, and raw git-blob hashes for every `SOURCE.json`
+binding file (catching edits that `git status` cannot see, such as
+skip-worktree files), and compares versions numerically (6.10.0 is newer than
+6.9.0). `tools/validate-source.py` guards the contract text.
+
+**Review oracle:** a clean checkout passes; a different HEAD, a short or branch
+ref, a modified tracked file, a modified skip-worktree file, and a manifest
+file missing from the revision each fail; a 6.5.0 loader against 6.6.1 reports
+`STALE LOADER` without failing integrity. If a later call relies on summarized
+law without the unverified disclosure, or ignores reported loader drift, this
+change failed.
+
 ## 2026-10-13 — Exclude concurrent mirror writers during recovery
 
 **Observed gap:** the v6.6.0 undo journal made interruption recoverable, but

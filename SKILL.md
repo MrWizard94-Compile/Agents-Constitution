@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.6.1"
+  skill-version: "6.7.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -24,14 +24,18 @@ manifest live in `SOURCE.json`.
 
 1. Resolve the full SHA of accepted GitHub `main`, or a director-named
    accepted release. Validate `SOURCE.json`, `VERSION`, and the file manifest;
-   record the SHA. The source revision is frozen for this call. If GitHub is
+   record the SHA. The source revision is frozen for this call. If this
+   loader's `skill-version` differs from the frozen `SOURCE.json`, follow the
+   frozen `SKILL.md` and disclose both versions (GOV-FREEZE-001). If GitHub is
    unavailable, use only a previously verified mirror, disclose degraded
    sync, and do not claim freshness.
 2. Read `references/always-load.md`, `AGENTS.md`, `SOP.md`, and
    `governance/EVOLUTION.md` from that **same** revision. Read relevant `law/*`
    files using the matrix in `AGENTS.md`. Read the project's own instructions
    for mission, stack, and acceptance criteria. Do not substitute an adjacent
-   folder, old pack, or web search result for binding law.
+   folder, old pack, web search result, or summarized page text for binding
+   law. Read it byte-exact: a checkout of the frozen SHA confirmed with
+   `tools/check-frozen-load.py`, or a hash-verified sync (GOV-FREEZE-001).
 3. Identify the user-approved scope, current state, dependencies, risks,
    checks, and necessary authority. For a broad refactor, migration, or
    cleanup, make a concise plan with rollback before mutating state. Establish
@@ -119,7 +123,7 @@ at the strongest available level.
 
 ## Handoff minimum
 
-State what changed and why, source SHA, changed paths, exact verification and
+State what changed and why, source SHA (naming any loader-version mismatch or unverified-law reading), changed paths, exact verification and
 its limits, unresolved risks, and next human action. Distinguish source QA,
 package, install, runtime, physical acceptance, and publication. Include a
 compact `Skill evolution:` line naming the meaningful change and whether it

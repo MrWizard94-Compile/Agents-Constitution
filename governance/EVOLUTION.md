@@ -22,6 +22,18 @@ The change becomes eligible only on a later call after acceptance on
 `main`. If GitHub is unavailable, a previously verified mirror may be
 used with a visible degraded-sync note.
 
+Binding text MUST be read **byte-exact** from the frozen revision: a Git
+checkout of that SHA confirmed with `tools/check-frozen-load.py --sha <SHA>`,
+or a hash-verified `distribution/sync.py` snapshot. Web-page converters,
+search snippets, and other summarizing or model-relayed readers can help
+resolve the SHA or locate a file, but their output is orientation, not law:
+it may paraphrase or truncate without any visible sign. If only such a reader
+is available, the handoff reports binding law as unverified and any completion
+claim as partial. If the running loader's `skill-version` differs from the
+frozen `SOURCE.json`, the frozen `SKILL.md` governs the call, the loader's
+differing steps are not followed, and the handoff names both versions;
+`--loader <running SKILL.md>` reports the drift.
+
 ## GOV-EVOLVE-001 — One meaningful improvement per call
 
 Every top-level use of the `wpai-constitution` skill MUST author one
