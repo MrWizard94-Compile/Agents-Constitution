@@ -2,6 +2,26 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Preserve every supported relationship representation in derived context
+
+**Observed gap:** the WPAI vault resolver accepted Markdown links, but its
+graph included only wiki links. On the real vault, correcting the omission
+raised resolved links from 86 to 2,715 and reduced notes without incoming
+links from 2,150 to 1,268. A plausible graph and passing parser checks had
+concealed materially false context and orphan statistics.
+
+**Meaningful change:** `ENG-FW-001` now requires every supported relationship
+representation to reach each derived consumer that claims that relationship,
+with provenance separating authored from inferred edges. Intentional
+exclusions must be visible rather than misreported as absence. The skill
+points callers to the existing rule home.
+
+**Review oracle:** a Markdown-only or other single-representation fixture
+must yield the expected consumer edge, backlink, count, and provenance; an
+excluded form must be disclosed. This rule is falsified if the parser succeeds
+but the installed graph or visual silently omits that fixture, or if it
+requires a consumer to include relationships outside its declared scope.
+
 ## 2026-10-14 — Make externally mutable context indexes honest about freshness
 
 **Observed gap:** a live vault MCP context provider reported a deleted

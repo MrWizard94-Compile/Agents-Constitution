@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.13.0"
+  skill-version: "6.14.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -125,6 +125,9 @@ and performance attribution separate; none proves the others by itself.
 For an agent-facing context index over externally mutable files, verify its
 freshness and stale-path recovery contract through the installed consumer,
 not only through direct source tests (`ENG-FW-001`).
+For a graph or retrieval projection, test each supported source-link form
+independently at the consumer boundary; a resolver accepting a link does not
+prove that its edges, backlinks, or statistics include it (`ENG-FW-001`).
 
 When the user requests a final, professional, or production-ready result,
 target the highest quality reasonably achievable within the authorized scope

@@ -75,6 +75,15 @@ bound or after an explicit refresh. Retry a transient stale-path failure from
 a rebuilt index, or report an actionable incomplete result rather than a
 false clean graph. Test create, edit, delete, and the installed consumer's
 response; measure refresh cost on a representative workspace.
+When a parser or resolver accepts multiple representations of a relationship,
+trace each supported representation through every derived index, graph,
+retrieval result, statistic, and visual projection that claims to include that
+relationship. Preserve source provenance so authored evidence is distinguishable
+from inferred connections. An intentional exclusion needs a documented,
+consumer-visible scope and must not be counted as an absence or orphan. Test a
+fixture where each representation occurs alone, then verify the actual
+consumer's edges, backlinks, counts, and provenance; a parser-only success or
+a visually plausible graph does not establish projection completeness.
 
 ### ENG-REPRO-001 — Reproducibility
 

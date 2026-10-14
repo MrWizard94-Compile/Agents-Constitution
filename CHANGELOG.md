@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.14.0 — 2026-10-14 (candidate)
+
+- Required representation parity and provenance across derived indexes,
+  graphs, retrieval, statistics, and visuals that claim a relationship. A
+  supported source-link form cannot silently vanish downstream or be counted
+  as an orphan. Consumer-level tests must exercise each form alone. This
+  extends `ENG-FW-001` at its existing canonical home.
+
 ## 6.13.0 — 2026-10-14 (candidate)
 
 - Required a bounded freshness and stale-path recovery contract for
