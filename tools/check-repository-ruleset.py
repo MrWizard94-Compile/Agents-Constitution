@@ -71,6 +71,9 @@ def main() -> int:
             print(f"DRIFT: expected one named ruleset, found {len(matching)}")
             return 1
         detail = fetch_json(f"/rulesets/{matching[0]['id']}")
+        if not isinstance(detail, dict) or not isinstance(detail.get("bypass_actors"), list):
+            print("UNVERIFIED: ruleset detail omits bypass actors; authenticate gh before auditing")
+            return 2
         effective = fetch_json("/rules/branches/main?per_page=100")
         errors = audit(rulesets, detail, effective)
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError, ValueError, json.JSONDecodeError) as exc:
