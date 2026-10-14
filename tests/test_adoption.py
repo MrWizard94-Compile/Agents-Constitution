@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import importlib.util
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 SOURCE = Path(__file__).resolve().parents[1] / "tools" / "check-adoption.py"
@@ -108,6 +110,91 @@ class AdoptionCheckTests(unittest.TestCase):
             self.assertIn(("LEGACY_REFERENCE", ".claude/AGENTS.md", 1), findings)
             self.assertIn(("RETIRED_LAW_BACKUP", "SOUL.md.legacy-pre-pack-local", 0), findings)
             self.assertFalse(any(path == "node_modules/SOUL.md" for _, path, _ in findings))
+
+    def test_explicit_filesystem_mode_audits_ignored_subproject_and_built_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            self.make_repo(parent)
+            (parent / ".gitignore").write_text("/app/\n", encoding="utf-8")
+            project = parent / "app"
+            project.mkdir()
+            (project / "AGENTS.md").write_text(
+                "Canonical: https://github.com/MrWizard94-Compile/Agents-Constitution\n",
+                encoding="utf-8",
+            )
+            for directory in ("src", "dist", "node_modules", "nested/AGENTS Constitution"):
+                (project / directory).mkdir(parents=True)
+            (project / "src" / "intake.ts").write_text("Load AGENTS Constitution/AGENTS.md\n", encoding="utf-8")
+            (project / "dist" / "intake.js").write_text("Load AGENTS Constitution/AGENTS.md\n", encoding="utf-8")
+            (project / "node_modules" / "SOUL.md").write_text("vendor copy\n", encoding="utf-8")
+            (project / "nested" / "AGENTS Constitution" / "PACK.md").write_text("old pack\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "Git repository root"):
+                ADOPTION.inspect(project)
+            findings = ADOPTION.inspect(project, filesystem=True)
+            self.assertIn(("LEGACY_REFERENCE", "src/intake.ts", 1), findings)
+            self.assertIn(("LEGACY_REFERENCE", "dist/intake.js", 1), findings)
+            self.assertIn(("OLD_PACK_DIRECTORY", "nested/AGENTS Constitution", 0), findings)
+            self.assertFalse(any("node_modules" in path for _, path, _ in findings))
+
+            result = subprocess.run(
+                [sys.executable, str(SOURCE), str(project), "--filesystem"],
+                text=True, capture_output=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("dist/intake.js", result.stdout)
+
+    def test_filesystem_mode_can_pass_clean_ignored_project_without_git(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "AGENTS.md").write_text(
+                "Canonical: https://github.com/MrWizard94-Compile/Agents-Constitution\n",
+                encoding="utf-8",
+            )
+            vendor = root / "node_modules"
+            vendor.mkdir()
+            (vendor / "SOUL.md").write_text("third-party data\n", encoding="utf-8")
+            self.assertEqual(ADOPTION.inspect(root, filesystem=True), [])
+            result = subprocess.run(
+                [sys.executable, str(SOURCE), str(root), "--filesystem"],
+                text=True, capture_output=True, check=False,
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("first-party filesystem", result.stdout)
+
+    def test_filesystem_mode_reports_links_and_nested_repositories(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = parent / "project"
+            outside = parent / "outside"
+            root.mkdir()
+            outside.mkdir()
+            (outside / "SOUL.md").write_text("outside law\n", encoding="utf-8")
+            nested = root / "nested"
+            nested.mkdir()
+            (nested / ".git").mkdir()
+            (nested / "SOUL.md").write_text("separate repository\n", encoding="utf-8")
+            findings = ADOPTION.inspect(root, filesystem=True)
+            self.assertIn(("NESTED_GIT_REPOSITORY_UNINSPECTED", "nested", 0), findings)
+            try:
+                (root / "linked").symlink_to(outside, target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(f"directory symlink unavailable: {exc}")
+            findings = ADOPTION.inspect(root, filesystem=True)
+            self.assertIn(("LINKED_PATH_UNINSPECTED", "linked", 0), findings)
+            self.assertNotIn(("RETIRED_SOUL_FILE", "linked/SOUL.md", 0), findings)
+            self.assertNotIn(("RETIRED_SOUL_FILE", "nested/SOUL.md", 0), findings)
+            with self.assertRaisesRegex(ValueError, "root must not be a link"):
+                ADOPTION.inspect(root / "linked", filesystem=True)
+
+    def test_filesystem_mode_limit_never_returns_a_false_pass(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in ("one.md", "two.md", "three.md"):
+                (root / name).write_text("clean\n", encoding="utf-8")
+            with patch.object(ADOPTION, "MAX_FILESYSTEM_ENTRIES", 2):
+                with self.assertRaisesRegex(ValueError, "scan limit reached"):
+                    ADOPTION.inspect(root, filesystem=True)
 
     def test_linked_agent_directory_is_reported_without_reading_target(self):
         with tempfile.TemporaryDirectory() as temporary:

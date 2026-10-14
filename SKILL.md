@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.11.0"
+  skill-version: "6.12.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -95,6 +95,11 @@ pointers and pre-pack backups even in bounded ignored agent-config directories,
 plus explicit declarations that `SOUL.md` is still active law; preserve
 recoverability in Git history while retiring working-tree
 copies. A clean static audit does not replace a review of indirect consumers.
+When the exact project directory is not its own Git root, use
+`python tools/check-adoption.py <project-directory> --filesystem` instead of
+auditing its parent repository as a substitute. This explicit mode includes
+first-party and built files, excludes known dependency caches, and reports
+linked or nested repository paths as unresolved coverage.
 The audit checks literal canonical source pins in GitHub workflows; review
 dynamic fetches separately and verify that the pinned SHA was accepted on
 `main`. A syntactically pinned but unvalidated commit is not enough.
