@@ -59,6 +59,28 @@ class SourceValidationTests(unittest.TestCase):
             VALIDATOR.cache_link_contract_errors(specialist.replace("cached caller", "other class")),
         )
 
+    def test_resource_rule_requires_host_level_acceptance(self):
+        engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.integrated_resource_contract_errors(engineering), [])
+        self.assertIn(
+            "PERF-BUDGET-001 detailed rule missing",
+            VALIDATOR.integrated_resource_contract_errors(
+                engineering.replace("### PERF-BUDGET-001", "### Retired rule")
+            ),
+        )
+        self.assertIn(
+            "PERF-BUDGET-001 missing integrated resource safeguard: peak aggregate",
+            VALIDATOR.integrated_resource_contract_errors(
+                engineering.replace("peak aggregate", "individual peak")
+            ),
+        )
+        self.assertIn(
+            "PERF-BUDGET-001 missing integrated resource safeguard: restore an ineffective trial",
+            VALIDATOR.integrated_resource_contract_errors(
+                engineering.replace("restore an ineffective trial", "keep every trial")
+            ),
+        )
+
     def test_missing_binding_file_fails(self):
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary) / "source"

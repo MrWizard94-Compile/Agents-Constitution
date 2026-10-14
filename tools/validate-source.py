@@ -68,6 +68,24 @@ def cache_link_contract_errors(specialist: str) -> list[str]:
     return [f"LOW-CACHE-001 missing linkage safeguard: {term}" for term in required if term not in normalized]
 
 
+def integrated_resource_contract_errors(engineering: str) -> list[str]:
+    """Guard system-level acceptance when a provider runs inside a larger host."""
+    section = re.search(
+        r"^### PERF-BUDGET-001\b.*?\n(.*?)(?=^### |\Z)",
+        engineering,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["PERF-BUDGET-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "corpus size", "file-type scope", "cold startup", "usable host",
+        "peak aggregate", "fast backend", "restore an ineffective trial",
+    )
+    return [f"PERF-BUDGET-001 missing integrated resource safeguard: {term}"
+            for term in required if term not in normalized]
+
+
 def freeze_contract_errors(evolution: str, skill: str) -> list[str]:
     """Guard the frozen-load integrity contract, not just the freeze heading."""
     section = re.search(
@@ -147,6 +165,7 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(craft_contract_errors(agents))
     errors.extend(freeze_contract_errors(evolution, skill))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
+    errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
         errors.append("ledger must say ledger-only edits never count")
 
