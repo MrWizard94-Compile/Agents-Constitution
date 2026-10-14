@@ -186,7 +186,7 @@ def main() -> int:
     if findings:
         print(f"FAIL: {len(findings)} unresolved Constitution adoption findings")
         return 1
-    print("PASS: no detected retired law artifact, active legacy consumer, or top-level pack; indirect data flow still requires review")
+    print("PASS: no detected retired law artifact, active legacy consumer, or pack in audited locations; indirect data flow still requires review")
     return 0
 
 
