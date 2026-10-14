@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.14.0"
+  skill-version: "6.15.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -128,6 +128,9 @@ not only through direct source tests (`ENG-FW-001`).
 For a graph or retrieval projection, test each supported source-link form
 independently at the consumer boundary; a resolver accepting a link does not
 prove that its edges, backlinks, or statistics include it (`ENG-FW-001`).
+For a generated view or other consumer-discovered artifact, preflight its
+destination against that consumer's root and exclusion rules, then verify a
+valid artifact from the consumer itself (`ENG-FW-001`).
 
 When the user requests a final, professional, or production-ready result,
 target the highest quality reasonably achievable within the authorized scope

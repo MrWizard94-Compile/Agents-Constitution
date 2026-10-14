@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.15.0 — 2026-10-14 (candidate)
+
+- Required generated artifacts to pass their actual consumer's discovery
+  boundary: root location, ignore/exclusion rules, registration, and packaged
+  paths. A valid but hidden file is not a delivered view. Preflight unsafe
+  destinations, test rejection, and keep live acceptance open until the
+  intended consumer visibly loads a valid artifact. This extends `ENG-FW-001`.
+
 ## 6.14.0 — 2026-10-14 (candidate)
 
 - Required representation parity and provenance across derived indexes,
