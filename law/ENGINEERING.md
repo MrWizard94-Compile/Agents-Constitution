@@ -55,6 +55,13 @@ may still be unusable. Preserve every required input and the original
 all-or-partial conversion behavior; do not widen only a validator, discard an
 ingredient, or suppress a warning to obtain a green result. Test capacity
 boundaries and the real consumer, including reload where applicable.
+Verify the consumer's discovery boundary as well as the artifact's bytes:
+target roots, ignore or exclusion rules, registration, and packaged paths.
+Preflight the destination before writing; a valid artifact hidden under an
+ignored path, outside the consumer's root, or behind an unsafe link is not a
+delivered view. Test rejected destinations and observe a valid one through
+the intended consumer. If that consumer cannot be run, report its acceptance
+gate as open rather than equating a successful export with visibility.
 For declarative assets, trace the exact-version producer, executable program,
 dependency chain, and consumer lookup. An inactive declaration is not the
 same as missing active content. Prove absence behavior before deletion;

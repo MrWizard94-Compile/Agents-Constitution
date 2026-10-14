@@ -2,6 +2,27 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Require generated artifacts to be discoverable by their consumer
+
+**Observed gap:** a valid WPAI neural-vault Canvas was first exported below
+`Software/obsidian-mcp-server/data`, while the vault's `.obsidianignore`
+excluded that entire project. The exporter succeeded and JSON Canvas tests
+passed, but Obsidian could not discover the view. A second export had to be
+placed under a non-ignored vault directory. Native UI acceptance is still open
+because Obsidian remained at its loading screen.
+
+**Meaningful change:** `ENG-FW-001` now makes the consumer's discovery boundary
+part of generated-artifact correctness. Agents must preflight the destination
+against roots, exclusions, registration, and packaged paths; reject hidden or
+unsafe destinations and distinguish successful export from consumer visibility.
+The skill points to that single rule home.
+
+**Review oracle:** a generated view aimed below an ignored path, outside the
+consumer root, or through a linked directory must fail before writing. A valid
+path must be observed through the installed consumer before live acceptance.
+This rule is wrong if it treats file existence or schema validity as proof of
+visibility, or forces an unavailable consumer to be described as accepted.
+
 ## 2026-10-14 — Preserve every supported relationship representation in derived context
 
 **Observed gap:** the WPAI vault resolver accepted Markdown links, but its
