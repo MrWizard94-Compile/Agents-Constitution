@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.16.0 — 2026-10-14 (candidate)
+
+- Required end-to-end resource acceptance for host-plus-provider workflows on
+  the intended corpus. Cold host usability, enabled file-type scope, and peak
+  combined process use now matter alongside warm query speed. Configuration
+  trials must be reversible, disclose hidden content, and cannot close the
+  live gate when the user-facing host still fails to load (`PERF-BUDGET-001`).
+
 ## 6.15.0 — 2026-10-14 (candidate)
 
 - Required generated artifacts to pass their actual consumer's discovery

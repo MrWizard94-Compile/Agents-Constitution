@@ -2,6 +2,26 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-14 — Budget the actual host-plus-provider system
+
+**Observed gap:** the installed WPAI neural-context provider returned a warm
+query quickly, but the user-facing Obsidian vault remained at “Loading vault”
+on a workspace with roughly 1.58 million files. A provider-only latency test
+could misleadingly mark the integrated neural workspace as accepted.
+
+**Meaningful change:** `PERF-BUDGET-001` now requires a representative corpus
+and file-type scope, cold time to a usable host, steady-state behavior, and
+peak aggregate resource use across required host and provider processes.
+Reversible configuration trials must disclose hidden content and be restored
+if ineffective; live host and agent acceptance remain separate from query QA.
+
+**Review oracle:** on the intended corpus, a fast warm provider response with
+an unusable or over-budget host must leave acceptance open. An effective
+scope reduction must show the host and agent flow working and name hidden
+content; an ineffective reduction must be restored. The rule is wrong if it
+requires measuring irrelevant processes or treats every large corpus as a
+failure without an actual resource or usability limit.
+
 ## 2026-10-14 — Require generated artifacts to be discoverable by their consumer
 
 **Observed gap:** a valid WPAI neural-vault Canvas was first exported below

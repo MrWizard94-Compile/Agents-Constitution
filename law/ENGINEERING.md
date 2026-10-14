@@ -219,6 +219,16 @@ cancellation; yielding between expensive units does not bound one unit.
 
 Honor explicit CPU, GPU, RAM, storage, latency, battery, tick, token, and cost
 limits. Measure peak use under a realistic constrained workload when material.
+For a host plus plugin, sidecar, or agent-provider workflow, budget the whole
+required system, not only an isolated provider call or warm query. Record the
+representative corpus size and file-type scope, enabled integrations, cold
+startup time to a usable host, steady-state behavior, and peak aggregate
+resource use across required processes. A fast backend is not acceptance when
+the user-facing host cannot load or the combined system exceeds its budget.
+If the full workflow fails its budget or cannot load, test a reversible scope
+or configuration reduction against the same corpus. Disclose any content it
+hides, restore an ineffective trial, and keep the live acceptance gate open
+until the intended host and agent flow both work.
 
 ### DEP-REPRO-001 — Build inputs
 
