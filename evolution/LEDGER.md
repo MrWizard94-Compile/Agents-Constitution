@@ -2,6 +2,27 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-15 — Reject linked ancestor routes in adoption evidence
+
+**Observed gap:** a controlled Git fixture replaced a tracked directory with
+a Windows junction. The adoption checker read external Markdown through that
+parent because its link check covered only the final file. It also returned
+a clean result for an ordinary leaf symlink and accepted a linked Git root.
+Three new regression cases failed against the accepted baseline.
+
+**Meaningful change:** the checker inspects candidate components outermost-first
+and reports the first link or reparse point once, without reading descendants.
+It rejects linked root routes in both modes and retains name-only findings for
+retired leaf artifacts. The documentation explicitly limits this read-only
+audit to a quiescent tree, not race-free isolation from hostile writers.
+
+**Falsification:** real Windows junction/POSIX symlink fixtures must block
+content reads through tracked parents (including absent descendants), return
+a nonzero CLI status, preserve external bytes, and reject root aliases.
+Clean files and unstaged tracked deletions must retain their prior behavior.
+A metadata-order assertion fails if any component beneath a known link is
+queried. No binding-law or authority change is needed.
+
 ## 2026-10-14 — Budget the actual host-plus-provider system
 
 **Observed gap:** the installed WPAI neural-context provider returned a warm

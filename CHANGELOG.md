@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.16.1 — 2026-10-15 (candidate)
+
+- Fixed adoption scanning through linked ancestors of Git-listed files.
+  Each candidate's components are checked outermost-first before content is
+  read; symlinks and Windows reparse points leave explicit unresolved coverage.
+  Ordinary leaf links no longer silently pass, and both audit modes reject
+  linked project-root routes. Real junction/symlink regression fixtures cover
+  the boundary; concurrent hostile directory replacement is not sandboxed.
+
 ## 6.16.0 — 2026-10-14 (candidate)
 
 - Required end-to-end resource acceptance for host-plus-provider workflows on

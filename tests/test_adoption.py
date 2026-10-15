@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import patch
 
@@ -19,6 +21,117 @@ spec.loader.exec_module(ADOPTION)
 class AdoptionCheckTests(unittest.TestCase):
     def make_repo(self, root: Path) -> None:
         subprocess.run(["git", "init", "-q", str(root)], check=True)
+
+    @contextmanager
+    def directory_link(self, link: Path, target: Path):
+        """Exercise real Windows junctions and POSIX directory symlinks."""
+        if os.name == "nt":
+            environment = dict(os.environ, WPAI_TEST_LINK=str(link), WPAI_TEST_TARGET=str(target))
+            subprocess.run(
+                ["powershell", "-NoProfile", "-NonInteractive", "-Command",
+                 "$ErrorActionPreference = 'Stop'; New-Item -ItemType Junction "
+                 "-Path $env:WPAI_TEST_LINK -Target $env:WPAI_TEST_TARGET | Out-Null"],
+                check=True, capture_output=True, env=environment,
+            )
+        else:
+            link.symlink_to(target, target_is_directory=True)
+        try:
+            yield
+        finally:
+            # Remove only the fixture's link, never recurse into its target.
+            if os.name == "nt":
+                link.rmdir()
+            else:
+                link.unlink()
+
+    def test_git_tracked_descendants_of_linked_directory_are_not_read(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = parent / "repo"
+            root.mkdir()
+            self.make_repo(root)
+            linked = root / "docs"
+            nested = linked / "deep"
+            nested.mkdir(parents=True)
+            for filename in ("README.md", "SOUL.md", "deleted.md"):
+                (nested / filename).write_text("AGENTS Constitution\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(root), "add", "docs"], check=True)
+            outside = parent / "outside"
+            linked.rename(outside)
+            (outside / "deep" / "deleted.md").unlink()
+            original_read = Path.read_text
+
+            def guarded_read(path, *args, **kwargs):
+                self.assertFalse(path.is_relative_to(linked), "scanner read through linked ancestor")
+                return original_read(path, *args, **kwargs)
+
+            with self.directory_link(linked, outside), patch.object(Path, "read_text", guarded_read):
+                self.assertEqual(ADOPTION.inspect(root), [("LINKED_PATH_UNINSPECTED", "docs", 0)])
+                result = subprocess.run(
+                    [sys.executable, str(SOURCE), str(root)],
+                    text=True, capture_output=True, check=False,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("LINKED_PATH_UNINSPECTED: docs", result.stdout)
+                self.assertNotIn("LEGACY_REFERENCE", result.stdout)
+            self.assertEqual((outside / "deep" / "README.md").read_text(encoding="utf-8"), "AGENTS Constitution\n")
+
+    def test_linked_root_is_rejected_before_git_or_filesystem_scan(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            target = parent / "target"
+            target.mkdir()
+            self.make_repo(target)
+            nested = target / "nested"
+            nested.mkdir()
+            self.make_repo(nested)
+            link = parent / "linked"
+            with self.directory_link(link, target):
+                for filesystem in (False, True):
+                    for project in (link, link / "nested"):
+                        with self.subTest(filesystem=filesystem, project=project.name):
+                            with self.assertRaisesRegex(ValueError, "root must not be a link"):
+                                ADOPTION.inspect(project, filesystem=filesystem)
+
+    def test_ordinary_leaf_symlink_is_unresolved_coverage_not_a_clean_scan(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = parent / "repo"
+            root.mkdir()
+            self.make_repo(root)
+            outside = parent / "outside.md"
+            outside.write_text("AGENTS Constitution\n", encoding="utf-8")
+            link = root / "README.md"
+            try:
+                link.symlink_to(outside)
+            except OSError as exc:
+                self.skipTest(f"file symlink unavailable: {exc}")
+            self.assertEqual(ADOPTION.inspect(root), [("LINKED_PATH_UNINSPECTED", "README.md", 0)])
+            link.unlink()
+            (root / "SOUL.md").symlink_to(outside)
+            self.assertEqual(ADOPTION.inspect(root), [
+                ("LINKED_PATH_UNINSPECTED", "SOUL.md", 0),
+                ("RETIRED_SOUL_FILE", "SOUL.md", 0),
+            ])
+
+    def test_first_link_stops_before_descendant_metadata_and_rejects_traversal(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            linked = root / "linked"
+            checked = []
+
+            def link_metadata(path):
+                checked.append(path)
+                self.assertNotEqual(path, linked / "child.md", "queried metadata through a link")
+                return path == linked
+
+            with patch.object(ADOPTION, "is_link_or_reparse", link_metadata):
+                self.assertEqual(ADOPTION.first_link(root, linked / "child.md"), linked)
+                self.assertEqual(checked, [root, linked])
+                with self.assertRaises(ValueError):
+                    ADOPTION.first_link(root, root / ".." / "outside.md")
+                with self.assertRaises(ValueError):
+                    ADOPTION.first_link(root, root.parent / "outside.md")
 
     def test_accepts_canonical_url_without_confusing_old_repo_slug_with_skill(self):
         with tempfile.TemporaryDirectory() as temporary:
