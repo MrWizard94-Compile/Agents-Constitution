@@ -4,8 +4,11 @@
 This is a read-only migration check. Run it after changing project entry points,
 CI, generators, and manifests, before removing a vendored pack. It inspects
 tracked and unignored files plus bounded ignored agent-config locations; it
-never follows symlinks or crawls arbitrary ignored caches. A clean static
-result still needs consumer review.
+checks every candidate's components before reading, reporting links and Windows
+reparse points as unresolved coverage. It does not crawl arbitrary ignored
+caches. Run on a quiescent tree: these pathname checks are not a sandbox against
+concurrent replacement of directories. A clean static result still needs
+consumer review.
 
 Use --filesystem for an explicit project directory that is not its own Git
 root. This mode audits first-party files, including built output, without
@@ -63,6 +66,26 @@ def is_link_or_reparse(path: Path) -> bool:
     return stat.S_ISLNK(metadata.st_mode) or bool(
         getattr(metadata, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT
     )
+
+
+def first_link(root: Path, path: Path) -> Path | None:
+    """Check outermost-first without statting a descendant through a link.
+
+    Paths must be lexical descendants, not already resolved through a link.
+    Do not cache results between candidates: the check is immediately before
+    inspection, although it cannot prevent another process racing that read.
+    """
+    relative = path.relative_to(root)
+    if ".." in relative.parts:
+        raise ValueError("audit path must not contain parent traversal; use an absolute project path")
+    current = root
+    if is_link_or_reparse(current):
+        return current
+    for part in relative.parts:
+        current = current / part
+        if is_link_or_reparse(current):
+            return current
+    return None
 
 
 def project_files(root: Path) -> list[Path]:
@@ -154,8 +177,9 @@ def workflow_source_findings(relative: str, lines: list[str]) -> list[tuple[str,
 
 
 def inspect(root: Path, *, filesystem: bool = False) -> list[tuple[str, str, int]]:
-    if filesystem and is_link_or_reparse(root):
-        raise ValueError("filesystem project root must not be a link or reparse point")
+    root = root.absolute()
+    if first_link(Path(root.anchor), root) is not None:
+        raise ValueError("project root must not be a link or reparse point, or descend through one")
     root = root.resolve(strict=True)
     if not root.is_dir():
         raise ValueError("project path must be a directory")
@@ -180,9 +204,26 @@ def inspect(root: Path, *, filesystem: bool = False) -> list[tuple[str, str, int
             if contains_pack_file(old_pack):
                 findings.append(("OLD_PACK_DIRECTORY", old_pack.relative_to(root).as_posix(), 0))
 
+    reported_links = {path for code, path, _ in findings if code in {
+        "LINKED_PATH_UNINSPECTED", "AGENT_DIR_SYMLINK_UNINSPECTED",
+    }}
     for path in paths:
         relative = path.relative_to(root).as_posix()
-        if not path.exists() and not is_link_or_reparse(path):
+        linked = first_link(root, path)
+        if linked is not None:
+            linked_relative = linked.relative_to(root).as_posix()
+            if linked_relative not in reported_links:
+                findings.append(("LINKED_PATH_UNINSPECTED", linked_relative, 0))
+                reported_links.add(linked_relative)
+            if linked == path:
+                if path.name.casefold() in RETIRED_SOUL_NAMES:
+                    findings.append(("RETIRED_SOUL_FILE", relative, 0))
+                elif RETIRED_LAW_BACKUP.fullmatch(path.name):
+                    findings.append(("RETIRED_LAW_BACKUP", relative, 0))
+                if LEGACY.search(relative):
+                    findings.append(("LEGACY_SYMLINK", relative, 0))
+            continue
+        if not path.exists():
             continue  # git ls-files still names deleted paths until their deletion is staged
         if "AGENTS Constitution" in path.parts and relative.startswith("AGENTS Constitution/"):
             continue  # one directory finding is enough
@@ -190,10 +231,6 @@ def inspect(root: Path, *, filesystem: bool = False) -> list[tuple[str, str, int
             findings.append(("RETIRED_SOUL_FILE", relative, 0))
         elif RETIRED_LAW_BACKUP.fullmatch(path.name):
             findings.append(("RETIRED_LAW_BACKUP", relative, 0))
-        if is_link_or_reparse(path):
-            if LEGACY.search(relative):
-                findings.append(("LEGACY_SYMLINK", relative, 0))
-            continue
         if not path.is_file() or path.suffix.casefold() not in TEXT_SUFFIXES:
             continue
         if path.stat().st_size > MAX_TEXT_BYTES:

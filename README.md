@@ -137,8 +137,13 @@ a parent repository scan as proof that an ignored child was inspected.
 The default Git mode checks tracked and unignored project files plus bounded
 ignored `.agents`, `.claude`, `.codex`, and `.grok` locations for retired SOUL
 files, pre-pack backups, old-pack loaders, and old packs. It does not crawl
-arbitrary ignored dependency trees or follow linked agent directories; a
-linked directory is reported for review.
+arbitrary ignored dependency trees. Before inspecting each file, it checks
+every path component from the project root outward. A linked file or parent
+directory (including a Windows junction) is reported as unresolved coverage,
+even when Git still lists tracked files below it. Both modes reject a project
+root reached through a link; pass the reviewed real project path instead.
+Use a quiescent tree: these checks do not provide atomic protection against
+another process replacing a directory between the check and the read.
 It also detects explicit declarations of active SOUL law. Resolve old CI,
 generator, manifest, pointer, and UI references before the old tree is removed.
 Keep recovery in Git history, not in a second active working-tree law copy.
