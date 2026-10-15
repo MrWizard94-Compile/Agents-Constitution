@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.16.2 — 2026-10-15 (candidate)
+
+- Changed the evolution guard from a filename check to committed-content
+  comparison. Synchronized release-version fields, JSON formatting, and
+  unchanged-content renames cannot satisfy evolution alone. Git fixtures
+  cover merge-base drift, negative paths, and preservation of meaningful
+  Markdown/code whitespace. Passing output explicitly requires semantic
+  review; the tool does not certify usefulness or widen workflow-only scope.
+
 ## 6.16.1 — 2026-10-15 (candidate)
 
 - Fixed adoption scanning through linked ancestors of Git-listed files.

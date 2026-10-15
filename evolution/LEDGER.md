@@ -2,6 +2,28 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-15 — Reject release metadata as evolution evidence
+
+**Observed gap:** the accepted guard selected filenames without inspecting
+their contents. An `AGENTS.md` version-header-only change returned success,
+as did a synchronized `AGENTS.md`, `SKILL.md`, and `SOURCE.json` version bump,
+when accompanied by the required `VERSION` and ledger edits.
+
+**Meaningful change:** compare committed blobs at the PR merge base and HEAD;
+ignore only known release-version fields, JSON formatting, existing excluded
+metadata/workflows, and unchanged-content renames. Require a numerical version
+increase. Preserve source whitespace and non-version manifest/loader content.
+Report surviving paths as candidates requiring semantic review, not proof of
+a meaningful improvement. No binding rule or authority boundary changes.
+
+**Falsification:** real Git fixtures must reject the reproduced version-only
+changes, malformed JSON, missing prerequisites, and workflow-only changes;
+accept actual manifest/loader and indentation changes for review; and compare
+against the merge base when the target branch advances. Unit cases retain
+Markdown nesting and version literals in rule bodies. These structural checks
+cannot decide usefulness or detect every cosmetic or harmful change; semantic
+review under `GOV-EVOLVE-001` remains required.
+
 ## 2026-10-15 — Reject linked ancestor routes in adoption evidence
 
 **Observed gap:** a controlled Git fixture replaced a tracked directory with

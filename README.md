@@ -23,9 +23,24 @@ python -m unittest discover -s tests -v
 python tools/validate-source.py
 ```
 
-Both commands must exit 0. CI runs the same checks and checks each PR for a
-substantive change. A passing source check is not proof that a local mirror,
-project pointer, runtime, or published release has been updated.
+Both commands must exit 0. CI runs the same checks and screens each PR with
+`python tools/evolution-guard.py --base <base-commit>`. The guard compares
+committed content against the merge base, requires an increased `VERSION`
+and changed ledger, and excludes release metadata, exact unchanged-content
+renames, and `.github/` changes from its candidate list. Known version fields
+in `AGENTS.md`, `SOP.md`, `governance/EVOLUTION.md`, `SKILL.md` frontmatter,
+and `SOURCE.json` cannot qualify by themselves. JSON formatting is ignored;
+other source whitespace is preserved because indentation, Markdown structure,
+and string contents can change behavior. Invalid source-manifest JSON fails
+closed. The existing exclusion of workflow-only changes remains in force.
+
+A pass identifies source-content candidates; it cannot prove usefulness or
+reject every typo, cosmetic edit, duplicate rule, timestamp, or harmful
+change. Mode-only and path-only behavior changes also need a separate review;
+they do not establish a content change. Review the actual improvement against
+`GOV-EVOLVE-001` and its falsification evidence. A passing source check is not
+proof that a local mirror, project pointer, runtime, or published release has
+been updated.
 
 The canonical `main` ruleset is a GitHub repository setting, not a Git file.
 Audit its live, effective controls separately with an authenticated `gh` CLI
