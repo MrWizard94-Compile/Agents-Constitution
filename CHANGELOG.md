@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.16.3 — 2026-10-16 (candidate)
+
+- Extended adoption text scanning to native/JVM sources, shell entry points,
+  and related source/build languages. Retired-law references in compiled CLI
+  help no longer disappear solely because their file suffix was omitted.
+  Git and filesystem fixtures retain size limits, binary exclusion, canonical
+  URL acceptance, and existing path checks. This is literal-source coverage,
+  not proof of dynamic data flow or installed consumer behavior.
+
 ## 6.16.2 — 2026-10-15 (candidate)
 
 - Changed the evolution guard from a filename check to committed-content

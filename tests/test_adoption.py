@@ -19,6 +19,44 @@ spec.loader.exec_module(ADOPTION)
 
 
 class AdoptionCheckTests(unittest.TestCase):
+    def test_native_jvm_and_shell_consumers_are_not_invisible_to_audit(self):
+        for filesystem in (False, True):
+            with self.subTest(filesystem=filesystem), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                if not filesystem:
+                    self.make_repo(root)
+                consumers = {
+                    "main.rs": 'println!("Law: AGENTS Constitution/AGENTS.md + SOP.md");\n',
+                    "Main.java": 'System.out.println("Read AGENTS Constitution/AGENTS.md");\n',
+                    "main.cpp": 'puts("SOUL.md is law");\n',
+                    "Program.cs": 'Console.WriteLine("Law: SOUL.md");\n',
+                    "build.gradle": 'apply from: "AGENTS Constitution/verify.gradle"\n',
+                    "start.sh": 'cat "AGENTS Constitution/AGENTS.md"\n',
+                    "start.cmd": 'type "AGENTS Constitution\\AGENTS.md"\n',
+                    "routes.go": 'const law = "AGENTS Constitution/AGENTS.md"\n',
+                }
+                for filename, body in consumers.items():
+                    (root / filename).write_text(body, encoding="utf-8")
+                findings = ADOPTION.inspect(root, filesystem=filesystem)
+                for filename in consumers:
+                    code = "ACTIVE_LEGACY_LAW" if filename in {"main.cpp", "Program.cs"} else "LEGACY_REFERENCE"
+                    self.assertIn((code, filename, 1), findings)
+                for filename in consumers:
+                    (root / filename).write_text(
+                        "Canonical: https://github.com/MrWizard94-Compile/Agents-Constitution\n",
+                        encoding="utf-8",
+                    )
+                self.assertEqual(ADOPTION.inspect(root, filesystem=filesystem), [])
+
+    def test_native_text_keeps_size_bounds_and_binary_artifacts_are_not_decoded(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.make_repo(root)
+            (root / "main.rs").write_text("AGENTS Constitution" * 10, encoding="utf-8")
+            (root / "native.dll").write_bytes(b"\x00\xffAGENTS Constitution")
+            with patch.object(ADOPTION, "MAX_TEXT_BYTES", 32):
+                self.assertEqual(ADOPTION.inspect(root), [("TEXT_TOO_LARGE_UNCHECKED", "main.rs", 0)])
+
     def make_repo(self, root: Path) -> None:
         subprocess.run(["git", "init", "-q", str(root)], check=True)
 

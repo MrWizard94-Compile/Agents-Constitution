@@ -2,6 +2,24 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-16 — Inspect retired-law consumers in native and JVM sources
+
+**Observed gap:** a portfolio Rust CLI still printed a retired local law route,
+but the adoption checker skipped its `.rs` file. A fixture containing that
+literal plus Java, C++, C#, Go, Gradle, and shell consumers returned no findings
+in both Git and filesystem modes. An oversized Rust source also escaped the
+unchecked-text size finding because the suffix was not recognized.
+
+**Meaningful change:** extend the existing bounded text allow-list to the
+portfolio's native/JVM and shell source/build languages. Apply the same literal
+reference checks, path protections, and byte limit; do not decode binary build
+artifacts or claim dynamic execution coverage. No protected law changes.
+
+**Falsification:** regression fixtures must flag the reproduced source routes
+in both modes, accept their canonical URL replacements, report oversized native
+text as unchecked, and leave a binary fixture unread. Existing link/junction,
+ignored-agent, workflow-pin, and historical-reference cases must remain green.
+
 ## 2026-10-15 — Reject release metadata as evolution evidence
 
 **Observed gap:** the accepted guard selected filenames without inspecting
