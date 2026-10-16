@@ -137,6 +137,11 @@ Before retiring an old project pack, run the read-only consumer audit:
 python tools/check-adoption.py <project-git-root>
 ```
 
+The bounded text scan includes native/JVM and shell source/build languages as
+well as Markdown, configuration, and JS/TS/Python: compiled CLI help can be an
+active governance consumer. The explicit suffix list is in the checker; binary
+artifacts and dynamic data flow still require separate consumer inspection.
+
 For a local project directory that is ignored by its parent Git repository or
 has no Git root of its own, target the exact directory explicitly:
 

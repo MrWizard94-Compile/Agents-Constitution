@@ -24,7 +24,15 @@ import subprocess
 import sys
 from pathlib import Path
 
-TEXT_SUFFIXES = {".md", ".mdc", ".json", ".toml", ".yaml", ".yml", ".ps1", ".py", ".js", ".mjs", ".cjs", ".ts", ".tsx"}
+# Governance routes also live in compiled CLI help, JVM build scripts, and
+# shell entry points. Keep this a bounded text allow-list, not binary decoding.
+TEXT_SUFFIXES = {
+    ".md", ".mdc", ".json", ".toml", ".yaml", ".yml", ".ps1", ".psm1", ".psd1",
+    ".py", ".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx", ".vue", ".svelte",
+    ".rs", ".go", ".c", ".h", ".cc", ".cpp", ".cxx", ".hpp", ".cs",
+    ".java", ".kt", ".kts", ".scala", ".groovy", ".gradle", ".swift", ".dart",
+    ".rb", ".php", ".lua", ".sh", ".bash", ".zsh", ".fish", ".cmd", ".bat",
+}
 AGENT_CONFIG_DIRS = (".agents", ".claude", ".codex", ".grok")
 RETIRED_SOUL_NAMES = {"soul.md", "soulv2.0.0.md", "soulv2.md", "soul-v2.md"}
 INSTRUCTION_NAMES = {"agents.md", "claude.md"}
