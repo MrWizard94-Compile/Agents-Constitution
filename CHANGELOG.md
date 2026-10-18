@@ -1,5 +1,19 @@
 # Changelog
 
+## 6.16.4 — 2026-10-18 (candidate)
+
+- Fixed inventory identity comparisons for equivalent long/Windows 8.3 paths:
+  exclude the scanner's own files, reject overlapping root aliases and retain
+  correct per-root access-gap attribution. Preserve lexical ownership of
+  rejected reparse paths and incomplete status for unresolved errors. Root
+  deduplication now respects platform case sensitivity. Canonicalize bounded
+  comparison inputs and scan roots, not every file in the traversal hot path.
+  Preserve a rejected leaf's lexical ownership when its parent uses an alias;
+  long/short root spellings cannot change path-marker classifications.
+- Add real Windows alias and portable classification regressions without
+  changing the existing assertions. CI exercises Python 3.11/3.12 on Windows
+  and Linux; the stable required `validate` job aggregates every cohort.
+
 ## 6.16.3 — 2026-10-16 (candidate)
 
 - Extended adoption text scanning to native/JVM sources, shell entry points,

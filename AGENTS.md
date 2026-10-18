@@ -1,6 +1,6 @@
 # WPAI Constitution
 
-**Version:** 6.16.3
+**Version:** 6.16.4
 
 **Status:** Binding
 
