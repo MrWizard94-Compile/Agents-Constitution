@@ -329,7 +329,8 @@ class InventoryCopiesTests(unittest.TestCase):
     @unittest.skipUnless(os.name == "nt", "Windows 8.3 aliases are platform-specific")
     def test_real_windows_alias_excludes_checkpoint_and_rejects_overlap(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory).resolve()
+            root = Path(directory).resolve() / "WPAI Constitution"
+            root.mkdir()
             get_short = ctypes.windll.kernel32.GetShortPathNameW
             get_short.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint32]
             get_short.restype = ctypes.c_uint32
@@ -351,6 +352,8 @@ class InventoryCopiesTests(unittest.TestCase):
             self.assertEqual(1, len(hits))
             self.assertEqual([], errors)
             self.assertEqual("AGENTS.md", Path(hits[0].path).name)
+            # Root spelling must not change path-marker reasons or file identity.
+            self.assertEqual(scan([root], 1024), scan([alias], 1024))
             error = inventory_copies.ScanError(str(alias), "scandir", "access denied")
             coverage = inventory_copies.summarize_coverage([root], [], [error])
             self.assertEqual("inaccessible", coverage["root_results"][0]["status"])

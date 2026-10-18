@@ -14,7 +14,9 @@ and input identity, not proof that every CLI invocation returned success.
 **Meaningful repair:** compare equivalent path identities for bounded output/
 checkpoint exclusions, root-overlap rejection and coverage attribution. Retain
 the cheap lexical comparison in the per-file loop and for rejected reparse
-paths; unresolved errors cannot become an absence claim. Platform-aware root
+paths, expanding parent aliases without resolving a rejected leaf; unresolved
+errors cannot become an absence claim. Both traversal modes normalize each
+root once so alias spelling cannot alter path-marker reasons. Platform-aware root
 deduplication preserves distinct case-sensitive filesystem areas. No binding
 law, protected quality rule, authorization or public-data contract changes.
 

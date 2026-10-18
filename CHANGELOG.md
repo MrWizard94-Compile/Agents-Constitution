@@ -7,7 +7,9 @@
   correct per-root access-gap attribution. Preserve lexical ownership of
   rejected reparse paths and incomplete status for unresolved errors. Root
   deduplication now respects platform case sensitivity. Canonicalize bounded
-  comparison inputs, not every file in the traversal hot path.
+  comparison inputs and scan roots, not every file in the traversal hot path.
+  Preserve a rejected leaf's lexical ownership when its parent uses an alias;
+  long/short root spellings cannot change path-marker classifications.
 - Add real Windows alias and portable classification regressions without
   changing the existing assertions. CI exercises Python 3.11/3.12 on Windows
   and Linux; the stable required `validate` job aggregates every cohort.

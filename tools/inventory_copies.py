@@ -126,6 +126,12 @@ def _same_path(first: str | Path, second: str | Path) -> bool:
     )
 
 
+def _parent_alias_path_key(path: str | Path) -> str:
+    """Expand parent aliases without resolving a possibly rejected leaf link."""
+    candidate = Path(path)
+    return _lexical_path_key(Path(_canonical_path_key(candidate.parent)) / candidate.name)
+
+
 def is_link_or_reparse(entry: os.DirEntry[str]) -> bool:
     try:
         if entry.is_symlink():
@@ -200,11 +206,12 @@ def scan(roots: Iterable[Path], max_text_bytes: int) -> tuple[list[Hit], list[Sc
     examined = 0
     seen: set[str] = set()
     for root in roots:
-        normalized_root = _canonical_path_key(root)
+        canonical_root = Path(normalize_path(root))
+        normalized_root = _lexical_path_key(canonical_root)
         if normalized_root in seen:
             continue
         seen.add(normalized_root)
-        for path in walk_files(root, errors):
+        for path in walk_files(canonical_root, errors):
             examined += 1
             try:
                 hit = inspect_file(path, max_text_bytes)
@@ -396,9 +403,14 @@ def scan_resumable(
 def _path_within_root(path: str, root: str) -> bool:
     # Preserve lexical attribution for a rejected link inside a named root.
     # Only a failed lexical comparison needs the alias-aware fallback.
-    for key in (_lexical_path_key, _canonical_path_key):
-        candidate = key(path)
-        normalized_root = key(root)
+    keys = (
+        (_lexical_path_key, _lexical_path_key),
+        (_parent_alias_path_key, _canonical_path_key),
+        (_canonical_path_key, _canonical_path_key),
+    )
+    for candidate_key, root_key in keys:
+        candidate = candidate_key(path)
+        normalized_root = root_key(root)
         try:
             if os.path.commonpath((candidate, normalized_root)) == normalized_root:
                 return True
