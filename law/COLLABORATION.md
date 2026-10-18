@@ -81,6 +81,17 @@ dependent action. Do not turn an exploratory question into a broad rewrite,
 expensive evaluation, or external action. Surface changes to architecture,
 public contracts, data formats, and user-visible behavior for director review
 before making an unrequested commitment.
+A user-supplied source (link, shared conversation, attachment, repository, or
+other reference) counts as evidence only to the extent its content was
+actually read in its delivered form. If retrieval yields only a page shell,
+title or metadata, a sign-in or consent wall, a truncated or summarized relay,
+or another incomplete view, record the source as **unread** or **partial**,
+say what was and was not seen, and ask for pasted text or an exported file;
+do not bypass access controls to get it (`SEC-PRIV-001`). Do not reconstruct
+its content or the user's intent from a title, URL, snippet, memory, or a
+similar-looking source, and do not treat an acceptance criterion that depends
+on it as met. Proceed only with work that does not depend on it, and carry
+the gap into the handoff.
 
 ### CTX-ONBOARD-001 — Start-here path
 

@@ -2,6 +2,37 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-18 — Record unreadable user-supplied sources as unread, not inferred
+
+**Observed gap:** the Director's only input in a skill call was a link to a
+shared Gemini conversation. Both the original and canonical URLs returned only
+a client-rendered page shell (title, site metadata, sign-in link) with no
+conversation text, yet each fetch returned as an ordinary successful page read
+with no error signal. No rule covered a user-referenced source that cannot be read in full:
+`CTX-ASSUME-001` separates verified fact from inference but did not say what an
+unreadable input is worth, `SEC-INPUT-001` treats web pages as untrusted but not
+as possibly empty, and `GOV-FREEZE-001` demands byte-exact reading only for
+binding law. An agent could plausibly fill the gap from the title or its own
+guess and report work against a conversation it never saw.
+
+**Meaningful change:** amend `CTX-ASSUME-001` (its existing home) so a
+user-supplied source counts as evidence only to the extent its content was
+actually read in its delivered form. A shell, metadata, sign-in wall, or
+truncated/summarized relay is recorded as unread or partial; the agent says
+what was and was not seen, asks for pasted text or an export, does not bypass
+access controls (`SEC-PRIV-001`), does not reconstruct content or intent, does
+not mark dependent acceptance criteria met, continues only independent work,
+and carries the gap into the handoff. `SKILL.md` names it in the handoff
+minimum, and `tools/validate-source.py` guards the clause with a mutation test.
+No protected rule changes and no new rule ID.
+
+**Falsification:** hand an agent a task whose only input is a client-rendered
+share URL. The change is wrong if the agent still describes or acts on
+unseen content, if it refuses or stalls on work that does not depend on the
+source, if it requests an export when the content was in fact fully readable,
+or if the guard test passes after the clause is weakened. The validator test
+removes each guarded phrase and requires the specific failure.
+
 ## 2026-10-16 — Inspect retired-law consumers in native and JVM sources
 
 **Observed gap:** a portfolio Rust CLI still printed a retired local law route,

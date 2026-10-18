@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.16.3"
+  skill-version: "6.17.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -144,7 +144,7 @@ at the strongest available level.
 
 ## Handoff minimum
 
-State what changed and why, source SHA (naming any loader-version mismatch or unverified-law reading), changed paths, exact verification and
+State what changed and why, source SHA (naming any loader-version mismatch or unverified-law reading), any user-supplied input left unread or partial (`CTX-ASSUME-001`), changed paths, exact verification and
 its limits, unresolved risks, and next human action. Distinguish source QA,
 package, install, runtime, physical acceptance, and publication. Include a
 compact `Skill evolution:` line naming the meaningful change and whether it

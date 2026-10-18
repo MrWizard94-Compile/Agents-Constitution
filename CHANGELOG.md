@@ -1,5 +1,16 @@
 # Changelog
 
+## 6.17.0 — 2026-10-18 (candidate)
+
+- Required unread-input honesty under `CTX-ASSUME-001`. A user-supplied link,
+  shared conversation, attachment, or repository counts as evidence only to
+  the extent its content was actually read. A page shell, metadata, sign-in
+  wall, or truncated relay is recorded as unread or partial; the agent asks
+  for pasted text or an export, does not bypass access controls, does not
+  reconstruct content or intent from a title or URL, and carries the gap into
+  the handoff. The validator guards the clause and `SKILL.md` names it in the
+  handoff minimum. No protected rule changes.
+
 ## 6.16.3 — 2026-10-16 (candidate)
 
 - Extended adoption text scanning to native/JVM sources, shell entry points,
