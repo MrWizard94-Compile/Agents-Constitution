@@ -101,6 +101,37 @@ def normalize_path(path: Path) -> str:
     return str(path.resolve(strict=False))
 
 
+def _lexical_path_key(path: str | Path) -> str:
+    return os.path.normcase(os.path.abspath(path))
+
+
+def _canonical_path_key(path: str | Path) -> str:
+    """Compare aliases without replacing the scanner's traversal guards.
+
+    Windows 8.3 names can differ from the names returned by scandir. Resolve
+    the small set of roots/output paths and report comparisons, not every
+    examined file. Unresolvable error paths retain their lexical spelling;
+    their errors must still keep overall coverage incomplete.
+    """
+    try:
+        return os.path.normcase(normalize_path(Path(path)))
+    except (OSError, RuntimeError):
+        return _lexical_path_key(path)
+
+
+def _same_path(first: str | Path, second: str | Path) -> bool:
+    return (
+        _lexical_path_key(first) == _lexical_path_key(second)
+        or _canonical_path_key(first) == _canonical_path_key(second)
+    )
+
+
+def _parent_alias_path_key(path: str | Path) -> str:
+    """Expand parent aliases without resolving a possibly rejected leaf link."""
+    candidate = Path(path)
+    return _lexical_path_key(Path(_canonical_path_key(candidate.parent)) / candidate.name)
+
+
 def is_link_or_reparse(entry: os.DirEntry[str]) -> bool:
     try:
         if entry.is_symlink():
@@ -175,11 +206,12 @@ def scan(roots: Iterable[Path], max_text_bytes: int) -> tuple[list[Hit], list[Sc
     examined = 0
     seen: set[str] = set()
     for root in roots:
-        normalized_root = normalize_path(root).casefold()
+        canonical_root = Path(normalize_path(root))
+        normalized_root = _lexical_path_key(canonical_root)
         if normalized_root in seen:
             continue
         seen.add(normalized_root)
-        for path in walk_files(root, errors):
+        for path in walk_files(canonical_root, errors):
             examined += 1
             try:
                 hit = inspect_file(path, max_text_bytes)
@@ -215,7 +247,7 @@ def inspect_directory(
                     if entry.is_dir(follow_symlinks=False):
                         children.append(Path(entry.path))
                     elif entry.is_file(follow_symlinks=False):
-                        if os.path.normcase(os.path.abspath(entry.path)) in excluded_files:
+                        if _lexical_path_key(entry.path) in excluded_files:
                             continue
                         examined += 1
                         try:
@@ -305,7 +337,7 @@ def scan_resumable(
     """Checkpoint only fully inspected directories; never publish a partial final report."""
     if checkpoint_directories < 1:
         raise ValueError("checkpoint_directories must be positive")
-    normalized_roots = [os.path.normcase(os.path.abspath(root)) for root in roots]
+    normalized_roots = [_canonical_path_key(root) for root in roots]
     for index, root in enumerate(normalized_roots):
         for earlier in normalized_roots[:index]:
             try:
@@ -316,7 +348,7 @@ def scan_resumable(
             if common in (root, earlier):
                 raise ValueError("scan roots overlap; name each filesystem area once")
     excluded_files = frozenset(
-        os.path.normcase(os.path.abspath(path))
+        _canonical_path_key(path)
         for path in (output, checkpoint, output.with_suffix(output.suffix + ".tmp"),
                      checkpoint.with_suffix(checkpoint.suffix + ".tmp"))
     )
@@ -369,13 +401,23 @@ def scan_resumable(
 
 
 def _path_within_root(path: str, root: str) -> bool:
-    candidate = os.path.normcase(os.path.abspath(path))
-    normalized_root = os.path.normcase(os.path.abspath(root))
-    try:
-        return os.path.commonpath((candidate, normalized_root)) == normalized_root
-    except ValueError:
-        # Distinct Windows volumes have no common path.
-        return False
+    # Preserve lexical attribution for a rejected link inside a named root.
+    # Only a failed lexical comparison needs the alias-aware fallback.
+    keys = (
+        (_lexical_path_key, _lexical_path_key),
+        (_parent_alias_path_key, _canonical_path_key),
+        (_canonical_path_key, _canonical_path_key),
+    )
+    for candidate_key, root_key in keys:
+        candidate = candidate_key(path)
+        normalized_root = root_key(root)
+        try:
+            if os.path.commonpath((candidate, normalized_root)) == normalized_root:
+                return True
+        except ValueError:
+            # Distinct drive spellings may still resolve to the same area.
+            continue
+    return False
 
 
 def summarize_coverage(roots: list[Path], hits: list[Hit], errors: list[ScanError]) -> dict[str, object]:
@@ -392,7 +434,7 @@ def summarize_coverage(roots: list[Path], hits: list[Hit], errors: list[ScanErro
         attributed_errors += len(root_errors)
         root_inaccessible = any(
             error.operation == "scandir"
-            and os.path.normcase(os.path.abspath(error.path)) == os.path.normcase(os.path.abspath(named_root))
+            and _same_path(error.path, named_root)
             for error in root_errors
         )
         root_results.append({

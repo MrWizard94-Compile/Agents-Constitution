@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import tempfile
+import ctypes
 import unittest
 import json
 import os
@@ -246,6 +247,122 @@ class InventoryCopiesTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "overlap"):
                 scan_resumable([root, child], 1024, output, checkpoint, resume=False)
             self.assertFalse(checkpoint.exists())
+
+    def test_coverage_attributes_equivalent_alias_errors(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "long-root"
+            root.mkdir()
+            alias = Path(directory) / "short-root"
+            original = inventory_copies.normalize_path
+
+            def expand_alias(path: Path) -> str:
+                try:
+                    suffix = path.relative_to(alias)
+                except ValueError:
+                    return original(path)
+                return original(root / suffix)
+
+            for child, expected in ((None, "inaccessible"), ("private", "partial")):
+                with self.subTest(child=child), patch.object(
+                    inventory_copies, "normalize_path", side_effect=expand_alias,
+                ):
+                    error_path = alias if child is None else alias / child
+                    error = inventory_copies.ScanError(str(error_path), "scandir", "access denied")
+                    coverage = inventory_copies.summarize_coverage([root], [], [error])
+                    self.assertEqual("incomplete", coverage["status"])
+                    self.assertEqual(expected, coverage["root_results"][0]["status"])
+                    self.assertEqual(1, coverage["root_results"][0]["error_count"])
+                    self.assertEqual(0, coverage["unattributed_error_count"])
+
+    def test_reparse_error_keeps_lexical_root_attribution(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            root.mkdir()
+            link = root / "link"
+            outside = Path(directory) / "outside"
+            original = inventory_copies.normalize_path
+
+            def resolved_link(path: Path) -> str:
+                return str(outside) if path == link else original(path)
+
+            error = inventory_copies.ScanError(str(link), "reparse", "link rejected")
+            with patch.object(inventory_copies, "normalize_path", side_effect=resolved_link):
+                coverage = inventory_copies.summarize_coverage([root], [], [error])
+            self.assertEqual("incomplete", coverage["status"])
+            self.assertEqual("partial", coverage["root_results"][0]["status"])
+            self.assertEqual(0, coverage["unattributed_error_count"])
+
+    def test_unresolvable_error_remains_an_incomplete_coverage_gap(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            root.mkdir()
+            denied = Path(directory) / "unresolvable"
+            original = inventory_copies.normalize_path
+
+            def deny_resolution(path: Path) -> str:
+                if path == denied:
+                    raise PermissionError("cannot resolve inaccessible path")
+                return original(path)
+
+            error = inventory_copies.ScanError(str(denied), "scandir", "access denied")
+            with patch.object(inventory_copies, "normalize_path", side_effect=deny_resolution):
+                coverage = inventory_copies.summarize_coverage([root], [], [error])
+            self.assertEqual("incomplete", coverage["status"])
+            self.assertEqual(1, coverage["unattributed_error_count"])
+
+    @unittest.skipIf(os.name == "nt", "case-distinct roots require a case-sensitive filesystem")
+    def test_case_distinct_roots_are_not_deduplicated(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            upper = Path(directory) / "Area"
+            lower = Path(directory) / "area"
+            upper.mkdir()
+            if lower.exists():
+                self.skipTest("this filesystem is case-insensitive")
+            lower.mkdir()
+            for root in (upper, lower):
+                (root / "AGENTS.md").write_text("project notes", encoding="utf-8")
+            hits, errors, examined = scan([upper, lower], 1024)
+            self.assertEqual(2, examined)
+            self.assertEqual(2, len(hits))
+            self.assertEqual([], errors)
+
+    @unittest.skipUnless(os.name == "nt", "Windows 8.3 aliases are platform-specific")
+    def test_real_windows_alias_excludes_checkpoint_and_rejects_overlap(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve() / "WPAI Constitution"
+            root.mkdir()
+            get_short = ctypes.windll.kernel32.GetShortPathNameW
+            get_short.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint32]
+            get_short.restype = ctypes.c_uint32
+            buffer = ctypes.create_unicode_buffer(32768)
+            size = get_short(str(root), buffer, len(buffer))
+            self.assertGreater(size, 0, "query the actual Windows alias, not a fabricated spelling")
+            self.assertLess(size, len(buffer))
+            alias = Path(buffer.value)
+            if os.path.normcase(str(alias)) == os.path.normcase(str(root)):
+                self.skipTest("8.3 aliases are unavailable on this volume")
+            self.assertTrue(alias.samefile(root))
+            (root / "AGENTS.md").write_text("project notes", encoding="utf-8")
+            output = alias / "inventory.json"
+            checkpoint = alias / "inventory.checkpoint.json"
+            hits, errors, examined = scan_resumable(
+                [alias], 1024, output, checkpoint, resume=False,
+            )
+            self.assertEqual(1, examined)
+            self.assertEqual(1, len(hits))
+            self.assertEqual([], errors)
+            self.assertEqual("AGENTS.md", Path(hits[0].path).name)
+            # Root spelling must not change path-marker reasons or file identity.
+            self.assertEqual(scan([root], 1024), scan([alias], 1024))
+            error = inventory_copies.ScanError(str(alias), "scandir", "access denied")
+            coverage = inventory_copies.summarize_coverage([root], [], [error])
+            self.assertEqual("inaccessible", coverage["root_results"][0]["status"])
+            self.assertEqual(0, coverage["unattributed_error_count"])
+            overlap_checkpoint = root / "overlap.checkpoint.json"
+            with self.assertRaisesRegex(ValueError, "overlap"):
+                scan_resumable([root, alias], 1024, root / "overlap.json",
+                               overlap_checkpoint, resume=False)
+            self.assertFalse(overlap_checkpoint.exists())
 
     def test_scanner_excludes_its_own_checkpoint_inside_scanned_root(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

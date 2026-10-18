@@ -33,6 +33,31 @@ source, if it requests an export when the content was in fact fully readable,
 or if the guard test passes after the clause is weakened. The validator test
 removes each guarded phrase and requires the specific failure.
 
+## 2026-10-18 — Keep inventory evidence consistent across path aliases
+
+**Observed gap:** Windows/Python 3.11 adoption CI exposed four existing inventory
+test failures. A separate real Windows 8.3 fixture proved the accepted direct
+API counted its own checkpoint (two examined inputs instead of one) and labeled
+an alias-spelled root access error as `scanned` with one unattributed error.
+Overall coverage still stayed incomplete; the defect was per-root attribution
+and input identity, not proof that every CLI invocation returned success.
+
+**Meaningful repair:** compare equivalent path identities for bounded output/
+checkpoint exclusions, root-overlap rejection and coverage attribution. Retain
+the cheap lexical comparison in the per-file loop and for rejected reparse
+paths, expanding parent aliases without resolving a rejected leaf; unresolved
+errors cannot become an absence claim. Both traversal modes normalize each
+root once so alias spelling cannot alter path-marker reasons. Platform-aware root
+deduplication preserves distinct case-sensitive filesystem areas. No binding
+law, protected quality rule, authorization or public-data contract changes.
+
+**Falsification:** keep every original assertion; verify a real Windows 8.3
+alias, own-file exclusion, overlap refusal before checkpoint creation, portable
+alias errors, lexical reparse attribution, unresolved errors and case-distinct
+roots. Require all Python 3.11/3.12 Windows/Linux cohorts through the stable
+aggregate `validate` check. The earlier invocation obligation was already met;
+this is an additional necessary source defect repair, not another invocation.
+
 ## 2026-10-16 — Inspect retired-law consumers in native and JVM sources
 
 **Observed gap:** a portfolio Rust CLI still printed a retired local law route,
