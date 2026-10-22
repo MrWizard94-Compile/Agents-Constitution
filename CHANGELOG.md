@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.17.0 — 2026-10-21 (candidate)
+
+- Clarify exact-lifecycle evidence for streaming/real-time discontinuities:
+  one clock owner, coherent consumers across seek/wrap/activation/preparation,
+  an independent output oracle, and measured transition workload cost. This
+  extends LOW-RISK-001 without changing authority or publication permissions.
+
 ## 6.16.4 — 2026-10-18 (candidate)
 
 - Fixed inventory identity comparisons for equivalent long/Windows 8.3 paths:

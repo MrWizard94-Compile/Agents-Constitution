@@ -2,6 +2,27 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-21 — Verify stateful streaming consumers across discontinuities
+
+**Observed gap:** an audio pipeline passed continuous playback fixtures while
+separate consumer playheads lacked a shared seek/wrap path. A newly activated
+consumer could start at zero, and old pending notes or tails could survive a
+backward jump. A bounded queue also permitted repeated expensive graph resets
+within one callback. Storage bounds alone did not establish deadline safety.
+
+**Meaningful change:** extend the existing LOW-RISK-001 lifecycle home with
+clock/discontinuity ownership, coherent consumer state reconstruction, alternate
+activation/preparation entry points, independent output comparison, and timing
+under transition load. No new rule home, permission, or protected quality waiver.
+
+**Falsification:** review a pipeline with correct steady playback but a late
+consumer starting at zero, a stale tail after backward wrap, or a callback that
+exceeds its deadline during queued seeks. Its continuous-playback tests cannot
+close lifecycle acceptance under the new paragraph. A coherent implementation
+with independent expected output and measured transition cost can. Source
+validation and the existing regression suite must remain green. This candidate
+is staged locally; it does not govern its own originating work.
+
 ## 2026-10-18 — Keep inventory evidence consistent across path aliases
 
 **Observed gap:** Windows/Python 3.11 adoption CI exposed four existing inventory

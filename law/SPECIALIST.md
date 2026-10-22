@@ -81,6 +81,15 @@ named target method. Where practical, lock the path and argument contract
 in a versioned integration test. For teardown or reload repairs, verify the
 hook executes on normal exit and that re-entry still works; helper tests and
 a clean build alone are not runtime acceptance.
+For a streaming or real-time pipeline with multiple stateful consumers, identify
+the clock and the owner of each discontinuity before changing seek, wrap,
+activation, reset, or device reconfiguration. Verify that every consumer joins
+the intended position and drops or reconstructs pending state consistently;
+continuous playback alone cannot prove this contract. Include forward and
+backward jumps, a boundary inside one callback, an inactive consumer joining
+later, and re-entry after preparation where supported. Compare representative
+output with an independently constructed sequence, and measure callback cost
+under the transition workload rather than inferring it from bounded storage.
 
 ### LOW-REASON-001 — Justify the technique
 
