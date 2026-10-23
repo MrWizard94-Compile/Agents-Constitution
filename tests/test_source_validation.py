@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 import shutil
 import tempfile
 import unittest
@@ -45,6 +46,29 @@ class SourceValidationTests(unittest.TestCase):
         self.assertEqual(
             VALIDATOR.freeze_contract_errors(evolution.replace("## GOV-FREEZE-001", "## Retired"), skill),
             ["GOV-FREEZE-001 section missing"],
+        )
+
+    def test_assumption_rule_rejects_lost_unread_input_safeguards(self):
+        collaboration = (ROOT / "law" / "COLLABORATION.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.unread_input_contract_errors(collaboration), [])
+        self.assertEqual(
+            VALIDATOR.unread_input_contract_errors(
+                collaboration.replace("### CTX-ASSUME-001", "### Retired rule")
+            ),
+            ["CTX-ASSUME-001 detailed rule missing"],
+        )
+        for term in ("page shell", "do not reconstruct", "acceptance criterion", "do not bypass access controls"):
+            with self.subTest(term=term):
+                mutated = re.sub(re.escape(term), "other wording", collaboration, flags=re.IGNORECASE)
+                self.assertNotEqual(mutated, collaboration, "mutation must change the text")
+                self.assertIn(
+                    f"CTX-ASSUME-001 missing unread-input safeguard: {term}",
+                    VALIDATOR.unread_input_contract_errors(mutated),
+                )
+        # Reflowing the Markdown must not trip the guard.
+        self.assertEqual(
+            VALIDATOR.unread_input_contract_errors(collaboration.replace("page shell", "page\nshell")),
+            [],
         )
 
     def test_cache_link_rule_rejects_a_one_sided_miss(self):

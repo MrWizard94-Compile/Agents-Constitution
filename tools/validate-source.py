@@ -86,6 +86,23 @@ def integrated_resource_contract_errors(engineering: str) -> list[str]:
             for term in required if term not in normalized]
 
 
+def unread_input_contract_errors(collaboration: str) -> list[str]:
+    """Guard the unread-input clause, not just the CTX-ASSUME-001 heading."""
+    section = re.search(
+        r"^### CTX-ASSUME-001\b.*?\n(.*?)(?=^### |\Z)",
+        collaboration,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["CTX-ASSUME-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "page shell", "**unread** or **partial**", "do not bypass access controls",
+        "do not reconstruct", "acceptance criterion", "carry the gap into the handoff",
+    )
+    return [f"CTX-ASSUME-001 missing unread-input safeguard: {term}" for term in required if term not in normalized]
+
+
 def freeze_contract_errors(evolution: str, skill: str) -> list[str]:
     """Guard the frozen-load integrity contract, not just the freeze heading."""
     section = re.search(
@@ -164,6 +181,7 @@ def validate(root: Path = ROOT) -> list[str]:
             errors.append(f"protected rule missing from entry/registry: {rule}")
     errors.extend(craft_contract_errors(agents))
     errors.extend(freeze_contract_errors(evolution, skill))
+    errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
