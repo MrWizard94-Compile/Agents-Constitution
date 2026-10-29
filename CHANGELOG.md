@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.18.0 — 2026-10-29 (candidate)
+
+- Added protected, always-loaded `CONST-RESOURCEFUL-001` at the Director's
+  request: technical roadblocks demand engineered workarounds, not premature
+  blocked reports. Diagnose the cause, investigate materially different
+  approaches and implement/verify a viable authorized route against the
+  original acceptance criteria. No silent goal reduction, weakened gates,
+  fake integration, unbounded retry loop or permission bypass. Record evidence
+  before genuine escalation and continue independent work. Loader, SOP,
+  lifecycle pointer, quality map and source guards route to the single core
+  definition. Protected-rule acceptance requires Director review before merge.
+
 ## 6.17.0 — 2026-10-18 (candidate)
 
 - Required unread-input honesty under `CTX-ASSUME-001`. A user-supplied link,

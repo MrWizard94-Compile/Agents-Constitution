@@ -2,6 +2,40 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-10-29 — Technical roadblocks demand engineered workarounds
+
+**Director request:** give highest priority to “Technical roadblocks are not
+hard blocks. Build a workaround.” Existing outage/resource guidance preserved
+checkpoints and reported missing evidence but did not impose an always-loaded
+duty to build a viable alternative before treating a mechanical failure as a
+terminal task block. A tool or preferred integration's failure could therefore
+be passed straight back to the human or used to quietly reduce the goal.
+
+**Meaningful change:** add protected `CONST-RESOURCEFUL-001`, with one home in
+AGENTS. Within authorized implementation scope, diagnose the cause, investigate
+materially different approaches, implement a viable route and verify the
+original acceptance criteria, failed scenario and relevant regressions/recovery.
+Changing strategy is required when evidence disproves the approach; blind
+retries, scope substitution, weakened tests and fake integration are not fixes.
+Before a blocked report, record what was actually tried, the concrete remaining
+requirement and why authorized alternatives cannot satisfy it. Continue
+independent work. True authority, safety, essential-input and demonstrated hard
+constraint boundaries remain explicit; the rule grants no extra permission.
+
+**Falsification:** present an authorized conversion task whose preferred tool
+is unavailable, with enough raw input and a viable standard-library route.
+The policy fails if the agent stops at the tool error, offers instructions
+instead of producing the artifact, drops difficult input or weakens verification.
+Pair it with an essential-input/authorization case: success must not be fabricated
+or controls bypassed. Source mutation tests guard lost operational clauses and
+loader/SOP routing, not just the rule heading or version. These presence checks
+cannot prove that future agents reason correctly; independent behavioral checks
+and Director review remain necessary. No claim of universal solvability.
+
+**Acceptance:** protected-rule change; submit through a validated PR and obtain
+explicit Director review before merge. Do not propagate an unmerged candidate
+or let it govern its own invocation retroactively.
+
 ## 2026-10-18 — Record unreadable user-supplied sources as unread, not inferred
 
 **Observed gap:** the Director's only input in a skill call was a link to a
