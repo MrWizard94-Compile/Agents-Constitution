@@ -143,6 +143,8 @@ requires a clear stop-use marker and recovery path.
 
 Keep active projects healthy, or archive them cleanly. Report a blocked
 project honestly rather than calling partial QA complete.
+Apply `CONST-RESOURCEFUL-001` before declaring a technical block; its core
+definition requires engineered alternatives and evidence, not automatic deferral.
 
 ### LIFE-TOOL-001 — Developer setup
 

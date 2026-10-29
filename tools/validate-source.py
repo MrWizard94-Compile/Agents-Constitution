@@ -15,7 +15,8 @@ HEADING_ID_RE = re.compile(r"^#{2,3} ([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-\d{3})\b", r
 LINK_RE = re.compile(r"(?<!!)\[[^]]+\]\(([^)]+)\)")
 PROTECTED = {
     "CONST-AUTH-001", "CONST-COMPLETE-001", "CONST-DEP-001",
-    "CONST-DONE-001", "CONST-GATE-001", "CONST-CRAFT-001", "ENG-WARN-001",
+    "CONST-DONE-001", "CONST-GATE-001", "CONST-CRAFT-001",
+    "CONST-RESOURCEFUL-001", "ENG-WARN-001",
     "TEST-BEHAVIOR-001", "DOC-SYNC-001", "SEC-INPUT-001",
     "GOV-SSOT-001", "GOV-EVOLVE-001",
 }
@@ -52,6 +53,35 @@ def craft_contract_errors(agents: str) -> list[str]:
     normalized = " ".join(section.group(1).casefold().split())
     required = ("ai slop", "generic filler", "real intended use", "independent oracle", "human-accepted")
     return [f"CONST-CRAFT-001 missing operational safeguard: {term}" for term in required if term not in normalized]
+
+
+def resourcefulness_contract_errors(agents: str, skill: str, sop: str) -> list[str]:
+    """Guard core prominence and operational clauses, not agent competence."""
+    section = re.search(
+        r"^### CONST-RESOURCEFUL-001\b[^\n]*\n(.*?)(?=^#{2,3} |\Z)",
+        agents,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["CONST-RESOURCEFUL-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "technical roadblocks are not hard blocks. build a workaround.",
+        "highest-priority engineering", "implement a viable workaround",
+        "materially different approaches", "original acceptance criteria",
+        "must not weaken", "unproductive retry loop", "before declaring work blocked",
+        "continue independent work", "does not grant new authority", "essential input",
+    )
+    errors = [f"CONST-RESOURCEFUL-001 missing operational safeguard: {term}"
+              for term in required if term not in normalized]
+    protected = re.search(r"^## Protected rules\n(.*?)(?=^#{2,3} |\Z)", agents,
+                          re.MULTILINE | re.DOTALL)
+    if protected is None or not re.search(r"^\| `CONST-RESOURCEFUL-001` \|", protected.group(1), re.MULTILINE):
+        errors.append("CONST-RESOURCEFUL-001 missing protected-core entry")
+    for path, body in (("SKILL.md", skill), ("SOP.md", sop)):
+        if "CONST-RESOURCEFUL-001" not in body:
+            errors.append(f"{path} must route technical roadblocks to CONST-RESOURCEFUL-001")
+    return errors
 
 
 def cache_link_contract_errors(specialist: str) -> list[str]:
@@ -159,6 +189,7 @@ def validate(root: Path = ROOT) -> list[str]:
             errors.append(f"mirror file absent: {rel}")
 
     skill = (root / "SKILL.md").read_text(encoding="utf-8-sig")
+    sop = (root / "SOP.md").read_text(encoding="utf-8-sig")
     agents = (root / "AGENTS.md").read_text(encoding="utf-8-sig")
     evolution = (root / "governance/EVOLUTION.md").read_text(encoding="utf-8-sig")
     registry = (root / "governance/RULE-REGISTRY.md").read_text(encoding="utf-8-sig")
@@ -180,6 +211,7 @@ def validate(root: Path = ROOT) -> list[str]:
         if rule not in agents or rule not in registry:
             errors.append(f"protected rule missing from entry/registry: {rule}")
     errors.extend(craft_contract_errors(agents))
+    errors.extend(resourcefulness_contract_errors(agents, skill, sop))
     errors.extend(freeze_contract_errors(evolution, skill))
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))

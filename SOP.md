@@ -1,6 +1,6 @@
 # WPAI delivery SOP
 
-**Version:** 3.2.0
+**Version:** 3.3.0
 
 **Authority:** `AGENTS.md`
 **Applies to:** Human-directed work under the WPAI Constitution
@@ -62,6 +62,9 @@ Build dependencies first. Keep affected code, tests, configuration, and docs
 synchronized. Preserve behavior unless the requested change intentionally
 alters it. Keep each checkpoint buildable and source-controlled. Avoid
 unrelated edits and protect existing worktree changes.
+Treat technical obstacles as engineering work under `CONST-RESOURCEFUL-001`,
+not an automatic stop or permission to narrow the requested outcome. Its
+canonical home in `AGENTS.md` defines workaround, verification and escalation.
 
 ## 6. Verify and harden
 
