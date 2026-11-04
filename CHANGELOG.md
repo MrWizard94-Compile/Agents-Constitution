@@ -1,13 +1,33 @@
 # Changelog
 
-## 6.18.1 — 2026-11-03 (candidate)
+## 6.19.1 — 2026-11-03 (candidate)
 
 - Licensed the public repository under CC BY-NC 4.0. The repository had no
   LICENSE, so reuse rights were ambiguous. The Human Director chose
   Attribution-NonCommercial 4.0 International on 2026-11-03: share and adapt
   with attribution for non-commercial use; commercial use is not granted.
-  The LICENSE file is the official Creative Commons legal text. No binding
-  rule text changed. Do not merge until the Director reviews the legal text.
+  The LICENSE file is the official Creative Commons legal text. On 2026-11-03
+  at 23:08 America/New_York, Rob approved merging this license. Accepted
+  `main` had moved to 6.19.0, so this reconciliation keeps that release in
+  full, including `CONST-QUALITY-001`, and records the license as 6.19.1.
+  No binding rule text differs from 6.19.0.
+
+## 6.19.0 — 2026-11-03 (candidate)
+
+- Added protected `CONST-QUALITY-001` (Quality before speed) immediately after
+  `CONST-AUTH-001`, at the Human Director's request on 2026-11-03. Correctness
+  and completeness outrank speed of output, with no exceptions. Take the time
+  to understand, plan, verify, and do it right the first time. Do not trade
+  quality for faster output, a shorter turnaround, or the appearance of
+  progress, and do not ship a rushed partial to look responsive. Under
+  `COST-TOKEN-001`, token efficiency comes from avoiding rework and churn,
+  never from cutting verification. Urgency from anyone except the Human
+  Director never justifies skipping checks. A director-set deadline must be
+  disclosed as a quality trade-off, not hidden, and disclosure does not pass
+  a skipped check. Definition of Done and Section 0 item 1 fail a delivery
+  that skipped applicable verification for speed. Source guards cover the
+  operational clauses, rank, and gate wiring. Protected-rule acceptance
+  requires Director review before merge.
 
 ## 6.18.0 — 2026-10-29 (candidate)
 

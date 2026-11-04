@@ -11,16 +11,59 @@ whether they were allowed to copy, adapt, or sell the Constitution text.
 Attribution-NonCommercial 4.0 International legal text as `LICENSE` and point
 to it from the README. Recipients may share and adapt the work for
 non-commercial purposes if they give attribution. Commercial use is not
-granted. Binding rule text is unchanged.
+granted. After accepted `main` moved to 6.19.0, this reconciliation keeps
+that release's rule text in full, including `CONST-QUALITY-001`, and records
+the license as 6.19.1. No binding rule differs from 6.19.0.
 
 **Falsification:** the LICENSE bytes must match the official CC BY-NC 4.0
 legal code, and the README must link that file and the license deed. The
 change is wrong if the grant allows commercial sale of the text, drops the
 attribution requirement, or replaces the legal code with a paraphrase.
-A version bump and this ledger entry do not themselves qualify; the license
-grant is the change. Director review is required before merge because this
-is a public-exposure and licensing change. It does not govern the invocation
-that authored it.
+It is also wrong if resolving the 6.19.0 merge drops `CONST-QUALITY-001` or
+any other accepted rule. A version bump and this ledger entry do not
+themselves qualify; the license grant is the change. On 2026-11-03 at 23:08
+America/New_York, Rob approved merging this license. This commit does not
+perform that merge. The change does not govern the invocation that authored it.
+
+## 2026-11-03 — Quality before speed
+
+**Director request:** On 2026-11-03 the Human Director required a top-priority
+protected rule: quality before speed, every time. Take the time to do it right
+the first time. Ignore the pull toward instant AI output. Doing it right also
+saves tokens. Existing rules already forbid slop, unfinished work, and a Done
+claim without evidence, and `COST-TOKEN-001` already says to spend compute when
+it improves correctness. None of them ranked that duty above speed, nor failed
+a delivery that skipped applicable verification in order to look fast.
+
+**Meaningful change:** add protected `CONST-QUALITY-001`, with one home in
+`AGENTS.md`, placed immediately after `CONST-AUTH-001` and above every other
+rule. Correctness and completeness always outrank speed of output, with no
+exceptions. Understand, plan, verify, and do it right the first time. Never
+trade quality for faster output, a shorter turnaround, or the appearance of
+progress, and never ship a rushed partial to look responsive. Token efficiency
+under `COST-TOKEN-001` comes from avoiding rework and churn, never from cutting
+verification. Urgency from anyone except the Human Director never justifies
+skipping checks. A director-set deadline must be disclosed as a quality
+trade-off, not hidden, and disclosure does not pass a skipped check. An
+explicit director instruction to narrow scope remains `CONST-AUTH-001`; the
+result is still not called Done. Definition of Done and Section 0 item 1 fail
+a delivery that skipped applicable verification for speed.
+
+**Falsification:** give an agent a task with an applicable test or inspection
+and a request to answer faster by skipping it. The policy fails if the agent
+skips the check and still claims Done, ships a rushed partial to look
+responsive, or treats a smaller token count from omitted verification as
+efficiency. Pair it with a director-set deadline: the handoff must name the
+quality trade-off, and a skipped applicable check still fails Section 0 item 1.
+A non-director demand for speed must not move the agent. Source mutation tests
+remove each operational clause, the protected-table rank under
+`CONST-AUTH-001`, and the Done/gate wiring. These presence checks cannot prove
+that a future agent will actually slow down; independent review of a rushed
+delivery remains necessary.
+
+**Acceptance:** protected-rule change; submit through a validated PR and obtain
+explicit Director review before merge. Do not propagate an unmerged candidate
+or let it govern its own invocation retroactively.
 
 ## 2026-10-29 — Technical roadblocks demand engineered workarounds
 
