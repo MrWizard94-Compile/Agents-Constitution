@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.18.1 — 2026-11-03 (candidate)
+
+- Licensed the public repository under CC BY-NC 4.0. The repository had no
+  LICENSE, so reuse rights were ambiguous. The Human Director chose
+  Attribution-NonCommercial 4.0 International on 2026-11-03: share and adapt
+  with attribution for non-commercial use; commercial use is not granted.
+  The LICENSE file is the official Creative Commons legal text. No binding
+  rule text changed. Do not merge until the Director reviews the legal text.
+
 ## 6.18.0 — 2026-10-29 (candidate)
 
 - Added protected, always-loaded `CONST-RESOURCEFUL-001` at the Director's

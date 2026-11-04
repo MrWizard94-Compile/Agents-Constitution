@@ -2,6 +2,26 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-03 — Public reuse terms are CC BY-NC 4.0
+
+**Observed gap:** accepted `main` shipped no LICENSE. Readers could not tell
+whether they were allowed to copy, adapt, or sell the Constitution text.
+
+**Meaningful change:** add the official Creative Commons
+Attribution-NonCommercial 4.0 International legal text as `LICENSE` and point
+to it from the README. Recipients may share and adapt the work for
+non-commercial purposes if they give attribution. Commercial use is not
+granted. Binding rule text is unchanged.
+
+**Falsification:** the LICENSE bytes must match the official CC BY-NC 4.0
+legal code, and the README must link that file and the license deed. The
+change is wrong if the grant allows commercial sale of the text, drops the
+attribution requirement, or replaces the legal code with a paraphrase.
+A version bump and this ledger entry do not themselves qualify; the license
+grant is the change. Director review is required before merge because this
+is a public-exposure and licensing change. It does not govern the invocation
+that authored it.
+
 ## 2026-10-29 — Technical roadblocks demand engineered workarounds
 
 **Director request:** give highest priority to “Technical roadblocks are not
