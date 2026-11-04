@@ -29,6 +29,27 @@ No reset, rebase, force-push, squash, or replacement of shared or unrelated
 history without explicit direction. Preserve dirty worktrees and unpublished
 commits. Use isolated branches and recoverable checkpoints for large changes.
 
+### VCS-INTEG-001 — Current base and combined integration
+
+A hosting provider's mergeable, clean, or blocked flag is not evidence that a
+branch contains the base tip. Before calling a pull request current, fetch
+that base tip and the head and record the ahead/behind counts. A status
+cached before the base moved does not count. A green check of the pre-merge
+head does not cover the merge.
+
+When shared history must be preserved, bring the base in with a merge commit.
+Do not rebase, squash, or force-push to make the branch look current
+(`VCS-HISTORY-001`). Resolve conflicts so each side's intended behavior
+remains, unless the director explicitly chose one side. Then run the
+project's required checks on the merged result.
+
+Pairwise cleanliness does not prove a set of pull requests integrates.
+Before recommending a merge order, or merging the set, integrate those heads
+locally on the fetched base without publishing that integration ref, and run
+the project's required checks. Report conflicts and test failures that appear
+only in combination. Do not merge, approve, tag, release, or change
+repository settings during that check unless the action was separately authorized.
+
 ## Refactor and migration
 
 ### REF-PLAN-001 — Plan broad refactors

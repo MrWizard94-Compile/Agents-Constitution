@@ -1,6 +1,6 @@
 # WPAI delivery SOP
 
-**Version:** 3.3.0
+**Version:** 3.3.1
 
 **Authority:** `AGENTS.md`
 **Applies to:** Human-directed work under the WPAI Constitution
@@ -106,6 +106,8 @@ an obvious in-scope correction for an artificial later pass.
 Commit, push, open a PR, merge, release, deploy, or distribute only when the
 director authorized that action and destination. Verify remote state after each
 external action. Protect shared history; never force-push to cover drift.
+Updating a pull request onto a moved base, and checking several pull requests
+together, follows `VCS-INTEG-001`.
 Release tags and published versions are immutable.
 
 ## 10. Learn and evolve
