@@ -2,6 +2,41 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-03 — A clean merge flag is not a current base or a combined suite
+
+**Observed gap:** while updating several Strata pull requests after #8
+landed on `development`, the host reported #5 and #11 mergeable and clean
+even though both heads were still behind the new base tip. `VCS-HISTORY-001`
+already forbids rewriting shared history, and `AI-COORD-002` says an
+integrator checks combined behavior, but neither required a fetched
+ahead/behind count, a merge commit onto the actual tip, or an unpublished
+local integration of the set. An agent could skip the update, or recommend
+a merge order from pairwise status, and miss conflicts that appear only
+when the branches are combined.
+
+**Meaningful change:** add `VCS-INTEG-001` in `law/OPERATIONS.md`. Call a
+pull request current only after fetching the base tip and recording
+ahead/behind. Preserve history with a merge commit, keep both intended
+behaviors unless the director chose one, and rerun the project's required
+checks on that result. Before recommending a merge order, integrate the
+set locally without publishing that ref and report combination-only
+conflicts and failures. Do not merge, approve, tag, release, or change
+settings as part of the check unless that action was separately authorized.
+Collaboration and SOP point at this rule; they do not restate it.
+
+**Falsification:** a pull request whose provider flag is clean while the
+base tip is not an ancestor of the head. The rule fails if that flag is
+treated as current or the history is rebased to catch up. A second case is
+two heads that each merge cleanly onto the base and then conflict or fail
+tests together. The rule fails if a merge recommendation uses only the
+pairwise results. Source tests reject a missing heading and the loss of
+each operational clause. Those presence checks do not prove a future agent
+will fetch or run the combined suite.
+
+**Acceptance:** routine law/tool addition; no protected rule changes.
+Submit through a validated PR. It does not govern the invocation that
+authored it.
+
 ## 2026-10-29 — Technical roadblocks demand engineered workarounds
 
 **Director request:** give highest priority to “Technical roadblocks are not

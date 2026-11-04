@@ -48,6 +48,36 @@ class SourceValidationTests(unittest.TestCase):
             ["GOV-FREEZE-001 section missing"],
         )
 
+    def test_integration_rule_rejects_a_clean_flag_without_the_base_tip(self):
+        operations = (ROOT / "law" / "OPERATIONS.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.integration_contract_errors(operations), [])
+        self.assertEqual(
+            VALIDATOR.integration_contract_errors(
+                operations.replace("### VCS-INTEG-001", "### Retired rule")
+            ),
+            ["VCS-INTEG-001 detailed rule missing"],
+        )
+        for term in (
+            "hosting provider",
+            "ahead/behind",
+            "merge commit",
+            "do not rebase",
+            "without publishing",
+            "only in combination",
+            "separately authorized",
+        ):
+            with self.subTest(term=term):
+                mutated = re.sub(re.escape(term), "other wording", operations, count=1, flags=re.IGNORECASE)
+                self.assertNotEqual(mutated, operations, "mutation must change the text")
+                self.assertIn(
+                    f"VCS-INTEG-001 missing integration safeguard: {term}",
+                    VALIDATOR.integration_contract_errors(mutated),
+                )
+        self.assertEqual(
+            VALIDATOR.integration_contract_errors(operations.replace("hosting provider", "hosting\nprovider")),
+            [],
+        )
+
     def test_assumption_rule_rejects_lost_unread_input_safeguards(self):
         collaboration = (ROOT / "law" / "COLLABORATION.md").read_text(encoding="utf-8")
         self.assertEqual(VALIDATOR.unread_input_contract_errors(collaboration), [])

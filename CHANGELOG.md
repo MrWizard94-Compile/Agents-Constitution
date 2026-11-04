@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.19.0 — 2026-11-03 (candidate)
+
+- Added `VCS-INTEG-001`. A hosting provider's mergeable, clean, or blocked
+  flag does not prove a branch contains the base tip: fetch the tip and
+  record ahead/behind, then bring a preserved history current with a merge
+  commit and rerun the required checks. Pairwise cleanliness does not prove
+  a set of pull requests integrates; combine them locally without publishing
+  that ref, and report conflicts that appear only in combination. Merging,
+  approving, tagging, releasing, or changing repository settings still
+  requires separate authorization. `AI-COORD-002` and SOP stage 9 point at
+  the single home in `law/OPERATIONS.md`. No protected rule changes.
+
 ## 6.18.0 — 2026-10-29 (candidate)
 
 - Added protected, always-loaded `CONST-RESOURCEFUL-001` at the Director's

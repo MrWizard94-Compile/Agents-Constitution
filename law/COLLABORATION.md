@@ -40,7 +40,8 @@ delegate merely because a task is large.
 Agents may research or implement independent components in parallel.
 Coordinate shared interfaces and avoid simultaneous edits to root law or
 other high-conflict files. Merge only after the integrator checks combined
-behavior, tests, docs, and scope.
+behavior, tests, docs, and scope. A provider mergeability flag does not
+replace the base-tip and combined-integration check in `VCS-INTEG-001`.
 
 ### AI-COORD-003 — One package
 

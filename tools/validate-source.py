@@ -116,6 +116,29 @@ def integrated_resource_contract_errors(engineering: str) -> list[str]:
             for term in required if term not in normalized]
 
 
+def integration_contract_errors(operations: str) -> list[str]:
+    """Guard base-tip and combined-integration duties, not just the heading."""
+    section = re.search(
+        r"^### VCS-INTEG-001\b.*?\n(.*?)(?=^#{2,3} |\Z)",
+        operations,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["VCS-INTEG-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "hosting provider",
+        "ahead/behind",
+        "merge commit",
+        "do not rebase",
+        "without publishing",
+        "only in combination",
+        "separately authorized",
+    )
+    return [f"VCS-INTEG-001 missing integration safeguard: {term}"
+            for term in required if term not in normalized]
+
+
 def unread_input_contract_errors(collaboration: str) -> list[str]:
     """Guard the unread-input clause, not just the CTX-ASSUME-001 heading."""
     section = re.search(
@@ -214,6 +237,7 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(resourcefulness_contract_errors(agents, skill, sop))
     errors.extend(freeze_contract_errors(evolution, skill))
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
+    errors.extend(integration_contract_errors((root / "law/OPERATIONS.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
