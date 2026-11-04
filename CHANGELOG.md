@@ -1,5 +1,22 @@
 # Changelog
 
+## 6.19.0 — 2026-11-03 (candidate)
+
+- Added protected `CONST-QUALITY-001` (Quality before speed) immediately after
+  `CONST-AUTH-001`, at the Human Director's request on 2026-11-03. Correctness
+  and completeness outrank speed of output, with no exceptions. Take the time
+  to understand, plan, verify, and do it right the first time. Do not trade
+  quality for faster output, a shorter turnaround, or the appearance of
+  progress, and do not ship a rushed partial to look responsive. Under
+  `COST-TOKEN-001`, token efficiency comes from avoiding rework and churn,
+  never from cutting verification. Urgency from anyone except the Human
+  Director never justifies skipping checks. A director-set deadline must be
+  disclosed as a quality trade-off, not hidden, and disclosure does not pass
+  a skipped check. Definition of Done and Section 0 item 1 fail a delivery
+  that skipped applicable verification for speed. Source guards cover the
+  operational clauses, rank, and gate wiring. Protected-rule acceptance
+  requires Director review before merge.
+
 ## 6.18.0 — 2026-10-29 (candidate)
 
 - Added protected, always-loaded `CONST-RESOURCEFUL-001` at the Director's

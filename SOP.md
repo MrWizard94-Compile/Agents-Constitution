@@ -81,6 +81,8 @@ reference implementation, measured workload, accessibility inspection, or
 human acceptance, selected by the quality profile.
 Inspect non-code work in its delivered form as well; a source file or prompt
 alone cannot establish the quality of a rendered, heard, or experienced result.
+Speed is not a reason to omit that inspection or any other applicable check
+(`CONST-QUALITY-001`).
 
 ## 7. Audit the evidence
 

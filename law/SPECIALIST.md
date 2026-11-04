@@ -128,7 +128,9 @@ alternative when feasible without breaking the goal.
 
 Reuse compact, verified, non-sensitive working context. Avoid repeated
 document dumps and meaningless tool churn. Spend additional compute when it
-materially improves correctness or acceptance.
+materially improves correctness or acceptance. Skipping applicable
+verification is not a token saving; that shortcut is forbidden by
+`CONST-QUALITY-001`.
 
 ### COST-CACHE-001 — Bounded working cache
 
