@@ -14,6 +14,15 @@ controls source freeze, one meaningful improvement per top-level call,
 review, and mirror propagation. [Architecture](docs/ARCHITECTURE.md) and the
 [historical-source record](docs/SOURCE-INVENTORY.md) explain the migration.
 
+## License
+
+This repository is licensed under the
+[Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/)
+(CC BY-NC 4.0). The legal text is in [LICENSE](LICENSE).
+
+You may share and adapt this work for non-commercial purposes with
+attribution. Commercial use is not granted. This is not legal advice.
+
 ## Verify source
 
 From a clean checkout, run:

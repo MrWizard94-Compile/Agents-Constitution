@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.19.1 — 2026-11-03 (candidate)
+
+- Licensed the public repository under CC BY-NC 4.0. The repository had no
+  LICENSE, so reuse rights were ambiguous. The Human Director chose
+  Attribution-NonCommercial 4.0 International on 2026-11-03: share and adapt
+  with attribution for non-commercial use; commercial use is not granted.
+  The LICENSE file is the official Creative Commons legal text. On 2026-11-03
+  at 23:08 America/New_York, Rob approved merging this license. Accepted
+  `main` had moved to 6.19.0, so this reconciliation keeps that release in
+  full, including `CONST-QUALITY-001`, and records the license as 6.19.1.
+  No binding rule text differs from 6.19.0.
+
 ## 6.19.0 — 2026-11-03 (candidate)
 
 - Added protected `CONST-QUALITY-001` (Quality before speed) immediately after
