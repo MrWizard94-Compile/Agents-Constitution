@@ -131,6 +131,13 @@ Resolve critical security and quality findings. Source QA, release
 packaging, deployment, live runtime, and physical acceptance have separate
 gates and must be reported separately.
 
+A human approval of terms, scope, or an adaptation is its own evidence
+class. Record the approver, the time, and the source of that decision.
+Do not invent a trial, demo, or live consumer observation to satisfy a
+gate, and do not treat the approval record as that observation. Do not
+treat an observed trial, demo, or live consumer result as the human
+approval. A checker that lets one class close the other is wrong.
+
 ## Project lifecycle
 
 ### LIFE-PHASE-001 — Respect maturity

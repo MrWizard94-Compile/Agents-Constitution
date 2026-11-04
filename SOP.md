@@ -94,6 +94,8 @@ Reconcile the evidence against the original quality profile and changed scope.
 Investigate contradictions and review-tool findings against the current tree;
 withdraw unsupported claims. A percentage, green badge, or polished artifact
 is not a substitute for evidence about the intended use.
+A human approval of terms or an adaptation does not close a trial, demo, or
+live-consumer gate, and the reverse is also true (`REL-HARDEN-001`).
 
 ## 8. Package and deliver
 

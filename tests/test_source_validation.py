@@ -48,6 +48,44 @@ class SourceValidationTests(unittest.TestCase):
             ["GOV-FREEZE-001 section missing"],
         )
 
+    def test_release_evidence_keeps_approval_separate_from_a_trial(self):
+        operations = (ROOT / "law" / "OPERATIONS.md").read_text(encoding="utf-8")
+        sop = (ROOT / "SOP.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.release_evidence_contract_errors(operations, sop), [])
+        self.assertEqual(
+            VALIDATOR.release_evidence_contract_errors(
+                operations.replace("### REL-HARDEN-001", "### Retired rule"), sop),
+            ["REL-HARDEN-001 detailed rule missing"],
+        )
+        mutations = {
+            "approver, the time, and the source": "approver, the time, and the source",
+            "invent a trial, demo, or live consumer observation":
+                "do not invent a trial, demo, or live consumer observation",
+            "do not treat the approval record as that observation":
+                "do not treat the approval record as that observation",
+            "observed trial, demo, or live consumer result":
+                "do not treat an observed trial, demo, or live consumer result as the human approval",
+        }
+        for needle, reported in mutations.items():
+            with self.subTest(term=reported):
+                mutated = operations.replace(needle, "other wording", 1)
+                self.assertNotEqual(mutated, operations)
+                self.assertIn(
+                    f"REL-HARDEN-001 missing evidence-class safeguard: {reported}",
+                    VALIDATOR.release_evidence_contract_errors(mutated, sop),
+                )
+        self.assertEqual(
+            VALIDATOR.release_evidence_contract_errors(
+                operations.replace("approver, the time, and the source", "approver,\nthe time, and the source"),
+                sop,
+            ),
+            [],
+        )
+        self.assertIn(
+            "SOP.md must keep human approval separate from a trial, demo, or live-consumer gate",
+            VALIDATOR.release_evidence_contract_errors(operations, sop.replace("REL-HARDEN-001", "other rule")),
+        )
+
     def test_assumption_rule_rejects_lost_unread_input_safeguards(self):
         collaboration = (ROOT / "law" / "COLLABORATION.md").read_text(encoding="utf-8")
         self.assertEqual(VALIDATOR.unread_input_contract_errors(collaboration), [])
