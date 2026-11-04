@@ -14,7 +14,7 @@ VERSION_RE = re.compile(r"\d+\.\d+\.\d+\Z")
 HEADING_ID_RE = re.compile(r"^#{2,3} ([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-\d{3})\b", re.MULTILINE)
 LINK_RE = re.compile(r"(?<!!)\[[^]]+\]\(([^)]+)\)")
 PROTECTED = {
-    "CONST-AUTH-001", "CONST-COMPLETE-001", "CONST-DEP-001",
+    "CONST-AUTH-001", "CONST-QUALITY-001", "CONST-COMPLETE-001", "CONST-DEP-001",
     "CONST-DONE-001", "CONST-GATE-001", "CONST-CRAFT-001",
     "CONST-RESOURCEFUL-001", "ENG-WARN-001",
     "TEST-BEHAVIOR-001", "DOC-SYNC-001", "SEC-INPUT-001",
@@ -81,6 +81,54 @@ def resourcefulness_contract_errors(agents: str, skill: str, sop: str) -> list[s
     for path, body in (("SKILL.md", skill), ("SOP.md", sop)):
         if "CONST-RESOURCEFUL-001" not in body:
             errors.append(f"{path} must route technical roadblocks to CONST-RESOURCEFUL-001")
+    return errors
+
+
+def quality_contract_errors(agents: str, skill: str, sop: str) -> list[str]:
+    """Guard quality-before-speed, its rank, and the Done/gate failure wire."""
+    section = re.search(
+        r"^### CONST-QUALITY-001\b[^\n]*\n(.*?)(?=^#{2,3} |\Z)",
+        agents,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["CONST-QUALITY-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "correctness and completeness always outrank speed of output, with no exceptions",
+        "take the time to understand, plan, verify, and do it right the first time",
+        "never trade quality for faster output, a shorter turnaround, or the appearance of progress",
+        "never ship a rushed partial to look responsive",
+        "cost-token-001",
+        "token efficiency comes from avoiding rework and churn, never from cutting verification",
+        "urgency from anyone except the human director never justifies skipping checks",
+        "director-set deadline must be disclosed as a quality trade-off, not hidden",
+        "skipped applicable verification for speed fails",
+    )
+    errors = [f"CONST-QUALITY-001 missing operational safeguard: {term}"
+              for term in required if term not in normalized]
+    protected = re.search(r"^## Protected rules\n(.*?)(?=^#{2,3} |\Z)", agents,
+                          re.MULTILINE | re.DOTALL)
+    rows = re.findall(r"^\| `([^`]+)` \|", protected.group(1), re.MULTILINE) if protected else []
+    if protected is None or "CONST-QUALITY-001" not in rows:
+        errors.append("CONST-QUALITY-001 missing protected-core entry")
+    elif len(rows) < 2 or rows[0] != "CONST-AUTH-001" or rows[1] != "CONST-QUALITY-001":
+        errors.append("CONST-QUALITY-001 must rank immediately after CONST-AUTH-001")
+    done = re.search(r"^## Definition of Done\n(.*?)(?=^## |\Z)", agents, re.MULTILINE | re.DOTALL)
+    if done is None or "CONST-QUALITY-001" not in done.group(1):
+        errors.append("Definition of Done must apply CONST-QUALITY-001")
+    gate = re.search(r"^## 0\. Mandatory pre-delivery gate\n(.*?)(?=^## |\Z)", agents,
+                     re.MULTILINE | re.DOTALL)
+    item = ""
+    if gate:
+        match = re.search(r"^\| 1 \|.*$", gate.group(1), re.MULTILINE)
+        if match:
+            item = " ".join(match.group(0).casefold().split())
+    if "const-quality-001" not in item or "skipped applicable verification for speed" not in item:
+        errors.append("Section 0 item 1 must fail a delivery that skipped applicable verification for speed")
+    for path, body in (("SKILL.md", skill), ("SOP.md", sop)):
+        if "CONST-QUALITY-001" not in body:
+            errors.append(f"{path} must route speed pressure to CONST-QUALITY-001")
     return errors
 
 
@@ -212,6 +260,7 @@ def validate(root: Path = ROOT) -> list[str]:
             errors.append(f"protected rule missing from entry/registry: {rule}")
     errors.extend(craft_contract_errors(agents))
     errors.extend(resourcefulness_contract_errors(agents, skill, sop))
+    errors.extend(quality_contract_errors(agents, skill, sop))
     errors.extend(freeze_contract_errors(evolution, skill))
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))

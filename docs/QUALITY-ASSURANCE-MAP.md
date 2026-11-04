@@ -1,7 +1,7 @@
 # Quality assurance map
 
 **Status:** Non-binding design aid. Binding requirements remain in `AGENTS.md`,
-`SOP.md`, and the one-home `law/*` files. Reviewed 2026-10-12.
+`SOP.md`, and the one-home `law/*` files. Reviewed 2026-11-03.
 
 The goal is the highest quality feasibly achievable for the authorized work,
 not a fictional guarantee of universal perfection. This is **not** permission
@@ -15,6 +15,7 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
 | Dimension | A useful falsification question | Constitutional home |
 |---|---|---|
 | Purpose-fit and craft | If presentation and volume are stripped away, does each material part still serve the brief and real intended use, without invented detail or generic filler? Has the delivered form been examined? | `CONST-CRAFT-001`; `CONST-COMPLETE-001` |
+| Quality before speed | Was an applicable verification check skipped, shortened, or replaced to finish faster, look responsive, or reduce token use? | `CONST-QUALITY-001`; `COST-TOKEN-001`; `CONST-DONE-001` |
 | Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |
 | Stack and factual correctness | Do the imports, symbols, versions, contracts, and actual runtime match the implementation's claims? | `ENG-STACK-001`; `ENG-RESEARCH-001`; `ENG-FW-001` |
 | Test integrity | Would the suite still fail if the defect were reintroduced, or has a skip, fixture, mock, assertion, or CI gate concealed it? | `TEST-QUALITY-001`; `TEST-REGRESSION-001` |

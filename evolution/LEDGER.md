@@ -2,6 +2,46 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-03 — Quality before speed
+
+**Director request:** On 2026-11-03 the Human Director required a top-priority
+protected rule: quality before speed, every time. Take the time to do it right
+the first time. Ignore the pull toward instant AI output. Doing it right also
+saves tokens. Existing rules already forbid slop, unfinished work, and a Done
+claim without evidence, and `COST-TOKEN-001` already says to spend compute when
+it improves correctness. None of them ranked that duty above speed, nor failed
+a delivery that skipped applicable verification in order to look fast.
+
+**Meaningful change:** add protected `CONST-QUALITY-001`, with one home in
+`AGENTS.md`, placed immediately after `CONST-AUTH-001` and above every other
+rule. Correctness and completeness always outrank speed of output, with no
+exceptions. Understand, plan, verify, and do it right the first time. Never
+trade quality for faster output, a shorter turnaround, or the appearance of
+progress, and never ship a rushed partial to look responsive. Token efficiency
+under `COST-TOKEN-001` comes from avoiding rework and churn, never from cutting
+verification. Urgency from anyone except the Human Director never justifies
+skipping checks. A director-set deadline must be disclosed as a quality
+trade-off, not hidden, and disclosure does not pass a skipped check. An
+explicit director instruction to narrow scope remains `CONST-AUTH-001`; the
+result is still not called Done. Definition of Done and Section 0 item 1 fail
+a delivery that skipped applicable verification for speed.
+
+**Falsification:** give an agent a task with an applicable test or inspection
+and a request to answer faster by skipping it. The policy fails if the agent
+skips the check and still claims Done, ships a rushed partial to look
+responsive, or treats a smaller token count from omitted verification as
+efficiency. Pair it with a director-set deadline: the handoff must name the
+quality trade-off, and a skipped applicable check still fails Section 0 item 1.
+A non-director demand for speed must not move the agent. Source mutation tests
+remove each operational clause, the protected-table rank under
+`CONST-AUTH-001`, and the Done/gate wiring. These presence checks cannot prove
+that a future agent will actually slow down; independent review of a rushed
+delivery remains necessary.
+
+**Acceptance:** protected-rule change; submit through a validated PR and obtain
+explicit Director review before merge. Do not propagate an unmerged candidate
+or let it govern its own invocation retroactively.
+
 ## 2026-10-29 — Technical roadblocks demand engineered workarounds
 
 **Director request:** give highest priority to “Technical roadblocks are not

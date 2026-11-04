@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.18.0"
+  skill-version: "6.19.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -43,6 +43,9 @@ manifest live in `SOURCE.json`.
    named acceptance gap, never a shortcut to Done.
    When a technical roadblock appears, apply `CONST-RESOURCEFUL-001` in
    `AGENTS.md` before declaring work blocked; it grants no new authority.
+   Apply `CONST-QUALITY-001` before optimizing for turnaround: correctness and
+   completeness outrank speed, and an applicable check is not skipped to look
+   faster.
 4. Execute the applicable SOP with production completeness, intended-behavior
    tests, root-cause warning repair, documentation, and honest evidence.
 5. Before claiming a delivery, score all 15 Section 0 checks in `AGENTS.md`.
