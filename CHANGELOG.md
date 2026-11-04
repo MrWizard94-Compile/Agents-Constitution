@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.19.2 — 2026-11-03 (candidate)
+
+- Strengthened `REL-HARDEN-001` so a human approval of terms, scope, or an
+  adaptation records the approver, the time, and the source, and cannot close
+  a gate that requires an observed trial, demo, or live consumer. The reverse
+  is also forbidden. `SOP.md` points at that rule. Version 6.19.1 is reserved
+  by open pull request #41 (CC BY-NC 4.0) and is not part of this branch.
+
 ## 6.19.0 — 2026-11-03 (candidate)
 
 - Added protected `CONST-QUALITY-001` (Quality before speed) immediately after

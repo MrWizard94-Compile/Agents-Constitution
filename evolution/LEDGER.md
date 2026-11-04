@@ -2,6 +2,28 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-03 — Human approval is not a trial
+
+**Observed gap:** `REL-HARDEN-001` already separated source QA, packaging,
+deployment, live runtime, and physical acceptance, but a release checker could
+still treat any non-empty note as enough evidence. A sentence recording that a
+person approved terms or an adaptation could be pasted into a trial, demo, or
+live-consumer gate and close it. The reverse was also possible. The rule did
+not require the approval record to name the approver, the time, and the source.
+
+**Meaningful change:** in the existing home `REL-HARDEN-001`, require that
+human-approval record, and forbid using it to satisfy an observed trial, demo,
+or live consumer gate. Forbid using one of those observations as the human
+approval. `SOP.md` points at the rule during evidence audit. No new rule ID.
+
+**Falsification:** delete the approver/time/source requirement, or let an
+approval sentence close a consumer gate, and the source guard fails. The change
+is wrong if a real observed trial is rejected merely because it is not also a
+signature, or if a named approval is rejected because no trial has been run.
+Those remain different gates. Presence checks do not prove a future agent will
+keep them apart; review of the release record is still required. Version 6.19.1
+is reserved by open pull request #41 and is not this change.
+
 ## 2026-11-03 — Quality before speed
 
 **Director request:** On 2026-11-03 the Human Director required a top-priority

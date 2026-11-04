@@ -164,6 +164,32 @@ def integrated_resource_contract_errors(engineering: str) -> list[str]:
             for term in required if term not in normalized]
 
 
+def release_evidence_contract_errors(operations: str, sop: str) -> list[str]:
+    """Keep a named human approval from standing in for an observed trial."""
+    section = re.search(
+        r"^### REL-HARDEN-001\b.*?\n(.*?)(?=^### |\Z)",
+        operations,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["REL-HARDEN-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "approver, the time, and the source",
+        "do not invent a trial, demo, or live consumer observation",
+        "do not treat the approval record as that observation",
+        "do not treat an observed trial, demo, or live consumer result as the human approval",
+    )
+    errors = [
+        f"REL-HARDEN-001 missing evidence-class safeguard: {term}"
+        for term in required if term not in normalized
+    ]
+    sop_text = " ".join(sop.casefold().split())
+    if "rel-harden-001" not in sop_text or "does not close a trial, demo, or live-consumer gate" not in sop_text:
+        errors.append("SOP.md must keep human approval separate from a trial, demo, or live-consumer gate")
+    return errors
+
+
 def unread_input_contract_errors(collaboration: str) -> list[str]:
     """Guard the unread-input clause, not just the CTX-ASSUME-001 heading."""
     section = re.search(
@@ -265,6 +291,8 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
+    errors.extend(release_evidence_contract_errors(
+        (root / "law/OPERATIONS.md").read_text(encoding="utf-8-sig"), sop))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
         errors.append("ledger must say ledger-only edits never count")
 
