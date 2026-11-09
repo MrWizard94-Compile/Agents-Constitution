@@ -1,5 +1,20 @@
 # Changelog
 
+## 6.20.0 — 2026-11-09 (candidate)
+
+- Expanded protected `CONST-COMPLETE-001` from a table-only slogan into an
+  operational rule: a parent screen, section, package, or module is not
+  complete because it exists. When a specification enumerates named
+  player-facing controls, fields, or surfaces, each named item is an
+  independent acceptance unit. Shipping the parent without a named control is
+  incomplete unless that gap is recorded as an unmet acceptance item.
+  Definition of Done and Section 0 item 1 fail a delivery that presents an
+  enumerated surface as done while a named control is missing. Source guards
+  cover the operational clauses, protected-core entry, Done/gate wiring, and
+  SKILL/SOP routing. Observed from agents treating a Settings destination as
+  covering a GDD row that listed visual intensity when that control was
+  absent.
+
 ## 6.19.1 — 2026-11-03 (candidate)
 
 - Licensed the public repository under CC BY-NC 4.0. The repository had no

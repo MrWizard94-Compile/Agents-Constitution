@@ -32,6 +32,10 @@ oracle is unavailable, report the acceptance gate as unmet and arrange a
 safe next step; do not call the result Done.
 For every medium, include the intended-use and substance check in
 `CONST-CRAFT-001`; a polished surface is not an acceptance criterion by itself.
+When a specification enumerates named player-facing controls, fields, or
+surfaces, treat each named item as its own acceptance unit under
+`CONST-COMPLETE-001`; a parent screen or section that omits a named control is
+not complete.
 
 ## 2. Inventory and baseline
 
@@ -65,6 +69,9 @@ unrelated edits and protect existing worktree changes.
 Treat technical obstacles as engineering work under `CONST-RESOURCEFUL-001`,
 not an automatic stop or permission to narrow the requested outcome. Its
 canonical home in `AGENTS.md` defines workaround, verification and escalation.
+Inventory enumerated named controls from the specification and wire each one
+(`CONST-COMPLETE-001`); do not call a destination done because the parent
+screen exists.
 
 ## 6. Verify and harden
 

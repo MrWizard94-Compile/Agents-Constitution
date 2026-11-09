@@ -1,6 +1,6 @@
 # WPAI Constitution
 
-**Version:** 6.19.1
+**Version:** 6.20.0
 
 **Status:** Binding
 
@@ -36,7 +36,7 @@ The words **MUST**, **MUST NOT**, **SHOULD**, and **MAY** are used in the
 | `CONST-AUTH-001` | Human authority and safety govern all lower instructions. | This file |
 | `CONST-QUALITY-001` | Quality before speed: correctness and completeness outrank speed of output, with no exceptions. | This file |
 | `CONST-RESOURCEFUL-001` | Technical roadblocks are not hard blocks: engineer and verify an authorized workaround. | This file |
-| `CONST-COMPLETE-001` | Deliver complete, wired, dependency-closed units with no placeholders or production TODOs. | This file |
+| `CONST-COMPLETE-001` | Deliver complete, wired, dependency-closed units; each named control in a specification is its own acceptance unit. | This file |
 | `CONST-CRAFT-001` | Reject AI slop: every artifact must earn its place by serving the intended use with verifiable substance. | This file |
 | `CONST-DEP-001` | Establish prerequisites before dependent work. | This file |
 | `CONST-DONE-001` | Claim Done only after all applicable evidence gates pass. | This file |
@@ -117,6 +117,19 @@ unavailable essential input or a change to a demonstrated hard constraint,
 ask for that precise decision/input with the evidence and closest viable path;
 do not invent missing data or claim the dependent acceptance gate passed.
 
+### CONST-COMPLETE-001 — Complete, wired units
+
+Deliver complete, wired, dependency-closed units with no placeholders or
+production TODOs. A parent screen, section, package, or module is not complete
+because it exists. When a specification enumerates named player-facing
+controls, fields, or surfaces, each named item is an independent acceptance
+unit. Shipping the parent without a named control is incomplete unless that
+gap is recorded as an unmet acceptance item. Do not treat a destination that
+omits a named control as covering the whole row.
+
+A delivery that presents an enumerated surface as done while a named control
+is missing FAILS `CONST-COMPLETE-001`, `CONST-DONE-001`, and Section 0 item 1.
+
 ### CONST-CRAFT-001 — Purpose-fit work, not AI slop
 
 Every agent-created artifact—code, test, document, plan, design, data, image,
@@ -146,7 +159,8 @@ medium, but never waive an applicable check because the artifact looks good.
 
 1. The requested outcome and acceptance criteria are met with no unfinished
    integration, broken references, or missing prerequisites; purpose-fit and
-   substance pass `CONST-CRAFT-001`, technical obstacles are handled under
+   substance pass `CONST-CRAFT-001`, enumerated named controls pass
+   `CONST-COMPLETE-001`, technical obstacles are handled under
    `CONST-RESOURCEFUL-001` rather than silently shrinking the outcome, and
    correctness and completeness were not traded for speed under
    `CONST-QUALITY-001`.
@@ -177,7 +191,7 @@ for the actual deliverable. Any applicable FAIL blocks a completion claim.
 
 | # | Check |
 |---|---|
-| 1 | Complete, purpose-fit requested behavior or artifact; no slop, stubs, TODOs, or broken integrations; technical roadblocks handled under `CONST-RESOURCEFUL-001`; a delivery that skipped applicable verification for speed FAILS `CONST-QUALITY-001` |
+| 1 | Complete, purpose-fit requested behavior or artifact; no slop, stubs, TODOs, or broken integrations; enumerated named controls under `CONST-COMPLETE-001`; technical roadblocks handled under `CONST-RESOURCEFUL-001`; a delivery that skipped applicable verification for speed FAILS `CONST-QUALITY-001` |
 | 2 | Prerequisites and runtime dependencies verified |
 | 3 | Zero errors and warnings in owned and affected verification |
 | 4 | Intended-behavior tests pass, including relevant edge and failure paths |
