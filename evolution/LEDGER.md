@@ -2,6 +2,25 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-09 — Shared pipeline winding
+
+**Observed gap:** entity boxes submitted to the terrain GPU pipeline, which
+culls back faces. Their triangles wound inward, so Hollow/Grazer meshes were
+invisible from outside. UV and AABB tests stayed green. `TEST-DOMAIN-001`
+requires calling the shipped function; it does not require that every
+producer sharing a cull pipeline use the same winding oracle.
+
+**Meaningful change:** add `TEST-CULL-001` in `law/ENGINEERING.md`. Every
+mesh producer that shares a culling pipeline must be tested with the same
+outward-winding oracle as the primary producer. Drive the shipped mesh
+function. A UV-only or AABB-only test fails if triangles would be culled.
+
+**Falsification:** a second mesh path with reversed winding, UV tests green,
+no outward-dot check, suite still passes. Source mutation tests remove the
+operational clauses (shares that pipeline, outward-winding oracle,
+back-face culled, shipped mesh function, same pipeline). A version bump and
+this ledger entry do not themselves qualify.
+
 ## 2026-11-03 — Public reuse terms are CC BY-NC 4.0
 
 **Observed gap:** accepted `main` shipped no LICENSE. Readers could not tell

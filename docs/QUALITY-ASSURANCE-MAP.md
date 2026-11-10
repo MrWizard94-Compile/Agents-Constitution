@@ -19,6 +19,7 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
 | Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |
 | Stack and factual correctness | Do the imports, symbols, versions, contracts, and actual runtime match the implementation's claims? | `ENG-STACK-001`; `ENG-RESEARCH-001`; `ENG-FW-001` |
 | Test integrity | Would the suite still fail if the defect were reintroduced, or has a skip, fixture, mock, assertion, or CI gate concealed it? | `TEST-QUALITY-001`; `TEST-REGRESSION-001` |
+| Shared GPU cull | Does every mesh producer that shares a back-face cull use the same outward-winding oracle as the primary producer? | `TEST-CULL-001`; `TEST-DOMAIN-001` |
 | Security, privacy, and permission | Can untrusted content, excess privilege, secrets, or a dependency cross the intended boundary? | `SEC-INPUT-001`; `SEC-PRIV-001`; `SEC-SECRET-001`; `SEC-SUPPLY-001` |
 | Usability and accessibility | Can representative people complete the intended task with the input, display, language, and assistive modes they need? | `TEST-DOMAIN-001`; `DOC-SYNC-001`; project acceptance criteria |
 | Reliability and operations | Does the system recover from faults, interruption, restart, and unavailable shared services without data loss or false success? | `OBS-FAIL-001`; `LIFE-TOOL-001`; `REL-UPGRADE-001` |
