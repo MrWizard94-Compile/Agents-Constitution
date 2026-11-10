@@ -83,6 +83,30 @@ class SourceValidationTests(unittest.TestCase):
             VALIDATOR.cache_link_contract_errors(specialist.replace("cached caller", "other class")),
         )
 
+    def test_cull_rule_rejects_inward_second_mesh_path(self):
+        engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.cull_contract_errors(engineering), [])
+        self.assertIn(
+            "TEST-CULL-001 detailed rule missing",
+            VALIDATOR.cull_contract_errors(
+                engineering.replace("### TEST-CULL-001", "### Retired rule")
+            ),
+        )
+        for term in (
+            "shares that pipeline",
+            "outward-winding oracle",
+            "back-face culled",
+            "shipped mesh function",
+            "same pipeline",
+        ):
+            with self.subTest(term=term):
+                mutated = re.sub(re.escape(term), "other wording", engineering, flags=re.IGNORECASE)
+                self.assertNotEqual(mutated, engineering)
+                self.assertIn(
+                    f"TEST-CULL-001 missing cull safeguard: {term}",
+                    VALIDATOR.cull_contract_errors(mutated),
+                )
+
     def test_resource_rule_requires_host_level_acceptance(self):
         engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
         self.assertEqual(VALIDATOR.integrated_resource_contract_errors(engineering), [])

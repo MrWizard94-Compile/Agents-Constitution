@@ -126,6 +126,10 @@ required live flow. For a game or mod, verify that the actual renderer,
 server tick, or GameTest world calls the shipped production function; a
 synthetic fixture outside the interactive entry is not runtime acceptance.
 
+### TEST-CULL-001 — Shared pipeline winding
+
+When a GPU pipeline culls a winding, every mesh producer that shares that pipeline MUST be tested with the same outward-winding oracle as the primary producer. A second path that only checks UVs, AABBs, or texture layers FAILS this rule if its triangles face inward and would be back-face culled. Drive the shipped mesh function; do not reimplement the cross product in the test alone. A debug-only assert on one producer does not cover another producer that submits to the same pipeline.
+
 ### TEST-REGRESSION-001 — Preserve the safety net
 
 Do not delete or weaken a valid test to make a build green. Flakiness is a

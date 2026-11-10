@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.20.0 — 2026-11-09 (candidate)
+
+- Added `TEST-CULL-001`: when a GPU pipeline culls a winding, every mesh
+  producer that shares that pipeline must be tested with the same
+  outward-winding oracle as the primary producer. A second path that only
+  checks UVs or AABBs fails if its triangles face inward. Drive the shipped
+  mesh function. Observed when entity boxes reused the terrain pipeline's
+  back-face cull with opposite winding, so Hollow/Grazer meshes were
+  invisible from outside. No protected rule changes.
+
 ## 6.19.1 — 2026-11-03 (candidate)
 
 - Licensed the public repository under CC BY-NC 4.0. The repository had no
