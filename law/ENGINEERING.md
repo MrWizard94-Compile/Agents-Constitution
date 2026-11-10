@@ -126,6 +126,18 @@ required live flow. For a game or mod, verify that the actual renderer,
 server tick, or GameTest world calls the shipped production function; a
 synthetic fixture outside the interactive entry is not runtime acceptance.
 
+### TEST-SAMPLE-001 — Sampling span in the contract's units
+
+When a visual contract names a sampling span (one texture tile per voxel,
+one UV unit per cell, texels per metre), tests MUST measure that span on the
+shipped mesh vertices or shader inputs in the contract's units. Positions
+stored in a different unit, such as world-space metres after a grid scale
+change, MUST NOT be treated as proving a per-cell tile. A test that only
+checks that a texture layer exists, or that UV components are finite, FAILS
+this rule. A unit-square face that must sample a full authored tile MUST
+cover UV 0–1 on the shipped mesh path, and those UVs MUST NOT slide when
+the model moves in world space.
+
 ### TEST-REGRESSION-001 — Preserve the safety net
 
 Do not delete or weaken a valid test to make a build green. Flakiness is a

@@ -146,6 +146,27 @@ def cache_link_contract_errors(specialist: str) -> list[str]:
     return [f"LOW-CACHE-001 missing linkage safeguard: {term}" for term in required if term not in normalized]
 
 
+def sample_span_contract_errors(engineering: str) -> list[str]:
+    """Guard UV/tile sampling span in the contract's units, not world metres."""
+    section = re.search(
+        r"^### TEST-SAMPLE-001\b.*?\n(.*?)(?=^### |\Z)",
+        engineering,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["TEST-SAMPLE-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "sampling span",
+        "shipped mesh",
+        "contract's units",
+        "world-space metres",
+        "full authored tile",
+    )
+    return [f"TEST-SAMPLE-001 missing sampling safeguard: {term}"
+            for term in required if term not in normalized]
+
+
 def integrated_resource_contract_errors(engineering: str) -> list[str]:
     """Guard system-level acceptance when a provider runs inside a larger host."""
     section = re.search(
@@ -265,6 +286,7 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
+    errors.extend(sample_span_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
         errors.append("ledger must say ledger-only edits never count")
 

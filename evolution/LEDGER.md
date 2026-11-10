@@ -2,6 +2,27 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-09 — Sampling span in the contract's units
+
+**Observed gap:** after voxels became 0.5 m, terrain and mob shaders still
+built UVs from world-space metres. A block face spanned UV 0.5 (a quarter of
+the 32×32 tile). Mob AABBs had no local UV, so authored eye/face tiles swam
+as the creature moved. `TEST-DOMAIN-001` requires calling the shipped
+function; it does not require measuring a named sampling span in the
+contract's units.
+
+**Meaningful change:** add `TEST-SAMPLE-001` in `law/ENGINEERING.md`. Tests
+must measure the named span on shipped mesh vertices or shader inputs in
+those units. World-space metres do not prove a per-cell tile. A full-atlas
+face must cover UV 0–1 and must not slide with world position.
+
+**Falsification:** 0.5 m voxels, UV = world.xz, one-voxel face UV span 0.5,
+suite still green; or entity vertices store world corners, UVs change when
+the mob translates, suite still green. Source mutation tests remove the
+operational clauses (sampling span, shipped mesh, contract's units,
+world-space metres, full authored tile). A version bump and this ledger
+entry do not themselves qualify.
+
 ## 2026-11-03 — Public reuse terms are CC BY-NC 4.0
 
 **Observed gap:** accepted `main` shipped no LICENSE. Readers could not tell

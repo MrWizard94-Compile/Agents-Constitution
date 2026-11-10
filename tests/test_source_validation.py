@@ -83,6 +83,30 @@ class SourceValidationTests(unittest.TestCase):
             VALIDATOR.cache_link_contract_errors(specialist.replace("cached caller", "other class")),
         )
 
+    def test_sample_span_rule_rejects_world_metre_uvs(self):
+        engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.sample_span_contract_errors(engineering), [])
+        self.assertIn(
+            "TEST-SAMPLE-001 detailed rule missing",
+            VALIDATOR.sample_span_contract_errors(
+                engineering.replace("### TEST-SAMPLE-001", "### Retired rule")
+            ),
+        )
+        for term in (
+            "sampling span",
+            "shipped mesh",
+            "contract's units",
+            "world-space metres",
+            "full authored tile",
+        ):
+            with self.subTest(term=term):
+                mutated = re.sub(re.escape(term), "other wording", engineering, flags=re.IGNORECASE)
+                self.assertNotEqual(mutated, engineering)
+                self.assertIn(
+                    f"TEST-SAMPLE-001 missing sampling safeguard: {term}",
+                    VALIDATOR.sample_span_contract_errors(mutated),
+                )
+
     def test_resource_rule_requires_host_level_acceptance(self):
         engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
         self.assertEqual(VALIDATOR.integrated_resource_contract_errors(engineering), [])

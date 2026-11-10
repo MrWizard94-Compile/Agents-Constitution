@@ -1,5 +1,16 @@
 # Changelog
 
+## 6.20.0 — 2026-11-09 (candidate)
+
+- Added `TEST-SAMPLE-001`: a named sampling span (one texture tile per voxel,
+  one UV unit per cell) must be measured on shipped mesh vertices or shader
+  inputs in the contract's units. World-space metres after a grid scale
+  change do not prove a per-cell tile. A unit-square face that must sample a
+  full authored tile must cover UV 0–1 and must not slide when the model
+  moves. Observed when 0.5 m voxels left `fs_terrain` sampling world metres,
+  so a block face showed a quarter of its 32×32 tile and mob atlases swam
+  over AABB corners. No protected rule changes.
+
 ## 6.19.1 — 2026-11-03 (candidate)
 
 - Licensed the public repository under CC BY-NC 4.0. The repository had no
