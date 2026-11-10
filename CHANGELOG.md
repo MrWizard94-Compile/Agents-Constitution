@@ -1,5 +1,19 @@
 # Changelog
 
+## 6.20.0 — 2026-11-04 (candidate)
+
+- Added `TEST-PAYLOAD-001`: when acceptance names a stored payload (voxel
+  leaf bytes, encoded document, packed mesh), tests must measure that named
+  payload on the shipped type. Index nodes, occupancy sets, allocator RSS,
+  wrapper capacity, and empty-collection identity do not satisfy a
+  zero-payload claim. A filled leaf must round-trip the declared cell count.
+  Reimplementing the compressor or hard-coding the byte count without calling
+  the shipped store fails the rule. Observed while splitting 8³ SVO data
+  chunks from 32³ render regions: “0 bytes for empty air” was easy to “pass”
+  by checking a HashMap was empty while a 512-cell buffer still existed, or
+  by citing process RSS while octree index nodes remained. No protected rule
+  changes.
+
 ## 6.19.1 — 2026-11-03 (candidate)
 
 - Licensed the public repository under CC BY-NC 4.0. The repository had no

@@ -2,6 +2,30 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-04 — Named payload is not index RSS
+
+**Observed gap:** an engine acceptance criterion required empty 8×8×8 air
+chunks to consume 0 voxel-payload bytes via an SVO. A test that only checked
+that a parent map had no entry, or that process RSS looked small, could pass
+while a 512-cell buffer was still allocated, or could fail a true sparse
+tree because index nodes exist. `TEST-QUALITY-001` asks for meaningful
+coverage but does not separate named payload from index/RSS.
+
+**Meaningful change:** add `TEST-PAYLOAD-001` in `law/ENGINEERING.md`. Tests
+must measure the named payload through the shipped store type. Index nodes,
+occupancy sets, allocator RSS, wrapper capacity, and empty-collection
+identity do not satisfy a zero-payload or compression claim. A filled leaf
+must round-trip the declared cell count. A reimplemented compressor or a
+hard-coded expected byte count that never calls the shipped store fails.
+
+**Falsification:** give a suite a “0 voxel bytes for empty air” criterion and
+a store that still allocates `[u8; 512]` behind an empty HashMap. The rule
+fails if that suite is accepted, or if a correct omitted-leaf SVO is rejected
+because root index nodes exist. Source mutation tests remove the operational
+clauses (named payload, index nodes, 512-cell buffer, round-trip cell count,
+shipped store). A version bump and this ledger entry do not themselves
+qualify.
+
 ## 2026-11-03 — Public reuse terms are CC BY-NC 4.0
 
 **Observed gap:** accepted `main` shipped no LICENSE. Readers could not tell

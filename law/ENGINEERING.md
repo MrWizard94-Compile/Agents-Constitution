@@ -115,6 +115,20 @@ level. Cover edge, negative, failure, ordering, and resource cases in
 proportion to risk. Prefer intention-revealing assertions to coverage
 percentages or implementation-mirroring tests.
 
+### TEST-PAYLOAD-001 — Named payload, not index RSS
+
+When an acceptance criterion names a stored payload (voxel leaf bytes, encoded
+document, packed mesh, or similar), tests MUST measure that named payload
+through the shipped type. Index nodes, occupancy sets, allocator RSS, wrapper
+capacity, and empty collection identity MUST NOT be treated as satisfying a
+zero-payload or compression claim. An octree that omits a dense leaf still
+fails this rule if the test only checks that a parent map is empty while a
+512-cell buffer remains allocated, or only checks process RSS while claiming
+zero voxel bytes. Prove the absent-or-zero payload buffer on the production
+leaf type; prove a filled leaf round-trips the declared cell count. A test
+that reimplements the compressor or hard-codes the expected byte count without
+calling the shipped store FAILS this rule.
+
 ### TEST-DOMAIN-001 — Domain fit
 
 Use invariant/property and determinism tests for novel computation; real
