@@ -205,7 +205,11 @@ class SourceValidationTests(unittest.TestCase):
     def test_quality_rule_is_enforced_as_a_protected_rule(self):
         self.assertIn("CONST-QUALITY-001", VALIDATOR.PROTECTED)
         self.assertNotIn("CONST-QUALITY-001", {
-            "CONST-AUTH-001", "CONST-COMPLETE-001", "CONST-DEP-001",
+            "CONST-AUTH-001", "CONST-DEP-001",
+            "CONST-DONE-001", "CONST-GATE-001",
+        })
+        self.assertNotIn("CONST-COMPLETE-001", {
+            "CONST-AUTH-001", "CONST-DEP-001",
             "CONST-DONE-001", "CONST-GATE-001",
         })
         with tempfile.TemporaryDirectory() as temporary:
@@ -338,6 +342,66 @@ class SourceValidationTests(unittest.TestCase):
             errors = VALIDATOR.validate(target)
             self.assertIn("CONST-QUALITY-001 detailed rule missing", errors)
             self.assertIn("protected rule has no detailed definition: CONST-QUALITY-001", errors)
+
+    def test_completeness_rule_requires_a_detailed_core_home(self):
+        agents, skill, sop = self.quality_source()
+        self.assertEqual(VALIDATOR.completeness_contract_errors(agents, skill, sop), [])
+        self.assertEqual(
+            VALIDATOR.completeness_contract_errors(
+                agents.replace("### CONST-COMPLETE-001", "### Retired rule"), skill, sop),
+            ["CONST-COMPLETE-001 detailed rule missing"],
+        )
+
+    def test_completeness_slogan_alone_is_not_an_operational_rule(self):
+        _agents, skill, sop = self.quality_source()
+        slogan = ("### CONST-COMPLETE-001 — Complete, wired units\n\n"
+                  "Deliver complete units.\n")
+        errors = VALIDATOR.completeness_contract_errors(slogan, skill, sop)
+        self.assertIn(
+            "CONST-COMPLETE-001 missing operational safeguard: each named item is an independent acceptance unit",
+            errors,
+        )
+        self.assertIn("CONST-COMPLETE-001 missing protected-core entry", errors)
+
+    def test_completeness_rule_guards_named_control_clauses(self):
+        agents, skill, sop = self.quality_source()
+        for term in (
+            "complete, wired, dependency-closed",
+            "no placeholders or production todos",
+            "each named item is an independent acceptance unit",
+            "enumerates named player-facing controls, fields, or surfaces",
+            "recorded as an unmet acceptance item",
+        ):
+            with self.subTest(term=term):
+                pattern = r"\s+".join(re.escape(word) for word in term.split())
+                mutated, count = re.subn(pattern, "removed safeguard", agents, flags=re.IGNORECASE)
+                self.assertGreater(count, 0, "counterexample must change the actual rule")
+                self.assertIn(f"CONST-COMPLETE-001 missing operational safeguard: {term}",
+                              VALIDATOR.completeness_contract_errors(mutated, skill, sop))
+
+    def test_completeness_done_gate_and_routes_cannot_disappear(self):
+        agents, skill, sop = self.quality_source()
+        without_done = re.sub(
+            r"(^## Definition of Done\n.*?)(?=^## |\Z)",
+            lambda match: match.group(0).replace("CONST-COMPLETE-001", "REMOVED-RULE"),
+            agents, count=1, flags=re.MULTILINE | re.DOTALL)
+        self.assertIn("Definition of Done must apply CONST-COMPLETE-001",
+                      VALIDATOR.completeness_contract_errors(without_done, skill, sop))
+        without_gate = re.sub(
+            r"(^\| 1 \|.*)enumerated named controls under `CONST-COMPLETE-001`",
+            r"\1removed named-control check",
+            agents, count=1, flags=re.MULTILINE)
+        self.assertNotEqual(without_gate, agents)
+        self.assertIn("Section 0 item 1 must apply CONST-COMPLETE-001",
+                      VALIDATOR.completeness_contract_errors(without_gate, skill, sop))
+        for path in ("SKILL.md", "SOP.md"):
+            with self.subTest(path=path):
+                skill_input = skill.replace("CONST-COMPLETE-001", "removed") if path == "SKILL.md" else skill
+                sop_input = sop.replace("CONST-COMPLETE-001", "removed") if path == "SOP.md" else sop
+                self.assertIn(
+                    f"{path} must route enumerated named controls to CONST-COMPLETE-001",
+                    VALIDATOR.completeness_contract_errors(agents, skill_input, sop_input),
+                )
 
     @staticmethod
     def quality_source():

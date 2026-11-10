@@ -84,6 +84,43 @@ def resourcefulness_contract_errors(agents: str, skill: str, sop: str) -> list[s
     return errors
 
 
+def completeness_contract_errors(agents: str, skill: str, sop: str) -> list[str]:
+    """Guard enumerated named controls as independent acceptance units."""
+    section = re.search(
+        r"^### CONST-COMPLETE-001\b[^\n]*\n(.*?)(?=^#{2,3} |\Z)",
+        agents,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["CONST-COMPLETE-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "complete, wired, dependency-closed",
+        "no placeholders or production todos",
+        "each named item is an independent acceptance unit",
+        "enumerates named player-facing controls, fields, or surfaces",
+        "recorded as an unmet acceptance item",
+        "fails `const-complete-001`, `const-done-001`, and section 0 item 1",
+    )
+    errors = [f"CONST-COMPLETE-001 missing operational safeguard: {term}"
+              for term in required if term not in normalized]
+    protected = re.search(r"^## Protected rules\n(.*?)(?=^#{2,3} |\Z)", agents,
+                          re.MULTILINE | re.DOTALL)
+    if protected is None or not re.search(r"^\| `CONST-COMPLETE-001` \|", protected.group(1), re.MULTILINE):
+        errors.append("CONST-COMPLETE-001 missing protected-core entry")
+    done = re.search(r"^## Definition of Done\n(.*?)(?=^## |\Z)", agents, re.MULTILINE | re.DOTALL)
+    if done is None or "CONST-COMPLETE-001" not in done.group(1):
+        errors.append("Definition of Done must apply CONST-COMPLETE-001")
+    gate = re.search(r"^## 0\. Mandatory pre-delivery gate\n(.*?)(?=^## |\Z)", agents,
+                     re.MULTILINE | re.DOTALL)
+    if gate is None or "CONST-COMPLETE-001" not in gate.group(1):
+        errors.append("Section 0 item 1 must apply CONST-COMPLETE-001")
+    for path, body in (("SKILL.md", skill), ("SOP.md", sop)):
+        if "CONST-COMPLETE-001" not in body:
+            errors.append(f"{path} must route enumerated named controls to CONST-COMPLETE-001")
+    return errors
+
+
 def quality_contract_errors(agents: str, skill: str, sop: str) -> list[str]:
     """Guard quality-before-speed, its rank, and the Done/gate failure wire."""
     section = re.search(
@@ -261,6 +298,7 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(craft_contract_errors(agents))
     errors.extend(resourcefulness_contract_errors(agents, skill, sop))
     errors.extend(quality_contract_errors(agents, skill, sop))
+    errors.extend(completeness_contract_errors(agents, skill, sop))
     errors.extend(freeze_contract_errors(evolution, skill))
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
@@ -277,7 +315,7 @@ def validate(root: Path = ROOT) -> list[str]:
                 errors.append(f"duplicate rule definition {rule}: {defined[rule]}, {path.relative_to(root)}")
             defined[rule] = path.relative_to(root).as_posix()
     for rule in PROTECTED - set(defined):
-        if rule not in {"CONST-AUTH-001", "CONST-COMPLETE-001", "CONST-DEP-001", "CONST-DONE-001", "CONST-GATE-001"}:
+        if rule not in {"CONST-AUTH-001", "CONST-DEP-001", "CONST-DONE-001", "CONST-GATE-001"}:
             errors.append(f"protected rule has no detailed definition: {rule}")
     family_homes = {
         "ENG": "law/ENGINEERING.md", "TEST": "law/ENGINEERING.md",

@@ -2,6 +2,34 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-09 — Named specification controls are independent acceptance units
+
+**Observed gap:** `CONST-COMPLETE-001` existed only as a protected-table slogan
+("complete, wired, dependency-closed units with no placeholders"). Agents
+treated a parent destination as covering a specification row that listed
+named controls. In one product, GDD Settings required visual intensity,
+motion, text scaling, orientation, and backup; Settings existed with four of
+those controls and visual intensity was missing, yet the screen was treated
+as complete.
+
+**Meaningful change:** give `CONST-COMPLETE-001` a detailed home in `AGENTS.md`.
+When a specification enumerates named player-facing controls, fields, or
+surfaces, each named item is an independent acceptance unit. Shipping the
+parent without a named control is incomplete unless that gap is recorded as
+an unmet acceptance item. Definition of Done and Section 0 item 1 fail a
+delivery that presents the enumerated surface as done while a named control
+is missing. SKILL and SOP route the same inventory. Source guards fail if
+the operational clauses, protected-core entry, Done/gate wiring, or
+SKILL/SOP routing disappear.
+
+**Falsification:** give an agent a specification table that lists five named
+settings controls and a parent Settings screen that implements four of them.
+The policy fails if the agent calls the settings surface done, or if
+removing the named-control clauses from `AGENTS.md` still passes
+`tools/validate-source.py`. A version bump and this ledger entry do not
+themselves qualify. The change does not govern the invocation that authored
+it. Protected-rule expansion requires Director review before merge.
+
 ## 2026-11-03 — Public reuse terms are CC BY-NC 4.0
 
 **Observed gap:** accepted `main` shipped no LICENSE. Readers could not tell
