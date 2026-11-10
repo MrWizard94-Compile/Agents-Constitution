@@ -83,6 +83,30 @@ class SourceValidationTests(unittest.TestCase):
             VALIDATOR.cache_link_contract_errors(specialist.replace("cached caller", "other class")),
         )
 
+    def test_payload_rule_rejects_index_rss_as_zero_bytes(self):
+        engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.payload_contract_errors(engineering), [])
+        self.assertIn(
+            "TEST-PAYLOAD-001 detailed rule missing",
+            VALIDATOR.payload_contract_errors(
+                engineering.replace("### TEST-PAYLOAD-001", "### Retired rule")
+            ),
+        )
+        for term in (
+            "named payload",
+            "index nodes",
+            "512-cell buffer",
+            "round-trips the declared cell count",
+            "shipped store",
+        ):
+            with self.subTest(term=term):
+                mutated = re.sub(re.escape(term), "other wording", engineering, flags=re.IGNORECASE)
+                self.assertNotEqual(mutated, engineering)
+                self.assertIn(
+                    f"TEST-PAYLOAD-001 missing payload safeguard: {term}",
+                    VALIDATOR.payload_contract_errors(mutated),
+                )
+
     def test_resource_rule_requires_host_level_acceptance(self):
         engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
         self.assertEqual(VALIDATOR.integrated_resource_contract_errors(engineering), [])
