@@ -81,6 +81,9 @@ Exercise real runtime and device flows when acceptance requires them. Distinguis
 the first independent failure from downstream cascades. Fix causes, then rerun
 affected and broader gates. A successful catalog scan or artifact copy is
 preparation; runtime acceptance requires a clean launch and behavior flow.
+When acceptance names an action (a key, click, visible surface, or relaunch),
+that action passes only from evidence of the action and its observable result
+(`MIG-VERIFY-001`). A log line from another path does not satisfy it.
 Verify generated API claims against the installed stack. Inspect changes to
 tests, fixtures, mocks, skips, and CI gates before trusting green status. Use
 an independent oracle for consequential behavior, such as a real consumer,

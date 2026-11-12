@@ -19,6 +19,27 @@ class SourceValidationTests(unittest.TestCase):
     def test_current_source_valid(self):
         self.assertEqual(VALIDATOR.validate(ROOT), [])
 
+    def test_migration_verify_rejects_sibling_path_shortcut(self):
+        operations = (ROOT / "law/OPERATIONS.md").read_text(encoding="utf-8")
+        sop = (ROOT / "SOP.md").read_text(encoding="utf-8")
+        self.assertEqual(VALIDATOR.migration_verify_contract_errors(operations, sop), [])
+        self.assertIn(
+            "MIG-VERIFY-001 missing operational safeguard: another path does not satisfy the action",
+            VALIDATOR.migration_verify_contract_errors(
+                operations.replace(
+                    "another path does not satisfy the action",
+                    "another path may be enough",
+                ),
+                sop,
+            ),
+        )
+        self.assertIn(
+            "SOP.md must route named acceptance actions to MIG-VERIFY-001",
+            VALIDATOR.migration_verify_contract_errors(
+                operations, sop.replace("MIG-VERIFY-001", "REMOVED-RULE")
+            ),
+        )
+
     def test_craft_rule_rejects_missing_or_self_certified_oracle(self):
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         self.assertEqual(VALIDATOR.craft_contract_errors(agents), [])
