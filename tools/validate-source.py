@@ -121,6 +121,29 @@ def completeness_contract_errors(agents: str, skill: str, sop: str) -> list[str]
     return errors
 
 
+def migration_verify_contract_errors(operations: str, sop: str) -> list[str]:
+    """Guard named acceptance actions against sibling-path log tokens."""
+    section = re.search(
+        r"^### MIG-VERIFY-001\b[^\n]*\n(.*?)(?=^#{2,3} |\Z)",
+        operations,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["MIG-VERIFY-001 detailed rule missing"]
+    normalized = " ".join(section.group(1).casefold().split())
+    required = (
+        "each named acceptance action is its own evidence unit",
+        "passes only from evidence of that action and its observable result",
+        "another path does not satisfy the action",
+        "do not close a migration gate on the sibling token",
+    )
+    errors = [f"MIG-VERIFY-001 missing operational safeguard: {term}"
+              for term in required if term not in normalized]
+    if "MIG-VERIFY-001" not in sop or "another path does not satisfy" not in sop.casefold():
+        errors.append("SOP.md must route named acceptance actions to MIG-VERIFY-001")
+    return errors
+
+
 def quality_contract_errors(agents: str, skill: str, sop: str) -> list[str]:
     """Guard quality-before-speed, its rank, and the Done/gate failure wire."""
     section = re.search(
@@ -299,6 +322,8 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(resourcefulness_contract_errors(agents, skill, sop))
     errors.extend(quality_contract_errors(agents, skill, sop))
     errors.extend(completeness_contract_errors(agents, skill, sop))
+    errors.extend(migration_verify_contract_errors(
+        (root / "law/OPERATIONS.md").read_text(encoding="utf-8-sig"), sop))
     errors.extend(freeze_contract_errors(evolution, skill))
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))

@@ -70,6 +70,12 @@ risks, rollback, and acceptance gates. Do not leave silent migration debt.
 A clean build is preparation. Exercise the core user/runtime flow before
 secondary polish and before claiming the migration accepted.
 
+Each named acceptance action is its own evidence unit. A key, click,
+visible surface, or relaunch passes only from evidence of that action and
+its observable result. A log line, fixture, or timer hook that emits a
+related token from another path does not satisfy the action. Record the
+actions separately, and do not close a migration gate on the sibling token.
+
 ### MIG-CLEAN-001 — Recoverable cleanup
 
 Resolve exact paths and ownership before a move or delete. Preserve unique

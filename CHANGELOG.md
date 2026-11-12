@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.21.0 — 2026-11-12 (candidate)
+
+- Expanded `MIG-VERIFY-001` so each named acceptance action is its own
+  evidence unit. A key, click, visible surface, or relaunch passes only from
+  evidence of that action and its observable result. A log line, fixture, or
+  timer hook that emits a related token from another path does not satisfy
+  the action, and a migration gate must not close on that sibling token.
+  SOP verification routes the same rule. Source guards fail if the
+  operational clauses or the SOP route disappear. Observed when a smoke
+  completion line named sanctuary telemetry without the sanctuary having
+  been opened.
+
 ## 6.20.0 — 2026-11-09 (candidate)
 
 - Expanded protected `CONST-COMPLETE-001` from a table-only slogan into an

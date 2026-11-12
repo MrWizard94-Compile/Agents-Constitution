@@ -2,6 +2,31 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-12 — Named acceptance actions are not sibling log tokens
+
+**Observed gap:** `MIG-VERIFY-001` required the core user flow before a
+migration could be called accepted, but it did not stop a diagnostic line
+from standing in for a named device action. A smoke timer printed sanctuary
+telemetry without the sanctuary being opened. That line could be pasted as
+if the "press O and confirm the loom cycles" action had passed.
+
+**Meaningful change:** `MIG-VERIFY-001` in `law/OPERATIONS.md` now says each
+named acceptance action is its own evidence unit. A key, click, visible
+surface, or relaunch passes only from evidence of that action and its
+observable result. A log line, fixture, or timer hook from another path
+does not satisfy the action, and the migration gate must not close on the
+sibling token. SOP section 6 routes the same check. The source validator
+fails if those clauses or the SOP route disappear.
+
+**Falsification:** give an agent a checklist whose sanctuary item requires
+opening the panel and cycling a control, plus a smoke log that prints the
+sanctuary token from a timer while the panel stayed closed. The policy
+fails if the agent marks that item passed from the smoke line alone, or if
+removing "another path does not satisfy the action" from `law/OPERATIONS.md`
+still passes `tools/validate-source.py`. A version bump and this ledger
+entry do not themselves qualify. The change does not govern the invocation
+that authored it.
+
 ## 2026-11-09 — Named specification controls are independent acceptance units
 
 **Observed gap:** `CONST-COMPLETE-001` existed only as a protected-table slogan
