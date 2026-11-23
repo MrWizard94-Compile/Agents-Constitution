@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.20.0"
+  skill-version: "6.22.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -72,7 +72,9 @@ before adding a rule. Preserve safety, human authority, protected quality
 rules, and one-home ownership. A version bump, timestamp, ledger/changelog
 entry, typo, cosmetic edit, duplication, or renaming alone does **not** count.
 
-Implement and validate the change in an isolated branch. Update the ledger
+Implement and validate the change in the authorized isolated review slot
+under `GOV-CHANGE-001` and `VCS-CLEAN-001`; an occupied slot requires a queued
+apply-ready proposal, not another branch. Update the ledger
 and version as supporting evidence. Submit a PR to the canonical repository;
 do not race direct edits to `main`. Merge only under the review conditions in
 `governance/EVOLUTION.md`, then verify the accepted SHA and sync mirrors.

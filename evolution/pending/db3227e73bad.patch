@@ -1,0 +1,222 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 55dc3dd93ddcc99b11646ae390e0ce17470cd18b..963a7a55908ab1f3fef99b7b6b3a77a9d7c4c114 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,6 +1,6 @@
+ # WPAI Constitution
+ 
+-**Version:** 6.20.0
++**Version:** 6.21.0
+ 
+ **Status:** Binding
+ 
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index d2a765040deb1d6cb484d20837d6ddd5dc80e8c0..a8e9f76eb454df6f23592ffc0bb31883e4aae3df 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,17 @@
+ # Changelog
+ 
++## 6.21.0 — 2026-11-12 (candidate)
++
++- Expanded `MIG-VERIFY-001` so each named acceptance action is its own
++  evidence unit. A key, click, visible surface, or relaunch passes only from
++  evidence of that action and its observable result. A log line, fixture, or
++  timer hook that emits a related token from another path does not satisfy
++  the action, and a migration gate must not close on that sibling token.
++  SOP verification routes the same rule. Source guards fail if the
++  operational clauses or the SOP route disappear. Observed when a smoke
++  completion line named sanctuary telemetry without the sanctuary having
++  been opened.
++
+ ## 6.20.0 — 2026-11-09 (candidate)
+ 
+ - Expanded protected `CONST-COMPLETE-001` from a table-only slogan into an
+diff --git a/SKILL.md b/SKILL.md
+index addad01a6311bea51c71c4f3e8b328866114d723..2026bc12c5d9593274bd4bc3f637b32be5edfbcc 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -7,7 +7,7 @@ description: >
+   Each top-level call must produce one meaningful Constitution improvement.
+ metadata:
+   short-description: "Apply and evolve WPAI Constitution"
+-  skill-version: "6.20.0"
++  skill-version: "6.21.0"
+   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+ ---
+ 
+diff --git a/SOP.md b/SOP.md
+index d517f606f85e90a31730a0c33f52a19c81052e2a..91c4316fc00eb4198f2733d8f90fd161490f9a62 100644
+--- a/SOP.md
++++ b/SOP.md
+@@ -81,6 +81,9 @@ Exercise real runtime and device flows when acceptance requires them. Distinguis
+ the first independent failure from downstream cascades. Fix causes, then rerun
+ affected and broader gates. A successful catalog scan or artifact copy is
+ preparation; runtime acceptance requires a clean launch and behavior flow.
++When acceptance names an action (a key, click, visible surface, or relaunch),
++that action passes only from evidence of the action and its observable result
++(`MIG-VERIFY-001`). A log line from another path does not satisfy it.
+ Verify generated API claims against the installed stack. Inspect changes to
+ tests, fixtures, mocks, skips, and CI gates before trusting green status. Use
+ an independent oracle for consequential behavior, such as a real consumer,
+diff --git a/SOURCE.json b/SOURCE.json
+index 4d30044e5b746fedf6f0fc778a26f384311a3fd7..23e72bc8fd6ccbd1d2ea990ec27cb6b7f051fc2f 100644
+--- a/SOURCE.json
++++ b/SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": 2,
+   "name": "wpai-constitution",
+-  "skill_version": "6.20.0",
++  "skill_version": "6.21.0",
+   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
+   "default_branch": "main",
+diff --git a/VERSION b/VERSION
+index a7c176ac7fee8166d6021d8109e1b8761f22841c..7ecad140533239e3c1048d44cb64a4e764db0572 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-6.20.0
++6.21.0
+diff --git a/docs/QUALITY-ASSURANCE-MAP.md b/docs/QUALITY-ASSURANCE-MAP.md
+index 66ffad091ff665799e56ee9a48cca54793b73904..a2d5f584c37d9e87941b07fb1b4addd7ba6f204d 100644
+--- a/docs/QUALITY-ASSURANCE-MAP.md
++++ b/docs/QUALITY-ASSURANCE-MAP.md
+@@ -16,7 +16,7 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
+ |---|---|---|
+ | Purpose-fit and craft | If presentation and volume are stripped away, does each material part still serve the brief and real intended use, without invented detail or generic filler? Has the delivered form been examined? | `CONST-CRAFT-001`; `CONST-COMPLETE-001` |
+ | Quality before speed | Was an applicable verification check skipped, shortened, or replaced to finish faster, look responsive, or reduce token use? | `CONST-QUALITY-001`; `COST-TOKEN-001`; `CONST-DONE-001` |
+-| Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? When a specification enumerates named controls, is each named item present or recorded as an unmet acceptance item? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |
++| Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? When a specification enumerates named controls, is each named item present or recorded as an unmet acceptance item? Does each named acceptance action have evidence of that action, rather than a sibling log line from another path? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |
+ | Stack and factual correctness | Do the imports, symbols, versions, contracts, and actual runtime match the implementation's claims? | `ENG-STACK-001`; `ENG-RESEARCH-001`; `ENG-FW-001` |
+ | Test integrity | Would the suite still fail if the defect were reintroduced, or has a skip, fixture, mock, assertion, or CI gate concealed it? | `TEST-QUALITY-001`; `TEST-REGRESSION-001` |
+ | Security, privacy, and permission | Can untrusted content, excess privilege, secrets, or a dependency cross the intended boundary? | `SEC-INPUT-001`; `SEC-PRIV-001`; `SEC-SECRET-001`; `SEC-SUPPLY-001` |
+diff --git a/evolution/LEDGER.md b/evolution/LEDGER.md
+index 550b3c29b71e0c80b3c7ed837d411f23c1f28a23..7b67ae4052ca3153dac71b82adb7e7bcac287d1d 100644
+--- a/evolution/LEDGER.md
++++ b/evolution/LEDGER.md
+@@ -2,6 +2,31 @@
+ 
+ The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
+ 
++## 2026-11-12 — Named acceptance actions are not sibling log tokens
++
++**Observed gap:** `MIG-VERIFY-001` required the core user flow before a
++migration could be called accepted, but it did not stop a diagnostic line
++from standing in for a named device action. A smoke timer printed sanctuary
++telemetry without the sanctuary being opened. That line could be pasted as
++if the "press O and confirm the loom cycles" action had passed.
++
++**Meaningful change:** `MIG-VERIFY-001` in `law/OPERATIONS.md` now says each
++named acceptance action is its own evidence unit. A key, click, visible
++surface, or relaunch passes only from evidence of that action and its
++observable result. A log line, fixture, or timer hook from another path
++does not satisfy the action, and the migration gate must not close on the
++sibling token. SOP section 6 routes the same check. The source validator
++fails if those clauses or the SOP route disappear.
++
++**Falsification:** give an agent a checklist whose sanctuary item requires
++opening the panel and cycling a control, plus a smoke log that prints the
++sanctuary token from a timer while the panel stayed closed. The policy
++fails if the agent marks that item passed from the smoke line alone, or if
++removing "another path does not satisfy the action" from `law/OPERATIONS.md`
++still passes `tools/validate-source.py`. A version bump and this ledger
++entry do not themselves qualify. The change does not govern the invocation
++that authored it.
++
+ ## 2026-11-09 — Named specification controls are independent acceptance units
+ 
+ **Observed gap:** `CONST-COMPLETE-001` existed only as a protected-table slogan
+diff --git a/law/OPERATIONS.md b/law/OPERATIONS.md
+index 9a52ac6b603e2ac8ec35c6834ff064463dc032c8..e47c60e1c8cdce2ae17d3b942b6a7c8702766fec 100644
+--- a/law/OPERATIONS.md
++++ b/law/OPERATIONS.md
+@@ -70,6 +70,12 @@ risks, rollback, and acceptance gates. Do not leave silent migration debt.
+ A clean build is preparation. Exercise the core user/runtime flow before
+ secondary polish and before claiming the migration accepted.
+ 
++Each named acceptance action is its own evidence unit. A key, click,
++visible surface, or relaunch passes only from evidence of that action and
++its observable result. A log line, fixture, or timer hook that emits a
++related token from another path does not satisfy the action. Record the
++actions separately, and do not close a migration gate on the sibling token.
++
+ ### MIG-CLEAN-001 — Recoverable cleanup
+ 
+ Resolve exact paths and ownership before a move or delete. Preserve unique
+diff --git a/tests/test_source_validation.py b/tests/test_source_validation.py
+index 87fd5a0ab2dca705485c6c3356b4f12a1cb6a6e4..f643373d977c46cd35cc36349bbf923376bb6072 100644
+--- a/tests/test_source_validation.py
++++ b/tests/test_source_validation.py
+@@ -19,6 +19,27 @@ class SourceValidationTests(unittest.TestCase):
+     def test_current_source_valid(self):
+         self.assertEqual(VALIDATOR.validate(ROOT), [])
+ 
++    def test_migration_verify_rejects_sibling_path_shortcut(self):
++        operations = (ROOT / "law/OPERATIONS.md").read_text(encoding="utf-8")
++        sop = (ROOT / "SOP.md").read_text(encoding="utf-8")
++        self.assertEqual(VALIDATOR.migration_verify_contract_errors(operations, sop), [])
++        self.assertIn(
++            "MIG-VERIFY-001 missing operational safeguard: another path does not satisfy the action",
++            VALIDATOR.migration_verify_contract_errors(
++                operations.replace(
++                    "another path does not satisfy the action",
++                    "another path may be enough",
++                ),
++                sop,
++            ),
++        )
++        self.assertIn(
++            "SOP.md must route named acceptance actions to MIG-VERIFY-001",
++            VALIDATOR.migration_verify_contract_errors(
++                operations, sop.replace("MIG-VERIFY-001", "REMOVED-RULE")
++            ),
++        )
++
+     def test_craft_rule_rejects_missing_or_self_certified_oracle(self):
+         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+         self.assertEqual(VALIDATOR.craft_contract_errors(agents), [])
+diff --git a/tools/validate-source.py b/tools/validate-source.py
+index 72f49f2bd3906f23bc4e2e977b5ce1b4f2c8ac70..75b2ff622221bb9590397fcde47b267eadb9c6c7 100644
+--- a/tools/validate-source.py
++++ b/tools/validate-source.py
+@@ -121,6 +121,29 @@ def completeness_contract_errors(agents: str, skill: str, sop: str) -> list[str]
+     return errors
+ 
+ 
++def migration_verify_contract_errors(operations: str, sop: str) -> list[str]:
++    """Guard named acceptance actions against sibling-path log tokens."""
++    section = re.search(
++        r"^### MIG-VERIFY-001\b[^\n]*\n(.*?)(?=^#{2,3} |\Z)",
++        operations,
++        re.MULTILINE | re.DOTALL,
++    )
++    if section is None:
++        return ["MIG-VERIFY-001 detailed rule missing"]
++    normalized = " ".join(section.group(1).casefold().split())
++    required = (
++        "each named acceptance action is its own evidence unit",
++        "passes only from evidence of that action and its observable result",
++        "another path does not satisfy the action",
++        "do not close a migration gate on the sibling token",
++    )
++    errors = [f"MIG-VERIFY-001 missing operational safeguard: {term}"
++              for term in required if term not in normalized]
++    if "MIG-VERIFY-001" not in sop or "another path does not satisfy" not in sop.casefold():
++        errors.append("SOP.md must route named acceptance actions to MIG-VERIFY-001")
++    return errors
++
++
+ def quality_contract_errors(agents: str, skill: str, sop: str) -> list[str]:
+     """Guard quality-before-speed, its rank, and the Done/gate failure wire."""
+     section = re.search(
+@@ -299,6 +322,8 @@ def validate(root: Path = ROOT) -> list[str]:
+     errors.extend(resourcefulness_contract_errors(agents, skill, sop))
+     errors.extend(quality_contract_errors(agents, skill, sop))
+     errors.extend(completeness_contract_errors(agents, skill, sop))
++    errors.extend(migration_verify_contract_errors(
++        (root / "law/OPERATIONS.md").read_text(encoding="utf-8-sig"), sop))
+     errors.extend(freeze_contract_errors(evolution, skill))
+     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
+     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))

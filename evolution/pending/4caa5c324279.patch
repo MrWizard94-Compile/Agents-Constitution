@@ -1,0 +1,222 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 31f6d2c2c872067841bc11fb7a78b3e91a20a536..1bc03ae343d4d4b5daacce66dc3bdb1bd577ccea 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,6 +1,6 @@
+ # WPAI Constitution
+ 
+-**Version:** 6.19.0
++**Version:** 6.19.2
+ 
+ **Status:** Binding
+ 
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 116e148c7bb262f09d6ff6cdc581db9ed39fc9ea..c6e368cd1dbdab6f35134defa071276a1cc2f68c 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,13 @@
+ # Changelog
+ 
++## 6.19.2 — 2026-11-03 (candidate)
++
++- Strengthened `REL-HARDEN-001` so a human approval of terms, scope, or an
++  adaptation records the approver, the time, and the source, and cannot close
++  a gate that requires an observed trial, demo, or live consumer. The reverse
++  is also forbidden. `SOP.md` points at that rule. Version 6.19.1 is reserved
++  by open pull request #41 (CC BY-NC 4.0) and is not part of this branch.
++
+ ## 6.19.0 — 2026-11-03 (candidate)
+ 
+ - Added protected `CONST-QUALITY-001` (Quality before speed) immediately after
+diff --git a/SKILL.md b/SKILL.md
+index 971d1098b03563314ff040f0b3bd1573fcfee1ec..470a3d517a22c2d3d51681464beee4d690b5f0e1 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -7,7 +7,7 @@ description: >
+   Each top-level call must produce one meaningful Constitution improvement.
+ metadata:
+   short-description: "Apply and evolve WPAI Constitution"
+-  skill-version: "6.19.0"
++  skill-version: "6.19.2"
+   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+ ---
+ 
+diff --git a/SOP.md b/SOP.md
+index 0021024d6b966b79f77fae5cc7e0040b1f99466c..78aa83a96d19be1c2c3fa6fbb35370748b926c4e 100644
+--- a/SOP.md
++++ b/SOP.md
+@@ -94,6 +94,8 @@ Reconcile the evidence against the original quality profile and changed scope.
+ Investigate contradictions and review-tool findings against the current tree;
+ withdraw unsupported claims. A percentage, green badge, or polished artifact
+ is not a substitute for evidence about the intended use.
++A human approval of terms or an adaptation does not close a trial, demo, or
++live-consumer gate, and the reverse is also true (`REL-HARDEN-001`).
+ 
+ ## 8. Package and deliver
+ 
+diff --git a/SOURCE.json b/SOURCE.json
+index 434274da72423d9942e7b7dd0b306350ef96753b..a327dce1b3f268f738e7cf16a269e0a9ca7eb6ce 100644
+--- a/SOURCE.json
++++ b/SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": 2,
+   "name": "wpai-constitution",
+-  "skill_version": "6.19.0",
++  "skill_version": "6.19.2",
+   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
+   "default_branch": "main",
+diff --git a/VERSION b/VERSION
+index 74c926af475d891b36e2cda1370eb760db907815..daf4ba08202d5537741f356b2d0e99f01dfb4794 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-6.19.0
++6.19.2
+diff --git a/evolution/LEDGER.md b/evolution/LEDGER.md
+index 94b0b19ebdb33c177e792b89f844dee71648c7e9..480aa93f5df22f1cdfd869655bab59e8e519324f 100644
+--- a/evolution/LEDGER.md
++++ b/evolution/LEDGER.md
+@@ -2,6 +2,28 @@
+ 
+ The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
+ 
++## 2026-11-03 — Human approval is not a trial
++
++**Observed gap:** `REL-HARDEN-001` already separated source QA, packaging,
++deployment, live runtime, and physical acceptance, but a release checker could
++still treat any non-empty note as enough evidence. A sentence recording that a
++person approved terms or an adaptation could be pasted into a trial, demo, or
++live-consumer gate and close it. The reverse was also possible. The rule did
++not require the approval record to name the approver, the time, and the source.
++
++**Meaningful change:** in the existing home `REL-HARDEN-001`, require that
++human-approval record, and forbid using it to satisfy an observed trial, demo,
++or live consumer gate. Forbid using one of those observations as the human
++approval. `SOP.md` points at the rule during evidence audit. No new rule ID.
++
++**Falsification:** delete the approver/time/source requirement, or let an
++approval sentence close a consumer gate, and the source guard fails. The change
++is wrong if a real observed trial is rejected merely because it is not also a
++signature, or if a named approval is rejected because no trial has been run.
++Those remain different gates. Presence checks do not prove a future agent will
++keep them apart; review of the release record is still required. Version 6.19.1
++is reserved by open pull request #41 and is not this change.
++
+ ## 2026-11-03 — Quality before speed
+ 
+ **Director request:** On 2026-11-03 the Human Director required a top-priority
+diff --git a/law/OPERATIONS.md b/law/OPERATIONS.md
+index 9a52ac6b603e2ac8ec35c6834ff064463dc032c8..956542fce353514b6d430862aaf442b5be597d84 100644
+--- a/law/OPERATIONS.md
++++ b/law/OPERATIONS.md
+@@ -131,6 +131,13 @@ Resolve critical security and quality findings. Source QA, release
+ packaging, deployment, live runtime, and physical acceptance have separate
+ gates and must be reported separately.
+ 
++A human approval of terms, scope, or an adaptation is its own evidence
++class. Record the approver, the time, and the source of that decision.
++Do not invent a trial, demo, or live consumer observation to satisfy a
++gate, and do not treat the approval record as that observation. Do not
++treat an observed trial, demo, or live consumer result as the human
++approval. A checker that lets one class close the other is wrong.
++
+ ## Project lifecycle
+ 
+ ### LIFE-PHASE-001 — Respect maturity
+diff --git a/tests/test_source_validation.py b/tests/test_source_validation.py
+index f3ebf1b00325162a16c41742ae01bb6e6aa47348..a7d20944045b48dcc62183ebaeb5fac8c07f3a92 100644
+--- a/tests/test_source_validation.py
++++ b/tests/test_source_validation.py
+@@ -48,6 +48,44 @@ class SourceValidationTests(unittest.TestCase):
+             ["GOV-FREEZE-001 section missing"],
+         )
+ 
++    def test_release_evidence_keeps_approval_separate_from_a_trial(self):
++        operations = (ROOT / "law" / "OPERATIONS.md").read_text(encoding="utf-8")
++        sop = (ROOT / "SOP.md").read_text(encoding="utf-8")
++        self.assertEqual(VALIDATOR.release_evidence_contract_errors(operations, sop), [])
++        self.assertEqual(
++            VALIDATOR.release_evidence_contract_errors(
++                operations.replace("### REL-HARDEN-001", "### Retired rule"), sop),
++            ["REL-HARDEN-001 detailed rule missing"],
++        )
++        mutations = {
++            "approver, the time, and the source": "approver, the time, and the source",
++            "invent a trial, demo, or live consumer observation":
++                "do not invent a trial, demo, or live consumer observation",
++            "do not treat the approval record as that observation":
++                "do not treat the approval record as that observation",
++            "observed trial, demo, or live consumer result":
++                "do not treat an observed trial, demo, or live consumer result as the human approval",
++        }
++        for needle, reported in mutations.items():
++            with self.subTest(term=reported):
++                mutated = operations.replace(needle, "other wording", 1)
++                self.assertNotEqual(mutated, operations)
++                self.assertIn(
++                    f"REL-HARDEN-001 missing evidence-class safeguard: {reported}",
++                    VALIDATOR.release_evidence_contract_errors(mutated, sop),
++                )
++        self.assertEqual(
++            VALIDATOR.release_evidence_contract_errors(
++                operations.replace("approver, the time, and the source", "approver,\nthe time, and the source"),
++                sop,
++            ),
++            [],
++        )
++        self.assertIn(
++            "SOP.md must keep human approval separate from a trial, demo, or live-consumer gate",
++            VALIDATOR.release_evidence_contract_errors(operations, sop.replace("REL-HARDEN-001", "other rule")),
++        )
++
+     def test_assumption_rule_rejects_lost_unread_input_safeguards(self):
+         collaboration = (ROOT / "law" / "COLLABORATION.md").read_text(encoding="utf-8")
+         self.assertEqual(VALIDATOR.unread_input_contract_errors(collaboration), [])
+diff --git a/tools/validate-source.py b/tools/validate-source.py
+index 74acfdc1d1de5c0ab0bf4e6e64825db1e8af3c90..dea131a79ac2e3c8057107fc75cf74b0f418d878 100644
+--- a/tools/validate-source.py
++++ b/tools/validate-source.py
+@@ -164,6 +164,32 @@ def integrated_resource_contract_errors(engineering: str) -> list[str]:
+             for term in required if term not in normalized]
+ 
+ 
++def release_evidence_contract_errors(operations: str, sop: str) -> list[str]:
++    """Keep a named human approval from standing in for an observed trial."""
++    section = re.search(
++        r"^### REL-HARDEN-001\b.*?\n(.*?)(?=^### |\Z)",
++        operations,
++        re.MULTILINE | re.DOTALL,
++    )
++    if section is None:
++        return ["REL-HARDEN-001 detailed rule missing"]
++    normalized = " ".join(section.group(1).casefold().split())
++    required = (
++        "approver, the time, and the source",
++        "do not invent a trial, demo, or live consumer observation",
++        "do not treat the approval record as that observation",
++        "do not treat an observed trial, demo, or live consumer result as the human approval",
++    )
++    errors = [
++        f"REL-HARDEN-001 missing evidence-class safeguard: {term}"
++        for term in required if term not in normalized
++    ]
++    sop_text = " ".join(sop.casefold().split())
++    if "rel-harden-001" not in sop_text or "does not close a trial, demo, or live-consumer gate" not in sop_text:
++        errors.append("SOP.md must keep human approval separate from a trial, demo, or live-consumer gate")
++    return errors
++
++
+ def unread_input_contract_errors(collaboration: str) -> list[str]:
+     """Guard the unread-input clause, not just the CTX-ASSUME-001 heading."""
+     section = re.search(
+@@ -265,6 +291,8 @@ def validate(root: Path = ROOT) -> list[str]:
+     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
+     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
+     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
++    errors.extend(release_evidence_contract_errors(
++        (root / "law/OPERATIONS.md").read_text(encoding="utf-8-sig"), sop))
+     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
+         errors.append("ledger must say ledger-only edits never count")
+ 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.22.0 — 2026-11-23 (candidate)
+
+- Enforced the director's one-or-two branch budget: `main` plus one serial
+  review slot. `VCS-CLEAN-001` now requires branch inventory, verified recovery
+  of unmerged work, race checks, retirement after merge and live confirmation.
+  `GOV-CHANGE-001` and the loader route occupied slots into apply-ready
+  proposals instead of creating branches per call. A read-only live audit
+  checks count, automatic deletion and the effective creation restriction.
+- Preserved nine existing public proposals as exact, hash-indexed unaccepted
+  patches. Six open PRs can be retired without accepting their law; original
+  Git tips and unpublished local work retain verified private recovery.
+
 ## 6.20.0 — 2026-11-09 (candidate)
 
 - Expanded protected `CONST-COMPLETE-001` from a table-only slogan into an

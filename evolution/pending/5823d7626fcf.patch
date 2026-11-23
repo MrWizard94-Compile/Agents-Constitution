@@ -1,0 +1,153 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 8aa3e60f20c00ceae6c8199612d0667ad864635c..3ab2c9041b5f98e6b809d0acc7568ebe0fef778d 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,14 @@
+ # Changelog
+ 
++## 5.2.6 — 2026-10-08
++
++- Added a stacked-resource acceptance rule that distinguishes final resolved
++  state from parse, decode, validation, merge, and replacement side effects.
++- Requires version-exact resolver-order evidence, initial-load and repeated-
++  lifecycle runtime checks, exact event counts, and positive repair markers.
++- Rejects overlays that make final data correct while lower layers still emit
++  the targeted warning, error, mutation, or registration side effect.
++
+ ## 5.2.5 — 2026-09-22
+ 
+ - Validate explicit `PACK_ROOT` candidates and root environment variables before discovery can fall back to another local pack.
+diff --git a/SKILL.md b/SKILL.md
+index baa399090edd41369412e2cad0549707e29c01f7..546ec45f52803895df1c92938c4c1f915cec53c1 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -12,7 +12,7 @@ description: >
+   that must satisfy CONST-GATE-001 and CONST-DONE-001.
+ metadata:
+   short-description: "Enforce AGENTS Constitution pack"
+-  skill-version: "5.2.5"
++  skill-version: "5.2.6"
+   pack-version-pin: "5.1.0"
+   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
+@@ -210,6 +210,28 @@ or other runtime assembled from third-party components:
+    runtime acceptance. Credit the repair only after a clean relaunch and the
+    relevant behavior flow pass.
+ 
++#### Stacked resource override acceptance
++
++When a delivery claims that a higher-priority resource, configuration, policy,
++or data overlay eliminates defects from a lower layer:
++
++1. Inventory every contributing layer in the actual runtime resolver order,
++   including nested archives, generated resources, defaults, and user overlays.
++2. Inspect the version-exact loader contract and distinguish parse, decode,
++   validate, merge, replace, and apply phases. Do not infer that a replacement
++   prevents diagnostics or side effects merely because the final resolved state
++   is correct.
++3. Validate both the final state and every earlier phase capable of emitting a
++   warning, error, mutation, registration, cache entry, or other observable side
++   effect. Static overlay-schema tests are preparation, not runtime acceptance.
++4. Capture a pre-fix baseline, then exercise initial load and an explicit reload
++   or equivalent repeated lifecycle. Count exact targeted events and require a
++   positive repair marker when the intervention would otherwise be invisible.
++5. Reject the acceptance claim if the final state is repaired but a lower layer
++   still produces the targeted defect. Move the intervention to the earliest
++   version-pinned boundary that can prevent the defect without hiding unrelated
++   failures.
++
+ ### Mode: `gate`
+ 
+ 1. Resolve `PACK_ROOT`; re-read Section 0 in pack `AGENTS.md` (canonical 15-point checklist).
+diff --git a/SOURCE.json b/SOURCE.json
+index 61c3873122a940f4e43c120c33e786af5621efcc..af327b7b9027dd7f882cb95e8d52637ef6d7f86c 100644
+--- a/SOURCE.json
++++ b/SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": 1,
+   "name": "agents-constitution",
+-  "skill_version": "5.2.5",
++  "skill_version": "5.2.6",
+   "pack_version_pin": "5.1.0",
+   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
+diff --git a/VERSION b/VERSION
+index 462faf7485483d23e52b400c4e6492d7cf971fd5..a944d7e6175584a0a9405aa9212347a5da220d53 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-5.2.5
++5.2.6
+diff --git a/docs/ARCHITECTURE.md b/docs/ARCHITECTURE.md
+index 2d56ca8455554fb4c93ad0f6e4f325891bc0b535..a06aa8ee8dda2b3c8fa8fa1f4cb690adb6efbc0a 100644
+--- a/docs/ARCHITECTURE.md
++++ b/docs/ARCHITECTURE.md
+@@ -63,6 +63,20 @@ The qualifying change must reduce a concrete future failure, ambiguity,
+ inefficiency, validation weakness, quality gap, or repeated manual step. Metadata
+ churn never qualifies on its own.
+ 
++## Stacked-resource evidence boundary
++
++Layered loaders often expose a correct final state while still parsing,
++validating, or applying lower-priority data before a replacement takes effect.
++The skill therefore treats overlay syntax and static final-state tests as
++preparation. Acceptance requires version-exact resolver-order evidence and a
++runtime lifecycle that observes both initial load and repeated reload behavior.
++
++This boundary applies to data/resource packs, configuration overlays, container
++layers, plugin policy stacks, generated defaults, and similar precedence-based
++systems. It prevents a valid high-priority replacement from being mistaken for
++proof that lower-layer diagnostics, mutations, registrations, or cache effects
++were eliminated.
++
+ ## Platform integration
+ 
+ The source repository can be universal, but no Git repository can force every AI
+diff --git a/evolution/LEDGER.md b/evolution/LEDGER.md
+index 6940ad2ae6d48f6be7c80186027047f232430bd2..f1454b4f83e3037206488d3a99b4d26d8d11c839 100644
+--- a/evolution/LEDGER.md
++++ b/evolution/LEDGER.md
+@@ -2,6 +2,30 @@
+ 
+ The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
+ 
++## 2026-10-08 — Stacked-resource lifecycle acceptance
++
++**Observed issue:** a complete, higher-priority Minecraft data-map overlay used
++the framework's documented replacement flag and produced the correct final map,
++but the version-exact loader resolved every lower-priority value first. Static
++payload tests passed while the initial load and `/reload` each emitted the same
++23 targeted errors.
++
++**Meaningful improvement:** enforce mode now requires agents to inventory layered
++resources in actual resolver order, distinguish parse/decode/validate/merge/
++replace/apply phases, validate early observable side effects as well as final
++state, exercise initial and repeated lifecycle loads, and require exact event
++counts plus positive repair markers where appropriate.
++
++**Future failure reduced:** agents are less likely to accept a syntactically
++correct overlay or clean final state while a lower layer still emits the target
++warning, error, mutation, registration, or cache effect.
++
++**Changed paths:** `SKILL.md`, `VERSION`, `SOURCE.json`, `tools/validate-source.py`,
++`CHANGELOG.md`, `docs/ARCHITECTURE.md`, `evolution/LEDGER.md`.
++
++**Validation target:** `python tools/validate-source.py`, evolution guard against
++canonical `main`, and the binding pack's full self-run must pass before delivery.
++
+ ## 2026-09-22 — Explicit PACK_ROOT validation cannot silently fall through
+ 
+ **Meaningful improvement:** `resolve-pack.ps1` now validates a human-specified
+diff --git a/tools/validate-source.py b/tools/validate-source.py
+index 105ce02c2f9144c6fafcb73f0818c744452d3ac8..24e08980169fca3e377cbc366567c81df90a7294 100644
+--- a/tools/validate-source.py
++++ b/tools/validate-source.py
+@@ -27,6 +27,7 @@ CRITICAL_PHRASES = [
+     "exactly one evolution obligation per top-level invocation",
+     "highest quality reasonably achievable",
+     "runtime fixture dependency closure",
++    "stacked resource override acceptance",
+ ]
+ 
+ 
