@@ -28,6 +28,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Validate canonical source invariants
         run: python tools/validate-source.py
+      - name: Validate proposal decisions and archived evidence
+        run: python tools/check-proposals.py
       - name: Test mirror and inventory behavior
         run: python -X utf8 -W error -m unittest discover -s tests -v
       - name: Enforce meaningful evolution on pull requests

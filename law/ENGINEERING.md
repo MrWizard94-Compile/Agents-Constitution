@@ -23,6 +23,16 @@ appropriate to those exact versions and to the execution model. Avoid mixing
 deprecated and newer-major patterns. A deliberate compatibility change needs
 tests and documentation.
 
+When a build graph also compiles generated or vendor source, scope project
+warning-as-error and lint flags to project-owned compile tasks using actual
+source ownership. Inspect the configured task graph; a broad task-type matcher
+must not accidentally change vendor compilation semantics or relax owned
+checks. Keep inherited warnings visible and investigate upgrade, upstream
+repair or a compatible pin. `ENG-WARN-001` still governs release readiness;
+source ownership does not waive a relevant warning. A cached or skipped owned
+task is evidence only when the identical source and compiler inputs were
+already verified.
+
 ### ENG-RESEARCH-001 — Verify uncertainty
 
 For uncertain APIs, security, performance, concurrency, lifecycle, or
@@ -92,6 +102,18 @@ fixture where each representation occurs alone, then verify the actual
 consumer's edges, backlinks, counts, and provenance; a parser-only success or
 a visually plausible graph does not establish projection completeness.
 
+For layered resources, configuration or policy overlays, inventory every
+contributing layer in the actual resolver order, including nested archives,
+generated defaults and user overlays. Distinguish parse, decode, validate,
+merge, replace and apply phases in the exact-version loader. A correct final
+state does not prove that an earlier layer stopped emitting diagnostics,
+mutations, registrations or cache effects. Capture a pre-fix baseline and
+exercise initial load and explicit reload, checking final state and every
+earlier phase that can produce the targeted defect. Count targeted events
+and use a positive repair marker when the intervention is otherwise invisible.
+If a lower layer still causes the defect, move the repair to the earliest
+supported boundary that prevents it while preserving unrelated diagnostics.
+
 ### ENG-REPRO-001 — Reproducibility
 
 Pin the declared environment and dependency graph. Build and generation steps
@@ -114,6 +136,27 @@ Test pure logic, component boundaries, and user flows at the lowest useful
 level. Cover edge, negative, failure, ordering, and resource cases in
 proportion to risk. Prefer intention-revealing assertions to coverage
 percentages or implementation-mirroring tests.
+
+Measure the named quantity through the shipped production type or path,
+in the contract's units, with an independent oracle. In particular:
+
+- For a storage payload or compression claim, separate payload bytes from
+  index nodes, occupancy sets, allocator RSS and wrapper capacity. An empty
+  parent map does not prove an absent-or-zero payload buffer on the production
+  leaf type. Verify that a filled leaf round-trips the declared cell count;
+  neither a reimplemented compressor nor a hard-coded count replaces a call
+  to the shipped store.
+- For a visual sampling span, measure shipped mesh vertices or shader inputs
+  in the contract's units. World-space metres after a grid-scale change do
+  not prove tiles per cell. A face specified to sample one full authored tile
+  must span the corresponding UV range (0–1 for that contract) without sliding
+  as the model moves. Finite UVs or an existing texture layer are insufficient.
+- For shared GPU culling pipelines, every mesh producer must use the same
+  independent outward-winding oracle on the shipped mesh function's output.
+  UVs, bounds and texture-layer checks alone miss inward faces that would be
+  back-face culled. A debug assertion on one producer does not cover another
+  producer sharing the pipeline; computing a cross product on a substitute
+  mesh does not test the shipped producer.
 
 ### TEST-DOMAIN-001 — Domain fit
 

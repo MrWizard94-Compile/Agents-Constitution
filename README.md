@@ -65,7 +65,7 @@ and requires zero approvals with no bypass actors. Exit 1 means policy drift.
 Exit 2 means GitHub could not be verified; neither source CI nor an offline
 fixture proves the live setting.
 
-## Branch lifecycle and pending proposals
+## Branch lifecycle and proposal review
 
 Keep `main` and at most one review branch, `codex/constitution-review`.
 Use that slot serially and delete it after merge; another agent's task does
@@ -84,12 +84,25 @@ and effective creation restriction; 1 reports drift and 2 means unverified.
 The second audits main's existing PR/CI/history controls. These commands
 read GitHub and never modify settings or delete branches.
 
-The [pending proposal queue](evolution/pending/README.md) retains exact patches
-from retired public proposal branches. They are **unaccepted**, are outside
-the binding manifest, and must not be loaded or applied automatically.
-Archiving a proposal does not accept its law. Review and reconcile each one
-against current accepted `main` before a future PR. Superseded PRs retain
-their original discussion and diff on GitHub.
+The [proposal register](evolution/proposals/README.md) records the review and
+disposition of all 17 known proposal variants and historical closures. It
+retains the nine original public patches byte-for-byte in an archive outside
+the binding manifest. Archived patches are historical evidence; load active
+law from its canonical homes. A decision becomes effective only when its
+containing change is accepted on `main`. Superseded PRs retain their original
+discussion and diff on GitHub.
+
+Check register integrity and require an empty unresolved queue separately:
+
+```powershell
+python tools/check-proposals.py --require-resolved
+```
+
+The checker validates provenance, decisions, canonical homes and archive hashes.
+Ordinary validation permits visibly pending entries; `--require-resolved`
+fails when any remain. Neither mode accepts a proposed law or proves agent
+compliance. Reconcile a new proposal with current law before updating its
+decision; moving it into an archive alone never counts as review.
 
 Branch retirement must preserve unique work before deleting a reference.
 Keep private recovery bundles and manifests outside committed source; verify

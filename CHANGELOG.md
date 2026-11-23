@@ -1,5 +1,21 @@
 # Changelog
 
+## 6.23.0 — 2026-11-23 (candidate)
+
+- Resolved the remaining proposal backlog against current law: nine public
+  and two local proposals now strengthen evidence at shipped-code, lifecycle,
+  worker, action, approval and integration boundaries. Three narrow measurement
+  proposals share the existing `TEST-QUALITY-001` home. Added `VCS-INTEG-001`
+  for fetched-base and combined-merge verification; protected definitions and
+  invocation-freeze behavior remain unchanged.
+- Reviewed two foreign-freeze variants as superseded by existing source and
+  continuity rules, and confirmed four historical closures. All 17 entries
+  have decisions, rationale and canonical homes. Original public patches are
+  preserved byte-exact in the proposal archive; private staged work stays private.
+- Added offline proposal-register validation, CI integration and scoped source
+  guards/mutation tests. Moving evidence into an archive cannot by itself
+  satisfy review, acceptance or an empty-queue claim.
+
 ## 6.22.0 — 2026-11-23 (candidate)
 
 - Enforced the director's one-or-two branch budget: `main` plus one serial

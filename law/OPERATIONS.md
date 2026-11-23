@@ -46,6 +46,25 @@ No reset, rebase, force-push, squash, or replacement of shared or unrelated
 history without explicit direction. Preserve dirty worktrees and unpublished
 commits. Use isolated branches and recoverable checkpoints for large changes.
 
+### VCS-INTEG-001 — Current base and combined integration
+
+A hosting provider's mergeable, clean or blocked flag is not evidence that
+a branch contains its base tip. Before calling a PR current, fetch that base
+and head and record ahead/behind counts. A status cached before the base moved
+does not count; a green pre-merge head check does not cover the merged result.
+
+When shared history must be preserved, bring the base in with a merge commit.
+Do not rebase, squash or force-push merely to make a branch look current
+(`VCS-HISTORY-001`). Resolve conflicts to preserve both sides' intended
+behavior unless the director chose otherwise, then verify the merged result.
+
+Pairwise cleanliness does not prove that a set of PRs integrates. Before
+recommending a merge order or merging the set, integrate those heads locally
+on the fetched base without publishing that integration ref and run required
+checks. Report conflicts and failures appearing only in combination. This
+check does not authorize merge, approval, tagging, release or settings changes;
+those actions must be separately authorized.
+
 ## Refactor and migration
 
 ### REF-PLAN-001 — Plan broad refactors
@@ -87,6 +106,12 @@ risks, rollback, and acceptance gates. Do not leave silent migration debt.
 A clean build is preparation. Exercise the core user/runtime flow before
 secondary polish and before claiming the migration accepted.
 
+Each named acceptance action is its own evidence unit. A key, click, visible
+surface or relaunch passes only from evidence of that action and its observable
+result. A log line, fixture or timer hook that emits a related token from
+another path does not satisfy the action. Record the actions separately and
+do not close a migration gate on the sibling token.
+
 ### MIG-CLEAN-001 — Recoverable cleanup
 
 Resolve exact paths and ownership before a move or delete. Preserve unique
@@ -125,6 +150,15 @@ missing imports, unmanaged prerequisites, and temporary residue.
 Prefer complete file replacements in human copy/paste handoffs. Tool-driven
 patches are acceptable when the final tree is complete and reviewable.
 
+A displayed excerpt is not a complete replacement file. Never write an
+excerpt, ellipsis or a comment claiming the remainder is unchanged over an
+existing source file. For a narrow in-place correction, patch the complete
+workspace file and inspect the full diff before staging. Reconcile any
+unexpected deletion against the approved baseline, including definitions
+and tests outside the edited region. An intentionally authorized deletion
+remains valid; an omitted remainder is incomplete even if the requested
+lines appear correct.
+
 ### REL-PACKAGE-001 — Release contents
 
 When a release is requested, include version, changelog, build command,
@@ -147,6 +181,13 @@ limits, and backup/rollback. Test retained state when updating in place.
 Resolve critical security and quality findings. Source QA, release
 packaging, deployment, live runtime, and physical acceptance have separate
 gates and must be reported separately.
+
+A human approval of terms, scope or an adaptation is its own evidence class.
+Record the approver, the time and the source of that decision. Do not invent
+a trial, demo or live-consumer observation to satisfy a gate, and do not treat
+the approval record as that observation. Do not treat an observed trial,
+demo or live-consumer result as the human approval. A checker that lets one
+class close the other is wrong.
 
 ## Project lifecycle
 

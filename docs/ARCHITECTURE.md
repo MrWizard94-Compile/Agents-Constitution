@@ -27,8 +27,9 @@ running loader that differs from it is disclosed, not obeyed.
 Branch history is not a branch backlog. `main` and the optional serial
 `codex/constitution-review` slot are the only allowed remote names. Completed
 branches are retired; unique pending work retains exact patches or verified
-private recovery. `evolution/pending` is explicitly unaccepted evidence and
-is excluded from generated law mirrors. The per-call evolution requirement
+private recovery. `evolution/proposals` records decisions and historical
+patches outside generated law mirrors. Only the accepted current canonical
+homes define active law. The per-call evolution requirement
 can produce a complete queued patch while the shared review slot is occupied.
 
 The repository cannot force every AI platform to auto-load a skill. Local

@@ -1,7 +1,7 @@
 # Quality assurance map
 
 **Status:** Non-binding design aid. Binding requirements remain in `AGENTS.md`,
-`SOP.md`, and the one-home `law/*` files. Reviewed 2026-11-03.
+`SOP.md`, and the one-home `law/*` files. Reviewed 2026-11-23.
 
 The goal is the highest quality feasibly achievable for the authorized work,
 not a fictional guarantee of universal perfection. This is **not** permission
@@ -18,16 +18,16 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
 | Quality before speed | Was an applicable verification check skipped, shortened, or replaced to finish faster, look responsive, or reduce token use? | `CONST-QUALITY-001`; `COST-TOKEN-001`; `CONST-DONE-001` |
 | Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? When a specification enumerates named controls, is each named item present or recorded as an unmet acceptance item? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |
 | Stack and factual correctness | Do the imports, symbols, versions, contracts, and actual runtime match the implementation's claims? | `ENG-STACK-001`; `ENG-RESEARCH-001`; `ENG-FW-001` |
-| Test integrity | Would the suite still fail if the defect were reintroduced, or has a skip, fixture, mock, assertion, or CI gate concealed it? | `TEST-QUALITY-001`; `TEST-REGRESSION-001` |
+| Test integrity | Does the suite measure the named quantity on the shipped path in contract units, distinguish payload from index/RSS, and cover every producer sharing a culling pipeline? Would reintroducing the defect still fail? | `TEST-QUALITY-001`; `TEST-REGRESSION-001` |
 | Security, privacy, and permission | Can untrusted content, excess privilege, secrets, or a dependency cross the intended boundary? | `SEC-INPUT-001`; `SEC-PRIV-001`; `SEC-SECRET-001`; `SEC-SUPPLY-001` |
 | Usability and accessibility | Can representative people complete the intended task with the input, display, language, and assistive modes they need? | `TEST-DOMAIN-001`; `DOC-SYNC-001`; project acceptance criteria |
 | Reliability and operations | Does the system recover from faults, interruption, restart, and unavailable shared services without data loss or false success? | `OBS-FAIL-001`; `LIFE-TOOL-001`; `REL-UPGRADE-001` |
 | Technical resourcefulness | Was an authorized workaround built and checked against the original outcome, rather than merely suggested, silently reduced, endlessly retried or made to bypass a boundary? | `CONST-RESOURCEFUL-001`; `SEC-PRIV-001`; `TEST-BEHAVIOR-001` |
 | Performance and resources | Does a realistic constrained workload meet explicit time, memory, energy, and cost budgets without sacrificing correctness? | `PERF-REASON-001`; `PERF-BUDGET-001` |
 | Provenance and reproducibility | Can the delivered artifact be traced to the intended source, dependencies, build environment, and approval? | `ENG-REPRO-001`; `DEP-REPRO-001`; `REL-DETERM-001`; `GOV-SSOT-001` |
-| Runtime consumer closure | Does the actual shipped consumer load the verified bytes and exercise the proposed hook, conversion, or cache through normal lifecycle and failure paths? | `ENG-FW-001`; `TEST-DOMAIN-001`; `LOW-RISK-001`; `PERF-HOT-001` |
+| Runtime consumer closure | Does the shipped consumer exercise the verified bytes through initial load, earlier overlay phases, reload and stateful transitions? Does every named action have its own observation? | `ENG-FW-001`; `TEST-DOMAIN-001`; `LOW-RISK-001`; `MIG-VERIFY-001` |
 | Scope and human control | Was each dependent action gated by its prerequisite, and were material architecture or public-contract changes reviewed? | `CONST-AUTH-001`; `SEC-AUTHZ-001`; `CTX-ASSUME-001` |
-| Evidence and handoff | Are findings reproduced, status claims limited to observed stages, and resumption possible after context or service loss? | `REV-PACK-002`; `CTX-SELF-001`; `CONST-DONE-001` |
+| Evidence and handoff | Are approval and trial evidence distinct? Are worker baseline, terminal result and reviewed immutable candidate known, with findings reproduced? Is the final merged base verified? | `REL-HARDEN-001`; `AI-COORD-002`; `AI-COORD-003`; `VCS-INTEG-001` |
 
 Choose domain-specific standards in addition to this map. For example, a web
 interface may require WCAG conformance evidence; a web service can use OWASP

@@ -122,6 +122,12 @@ disposition. Preserve unique meaning in active law. Keep public history
 free of private project data; record a checksum and private location
 instead of publishing private content. Historical text is not active law.
 
+Record each reviewed proposal's provenance, explicit disposition, rationale
+and current canonical home. Distinguish pending, incorporated, already covered,
+superseded and obsolete work. Preserve original patch hashes when archiving;
+moving a file or closing a PR alone is not evidence of review or acceptance.
+Validate the proposal register before reporting an empty unresolved queue.
+
 ## Versioning
 
 The pack and skill share one SemVer `VERSION`. A major release changes a

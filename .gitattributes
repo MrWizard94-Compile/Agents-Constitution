@@ -10,4 +10,4 @@ VERSION text eol=lf
 
 # Immutable unified-diff evidence contains significant context spaces and LF.
 # Preserve its exact hashes on every host; review it as a patch, not source.
-evolution/pending/*.patch -text -diff -merge
+evolution/proposals/archive/*.patch -text -diff -merge

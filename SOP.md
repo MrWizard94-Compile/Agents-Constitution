@@ -1,6 +1,6 @@
 # WPAI delivery SOP
 
-**Version:** 3.3.0
+**Version:** 3.4.0
 
 **Authority:** `AGENTS.md`
 **Applies to:** Human-directed work under the WPAI Constitution
@@ -81,6 +81,10 @@ Exercise real runtime and device flows when acceptance requires them. Distinguis
 the first independent failure from downstream cascades. Fix causes, then rerun
 affected and broader gates. A successful catalog scan or artifact copy is
 preparation; runtime acceptance requires a clean launch and behavior flow.
+When acceptance names an action, require evidence of that action and its
+observable result under `MIG-VERIFY-001`; a token from another path is
+insufficient. Check named quantities and shared producers under
+`TEST-QUALITY-001`, including payload, sampling and culling evidence.
 Verify generated API claims against the installed stack. Inspect changes to
 tests, fixtures, mocks, skips, and CI gates before trusting green status. Use
 an independent oracle for consequential behavior, such as a real consumer,
@@ -101,6 +105,8 @@ Reconcile the evidence against the original quality profile and changed scope.
 Investigate contradictions and review-tool findings against the current tree;
 withdraw unsupported claims. A percentage, green badge, or polished artifact
 is not a substitute for evidence about the intended use.
+A human approval of terms or an adaptation does not close a trial, demo or
+live-consumer gate, and the reverse also holds (`REL-HARDEN-001`).
 
 ## 8. Package and deliver
 
@@ -116,6 +122,8 @@ Commit, push, open a PR, merge, release, deploy, or distribute only when the
 director authorized that action and destination. Verify remote state after each
 external action. Protect shared history; never force-push to cover drift.
 Release tags and published versions are immutable.
+Before claiming a PR current or recommending a merge order, verify the
+fetched base and combined result under `VCS-INTEG-001`.
 
 ## 10. Learn and evolve
 

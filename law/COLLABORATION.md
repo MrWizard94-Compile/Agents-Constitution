@@ -41,11 +41,24 @@ Agents may research or implement independent components in parallel.
 Coordinate shared interfaces and avoid simultaneous edits to root law or
 other high-conflict files. Merge only after the integrator checks combined
 behavior, tests, docs, and scope.
+Use `VCS-INTEG-001` for fetched-base and combined-integration evidence.
+For workers using separate checkouts or worktrees, record the common source
+revision and any intentionally inherited uncommitted changes before launch.
+Integrate each worker's delta from that baseline; do not overwrite newer
+parent changes with a complete stale file or silently omit inherited work.
 
 ### AI-COORD-003 — One package
 
 Present one coherent result, not separate unintegrated agent fragments.
 The integrator owns final verification and honest status.
+For headless or out-of-process workers, a successful launch or running process
+proves startup only. Retain the role, baseline, permissions, session identity,
+terminal outcome and collected result. Check changed files against assigned
+ownership, then verify an immutable integrated candidate. Independent review
+must identify the candidate it inspected; reproduce findings against that
+candidate, repair confirmed material defects, and rerun affected checks and
+review. A missing result, failed or interrupted turn, or changing checkout
+does not prove completed implementation or review.
 
 ### AI-COORD-004 — Canonical editor
 

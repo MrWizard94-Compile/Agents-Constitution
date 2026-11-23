@@ -235,6 +235,66 @@ def freeze_contract_errors(evolution: str, skill: str) -> list[str]:
     return errors
 
 
+def reviewed_evidence_contract_errors(root: Path) -> list[str]:
+    """Preserve reviewed operational clauses in their own canonical sections.
+
+    These are structural guards, not proof of future agent compliance.
+    """
+    requirements = {
+        ("law/ENGINEERING.md", "ENG-STACK-001"): (
+            "project-owned compile tasks", "configured task graph",
+            "source ownership does not waive a relevant warning", "identical source and compiler inputs"),
+        ("law/ENGINEERING.md", "ENG-FW-001"): (
+            "actual resolver order", "earlier layer", "initial load and explicit reload",
+            "positive repair marker", "preserving unrelated diagnostics"),
+        ("law/ENGINEERING.md", "TEST-QUALITY-001"): (
+            "named quantity through the shipped production type or path", "contract's units",
+            "payload bytes from index nodes", "absent-or-zero payload buffer",
+            "round-trips the declared cell count", "shipped store", "world-space metres",
+            "full authored tile", "without sliding", "every mesh producer",
+            "independent outward-winding oracle", "back-face culled", "substitute mesh"),
+        ("law/OPERATIONS.md", "VCS-INTEG-001"): (
+            "hosting provider", "ahead/behind", "merge commit", "do not rebase",
+            "without publishing", "only in combination", "separately authorized"),
+        ("law/OPERATIONS.md", "MIG-VERIFY-001"): (
+            "each named acceptance action is its own evidence unit",
+            "evidence of that action and its observable result",
+            "another path does not satisfy the action", "do not close a migration gate on the sibling token"),
+        ("law/OPERATIONS.md", "OPS-DEL-002"): (
+            "a displayed excerpt is not a complete replacement file", "complete workspace file",
+            "including definitions and tests outside the edited region", "intentionally authorized deletion"),
+        ("law/OPERATIONS.md", "REL-HARDEN-001"): (
+            "approver, the time and the source", "do not invent a trial",
+            "do not treat the approval record as that observation",
+            "do not treat an observed trial, demo or live-consumer result as the human approval"),
+        ("law/COLLABORATION.md", "AI-COORD-002"): (
+            "intentionally inherited uncommitted changes", "each worker's delta",
+            "do not overwrite newer parent changes"),
+        ("law/COLLABORATION.md", "AI-COORD-003"): (
+            "terminal outcome and collected result", "immutable integrated candidate",
+            "failed or interrupted turn", "does not prove completed implementation or review"),
+        ("law/SPECIALIST.md", "LOW-RISK-001"): (
+            "owner of each discontinuity", "boundary inside one callback", "inactive consumer joining later",
+            "independently constructed sequence", "measure callback cost under the transition workload"),
+    }
+    errors = []
+    for (relative, rule), phrases in requirements.items():
+        body = (root / relative).read_text(encoding="utf-8-sig")
+        section = re.search(rf"^### {re.escape(rule)}\b[^\n]*\n(.*?)(?=^#{{2,3}} |\Z)",
+                            body, re.MULTILINE | re.DOTALL)
+        if section is None:
+            errors.append(f"{rule} reviewed evidence home missing")
+            continue
+        normalized = " ".join(section.group(1).casefold().split())
+        errors.extend(f"{rule} reviewed safeguard missing: {phrase}"
+                      for phrase in phrases if phrase not in normalized)
+    sop = " ".join((root / "SOP.md").read_text(encoding="utf-8-sig").casefold().split())
+    for rule in ("mig-verify-001", "test-quality-001", "rel-harden-001", "vcs-integ-001"):
+        if rule not in sop:
+            errors.append(f"SOP.md missing reviewed evidence route: {rule.upper()}")
+    return errors
+
+
 def validate(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     required = MINIMUM_MIRROR | {"README.md", "CHANGELOG.md", "evolution/LEDGER.md", "docs/ARCHITECTURE.md", "docs/SOURCE-INVENTORY.md"}
@@ -303,6 +363,7 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
+    errors.extend(reviewed_evidence_contract_errors(root))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
         errors.append("ledger must say ledger-only edits never count")
 

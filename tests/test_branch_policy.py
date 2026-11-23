@@ -111,27 +111,27 @@ class BranchPolicyTests(unittest.TestCase):
                     self.assertEqual(POLICY.main(), expected)
                 self.assertTrue(output.getvalue().startswith(prefix), output.getvalue())
 
-    def test_public_pending_patches_match_manifest_and_are_outside_binding_set(self):
-        folder = ROOT / "evolution/pending"
+    def test_public_archived_patches_match_manifest_and_are_outside_binding_set(self):
+        folder = ROOT / "evolution/proposals"
         manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
-        entries = manifest["entries"]
-        self.assertEqual(manifest["schema"], 1)
+        entries = [e for e in manifest["entries"] if e["kind"] == "public-patch"]
+        self.assertEqual(manifest["schema"], 2)
         self.assertEqual(len(entries), 9)
         self.assertEqual({n for entry in entries for n in entry["original_prs"]}, {42, 44, 46, 47, 48, 49})
         expected_files = set()
         for entry in entries:
             with self.subTest(commit=entry["commit"]):
-                self.assertEqual(entry["status"], "unaccepted")
+                self.assertEqual(entry["status"], "incorporated")
                 self.assertRegex(entry["commit"], r"^[0-9a-f]{40}$")
                 self.assertRegex(entry["parent"], r"^[0-9a-f]{40}$")
-                self.assertEqual(entry["patch"], entry["commit"][:12] + ".patch")
+                self.assertEqual(entry["patch"], "archive/" + entry["commit"][:12] + ".patch")
                 content = (folder / entry["patch"]).read_bytes()
                 self.assertEqual(hashlib.sha256(content).hexdigest(), entry["sha256"])
                 self.assertTrue(content.startswith(b"diff --git "))
                 expected_files.add(entry["patch"])
-        self.assertEqual({p.name for p in folder.glob("*.patch")}, expected_files)
+        self.assertEqual({p.relative_to(folder).as_posix() for p in folder.glob("archive/*.patch")}, expected_files)
         source = json.loads((ROOT / "SOURCE.json").read_text(encoding="utf-8"))
-        self.assertFalse(any(p.startswith("evolution/pending/") for p in source["mirror_files"]))
+        self.assertFalse(any(p.startswith("evolution/proposals/") for p in source["mirror_files"]))
 
 
 if __name__ == "__main__":
