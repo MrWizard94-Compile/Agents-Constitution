@@ -1,0 +1,271 @@
+{
+  "schema": 2,
+  "reviewed_against": "c5331af55d3aadf30633c96ae2404845ec830723",
+  "resolution_version": "6.23.0",
+  "effect": "Decisions take effect only when the containing change is accepted on canonical main; archives are historical evidence, never law.",
+  "entries": [
+    {
+      "status": "incorporated",
+      "source_branch": "codex/owned-source-warning-gates",
+      "commit": "523015e04c7d0eed5ad2fc0284214033c8ebeb53",
+      "parent": "969ae2caa33c1e4c9de325282fe6029e35a1caea",
+      "title": "Harden warning gates for generated-source builds",
+      "original_prs": [],
+      "patch": "archive/523015e04c7d.patch",
+      "sha256": "78fa8d03d5101326d7089bd8ccf107cfe47cf92a18eced4a72c5fbb5d3723e17",
+      "id": "public-523015e04c7d",
+      "kind": "public-patch",
+      "rule_ids": [
+        "ENG-STACK-001"
+      ],
+      "reason": "Scope build flags using actual source ownership and preserve visible inherited warnings and the existing protected warning policy."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "codex/stacked-resource-runtime-gates",
+      "commit": "5823d7626fcf319489cbd80d3c25d7031910c636",
+      "parent": "969ae2caa33c1e4c9de325282fe6029e35a1caea",
+      "title": "Require lifecycle proof for stacked resource overrides",
+      "original_prs": [],
+      "patch": "archive/5823d7626fcf.patch",
+      "sha256": "9e3ea589d5e5db7d028b0c1301079022a070673e4d6d3cc7fc9f20a06262ab8c",
+      "id": "public-5823d7626fcf",
+      "kind": "public-patch",
+      "rule_ids": [
+        "ENG-FW-001"
+      ],
+      "reason": "Verify resolver order, earlier-phase side effects, baseline, initial load and reload, rather than relying on final overlay state."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "codex/trackforge-transport-lifecycle-evidence",
+      "commit": "e207f79f097dc773039a1b7b1dc5232223a93925",
+      "parent": "0010a8353b00754fad31a30ed24327d3b6d05425",
+      "title": "docs: require evidence for streaming discontinuities",
+      "original_prs": [],
+      "patch": "archive/e207f79f097d.patch",
+      "sha256": "a1e6cdde8d7c92bc357259af002b902ea1179f57b3a9e6a36ea022a2b927d4a0",
+      "id": "public-e207f79f097d",
+      "kind": "public-patch",
+      "rule_ids": [
+        "LOW-RISK-001"
+      ],
+      "reason": "Require clock/transition ownership, stateful-consumer re-entry, independent output evidence and transition callback cost."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "evolve/approval-is-not-a-trial",
+      "commit": "4caa5c324279cd78d3a43a74f5289f894d697897",
+      "parent": "c04dc0740e282c6c2dc0b377a28b057ff6d9866c",
+      "title": "Keep a human approval from closing a trial gate",
+      "original_prs": [
+        44
+      ],
+      "patch": "archive/4caa5c324279.patch",
+      "sha256": "68a1788c36362f9b1c3cbc8fc3e1bdab8fb14e5a1b1ada45742eeb2a6e1d88fd",
+      "id": "public-4caa5c324279",
+      "kind": "public-patch",
+      "rule_ids": [
+        "REL-HARDEN-001"
+      ],
+      "reason": "Keep named human approval and observed trial evidence distinct in both directions."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "evolve/mig-verify-named-actions",
+      "commit": "db3227e73bad082c70a16670b4bd70b7cb9b4ce5",
+      "parent": "27353ee14250c9a2bf680e49919999ad0d8521e1",
+      "title": "Require evidence of each named acceptance action.",
+      "original_prs": [
+        49
+      ],
+      "patch": "archive/db3227e73bad.patch",
+      "sha256": "38cad23a965b27886be15eeb7a8d9dff3dcdcfa6d36619a9627786e6e622c0e7",
+      "id": "public-db3227e73bad",
+      "kind": "public-patch",
+      "rule_ids": [
+        "MIG-VERIFY-001"
+      ],
+      "reason": "Require evidence for every named action and observable result; sibling-path log tokens cannot close the action gate."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "evolve/test-cull-shared-pipeline",
+      "commit": "d023fffbdbe673fc7a0592dae75e0788b5a0486b",
+      "parent": "309d93b3844e2cfd7e548924259bccfb39922c8c",
+      "title": "Add TEST-CULL-001: shared GPU pipeline winding coverage.",
+      "original_prs": [
+        48
+      ],
+      "patch": "archive/d023fffbdbe6.patch",
+      "sha256": "03c5cd4a6417ef90be9bdc11c1775382aa7c39acb3f5a5a718fde708e307fc02",
+      "id": "public-d023fffbdbe6",
+      "kind": "public-patch",
+      "rule_ids": [
+        "TEST-QUALITY-001"
+      ],
+      "reason": "Generalize candidate TEST-CULL-001 into the existing testing home: test every shipped producer sharing a culling pipeline with the same independent outward-winding oracle."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "evolve/test-payload-001",
+      "commit": "8207ac02fea852d5472cb2d8d982b64e20344758",
+      "parent": "309d93b3844e2cfd7e548924259bccfb39922c8c",
+      "title": "Add TEST-PAYLOAD-001: measure named payload, not index RSS.",
+      "original_prs": [
+        46
+      ],
+      "patch": "archive/8207ac02fea8.patch",
+      "sha256": "b70b7376f549ee4c40f2656cbe772227f483300ba1e00cfa226efdeeadbfabf6",
+      "id": "public-8207ac02fea8",
+      "kind": "public-patch",
+      "rule_ids": [
+        "TEST-QUALITY-001"
+      ],
+      "reason": "Generalize candidate TEST-PAYLOAD-001 into the existing testing home: measure actual production payload bytes, distinguish index/RSS and round-trip the declared cell count."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "evolve/test-sample-span",
+      "commit": "0a3fc55468d3fbd8d174748554abcf0d734e2e42",
+      "parent": "309d93b3844e2cfd7e548924259bccfb39922c8c",
+      "title": "Add TEST-SAMPLE-001: measure sampling span in the contract's units.",
+      "original_prs": [
+        47
+      ],
+      "patch": "archive/0a3fc55468d3.patch",
+      "sha256": "0ccdf944b0d5eb0d86a939beee9ff2303edd4d2bd54b7a79392a37a1a1a1376f",
+      "id": "public-0a3fc55468d3",
+      "kind": "public-patch",
+      "rule_ids": [
+        "TEST-QUALITY-001"
+      ],
+      "reason": "Generalize candidate TEST-SAMPLE-001 into the existing testing home: verify the authored span and stable UVs on shipped mesh/shader inputs in contract units."
+    },
+    {
+      "status": "incorporated",
+      "source_branch": "grok/vcs-integ-001",
+      "commit": "d475a8d0d945d660edd25fe7258c4744cba9b04b",
+      "parent": "63d99cdc72a1c18b5aa91b9336d02fd30126407b",
+      "title": "Require a fetched base tip before calling a pull request current.",
+      "original_prs": [
+        42
+      ],
+      "patch": "archive/d475a8d0d945.patch",
+      "sha256": "60ce856c2127a29c5e99bcb6049702c21d264517e1bad4aaf7bcc658a9ef22fb",
+      "id": "public-d475a8d0d945",
+      "kind": "public-patch",
+      "rule_ids": [
+        "VCS-INTEG-001"
+      ],
+      "reason": "Fetch and record base/head ahead-behind state, preserve shared history and check combined integration before recommendations or authorized merge."
+    },
+    {
+      "id": "local-5a95b5e85396",
+      "kind": "local-proposal",
+      "commit": "5a95b5e853968dd76163fe2b8754e9bfdf9561e4",
+      "title": "Headless worker baseline and completion evidence",
+      "status": "incorporated",
+      "rule_ids": [
+        "AI-COORD-002",
+        "AI-COORD-003"
+      ],
+      "reason": "Port only generic baseline/delta, terminal-result and immutable candidate review requirements; original private worktree remains unchanged.",
+      "private_recovery": true
+    },
+    {
+      "id": "local-f8bb2b75e764",
+      "kind": "local-proposal",
+      "commit": "f8bb2b75e764c46db6a00b49f22a4d268a0f1926",
+      "title": "Foreign-session freeze variant 1",
+      "status": "superseded",
+      "rule_ids": [
+        "GOV-FREEZE-001",
+        "CTX-SELF-001"
+      ],
+      "reason": "Superseded by the later local variant and current source-trust rules; tool identity alone must not restart an ongoing invocation or replace its freeze.",
+      "private_recovery": true
+    },
+    {
+      "id": "local-b62e221cf894",
+      "kind": "local-proposal",
+      "commit": "b62e221cf8947a7b3a4e74e7e37272dab576776d",
+      "title": "Foreign-session freeze variant 2",
+      "status": "superseded",
+      "rule_ids": [
+        "GOV-FREEZE-001",
+        "CTX-SELF-001",
+        "CTX-ASSUME-001"
+      ],
+      "reason": "Current rules already resolve accepted source at a genuine top-level call and treat retrieved sessions as evidence. Automatic foreign-tool invocation restart is not adopted; actual continuity and director instructions govern.",
+      "private_recovery": true
+    },
+    {
+      "id": "local-complete-file-repair",
+      "kind": "local-proposal",
+      "title": "Preserve complete files during narrow corrections",
+      "status": "incorporated",
+      "content_sha256": "6c0eb0b727bbdb21bf9ef8388ac1e1cad681d23863e7d0b8c9b1685888bfd53f",
+      "private_recovery": true,
+      "rule_ids": [
+        "OPS-DEL-002"
+      ],
+      "reason": "Port the generic excerpt/deletion-preservation contract, allow explicitly authorized deletion, and preserve original private staged files and index."
+    },
+    {
+      "id": "historical-pr-5",
+      "kind": "historical-pr",
+      "original_prs": [
+        5
+      ],
+      "title": "Interactive entry drives shipped core",
+      "status": "covered",
+      "rule_ids": [
+        "TEST-DOMAIN-001"
+      ],
+      "reason": "Closure record and current law confirm the actual renderer/server/GameTest production-entry safeguard was already incorporated."
+    },
+    {
+      "id": "historical-pr-7",
+      "kind": "historical-pr",
+      "original_prs": [
+        7
+      ],
+      "title": "One-level local pack resolver",
+      "status": "obsolete",
+      "rule_ids": [
+        "GOV-SSOT-001",
+        "GOV-FREEZE-001"
+      ],
+      "reason": "The unified GitHub snapshot supersedes sibling-walk pack discovery; restoring this workflow would revive retired ambiguity."
+    },
+    {
+      "id": "historical-pr-9",
+      "kind": "historical-pr",
+      "original_prs": [
+        9
+      ],
+      "title": "Separate skill and binding-pack roots",
+      "status": "obsolete",
+      "rule_ids": [
+        "GOV-SSOT-001",
+        "GOV-FREEZE-001"
+      ],
+      "reason": "Skill and binding law now share one verified snapshot. The former PACK_ROOT split is retired."
+    },
+    {
+      "id": "historical-pr-10",
+      "kind": "historical-pr",
+      "original_prs": [
+        10
+      ],
+      "title": "Lifecycle hooks and intrusive diagnostics",
+      "status": "covered",
+      "rule_ids": [
+        "LOW-RISK-001",
+        "OBS-PRIV-001"
+      ],
+      "reason": "Closure points to accepted PR 13; current law retains exact lifecycle, least-intrusive capture, capture approval and privacy safeguards."
+    }
+  ]
+}

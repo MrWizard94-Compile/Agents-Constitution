@@ -2,6 +2,43 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-23 — Reconcile the proposal backlog into verifiable evidence contracts
+
+**Observed gap:** branch retirement preserved nine public proposals but did
+not settle their useful law. Additional local worker/complete-file safeguards
+and foreign-freeze variants remained outside the queue. Several proposed
+rules mistook proxy evidence for the named production outcome, while a mere
+archive label could be mistaken for completed review.
+
+**Meaningful change:** reviewed all 17 known public/local/historical entries.
+Ported 11 useful variants into current homes for source-owned builds, layered
+loaders, production measurement, transitions, named actions, complete files,
+approval evidence and immutable worker/integration results. Three measurement
+IDs were generalized into `TEST-QUALITY-001`. The new `VCS-INTEG-001` covers
+base and combined merge evidence. Preserved protected definitions, one-home
+ownership, human authority and frozen-invocation behavior. Two local freeze
+variants are superseded; four historical PR closures remain supported.
+
+**Traceability:** the proposal register records status, rationale, canonical
+home and original provenance. Nine exact public patch bytes/hashes survive in
+the archive; original private staged files/index and local proposal recovery
+remain unchanged. The register becomes effective only with acceptance of its
+containing change. No archived patch or private raw proposal becomes law.
+
+**Falsification:** corruption, unsafe/duplicate evidence paths, missing source
+identity, nonexistent canonical homes, invalid decisions or false resolved
+claims must fail register validation. Restoring a proxy-only measurement,
+sibling-action log, approval-for-trial substitution, missing worker result,
+stale full-file overwrite or incomplete transition clause must fail scoped
+structural mutation checks. Verify every archived patch against the original
+accepted v6.22.0 Git blobs independently of the new manifest. These checks
+protect text/data integrity; they do not prove future agent behavior or the
+runtime acceptance of the products from which the proposals originated.
+
+**Acceptance:** one coherent director-requested backlog/evidence integration
+in the sole review slot; source validation, proposal audit, tests, complete
+diff review and CI precede merge. The amendment does not govern this call.
+
 ## 2026-11-23 — Bound branch creation and close its lifecycle
 
 **Observed gap:** the canonical repository had 51 remote branches, automatic
