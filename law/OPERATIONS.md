@@ -23,6 +23,23 @@ Keep temporary files, caches, generated reports, credentials, and backup
 artifacts out of release commits unless they are intentionally versioned
 evidence. Inspect the package before publication.
 
+Respect the director's branch budget. Keep only the accepted default branch
+and the authorized active review branch unless an explicit exception names
+another branch and its retirement condition. Before creating a branch, fetch
+and inventory existing branches and open PRs; reuse an available review slot
+or queue the proposal as an explicitly unaccepted artifact. Do not create a
+branch per agent, retry, continuation, or completed invocation indefinitely.
+
+After merge, retire the completed remote branch and stale local references.
+Before retiring an unmerged branch, preserve its exact tip and unique work in
+a verified, restorable Git bundle or another director-approved recovery
+artifact; record its disposition and retain reviewable pending proposals.
+Deletion is not acceptance. Never merge unreviewed law, discard dirty work,
+force-push, or weaken branch protections to meet a count. Recheck branch tips
+immediately before deletion and stop if another writer changed them.
+Confirm the final remote count and cleanup settings through the hosting API;
+a local branch listing or deletion request alone does not prove cleanup.
+
 ### VCS-HISTORY-001 — Preserve history
 
 No reset, rebase, force-push, squash, or replacement of shared or unrelated

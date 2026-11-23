@@ -1,0 +1,114 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index cd7ca6806e9a1d2e31471a3321b1123d82420a52..a0c3abe8e9eb09e27a8aa9244b70428fbf214398 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,6 +1,6 @@
+ # WPAI Constitution
+ 
+-**Version:** 6.16.4
++**Version:** 6.17.0
+ 
+ **Status:** Binding
+ 
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 84a0bc040e9e976d025c6458530942f97520f7f6..22e4868a8d5c5d3825fdd73b823590d4c0ae217f 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,12 @@
+ # Changelog
+ 
++## 6.17.0 — 2026-10-21 (candidate)
++
++- Clarify exact-lifecycle evidence for streaming/real-time discontinuities:
++  one clock owner, coherent consumers across seek/wrap/activation/preparation,
++  an independent output oracle, and measured transition workload cost. This
++  extends LOW-RISK-001 without changing authority or publication permissions.
++
+ ## 6.16.4 — 2026-10-18 (candidate)
+ 
+ - Fixed inventory identity comparisons for equivalent long/Windows 8.3 paths:
+diff --git a/SKILL.md b/SKILL.md
+index 6aff911b91fc8d037261afffc6a7fad7996563c8..322db5319a72e7a0aac8d623ddd64ad09ada4f40 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -7,7 +7,7 @@ description: >
+   Each top-level call must produce one meaningful Constitution improvement.
+ metadata:
+   short-description: "Apply and evolve WPAI Constitution"
+-  skill-version: "6.16.4"
++  skill-version: "6.17.0"
+   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+ ---
+ 
+diff --git a/SOURCE.json b/SOURCE.json
+index 36593bbe2fdf1f7dce6645309c12c31499cda860..cedb6647a3004aa4e867de00c4dc20c4db259bc8 100644
+--- a/SOURCE.json
++++ b/SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": 2,
+   "name": "wpai-constitution",
+-  "skill_version": "6.16.4",
++  "skill_version": "6.17.0",
+   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
+   "default_branch": "main",
+diff --git a/VERSION b/VERSION
+index f3472f93a56f9303a4da7138570ae7bf9f7715b0..1980a78f205478929a8eb969c58d1906e609dbf8 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-6.16.4
++6.17.0
+diff --git a/evolution/LEDGER.md b/evolution/LEDGER.md
+index 4bbc6ed6ef13259069715b65b7a8e823fbda31c8..6cb24c6ff793cf630a9a578ad2796cb52743687d 100644
+--- a/evolution/LEDGER.md
++++ b/evolution/LEDGER.md
+@@ -2,6 +2,27 @@
+ 
+ The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
+ 
++## 2026-10-21 — Verify stateful streaming consumers across discontinuities
++
++**Observed gap:** an audio pipeline passed continuous playback fixtures while
++separate consumer playheads lacked a shared seek/wrap path. A newly activated
++consumer could start at zero, and old pending notes or tails could survive a
++backward jump. A bounded queue also permitted repeated expensive graph resets
++within one callback. Storage bounds alone did not establish deadline safety.
++
++**Meaningful change:** extend the existing LOW-RISK-001 lifecycle home with
++clock/discontinuity ownership, coherent consumer state reconstruction, alternate
++activation/preparation entry points, independent output comparison, and timing
++under transition load. No new rule home, permission, or protected quality waiver.
++
++**Falsification:** review a pipeline with correct steady playback but a late
++consumer starting at zero, a stale tail after backward wrap, or a callback that
++exceeds its deadline during queued seeks. Its continuous-playback tests cannot
++close lifecycle acceptance under the new paragraph. A coherent implementation
++with independent expected output and measured transition cost can. Source
++validation and the existing regression suite must remain green. This candidate
++is staged locally; it does not govern its own originating work.
++
+ ## 2026-10-18 — Keep inventory evidence consistent across path aliases
+ 
+ **Observed gap:** Windows/Python 3.11 adoption CI exposed four existing inventory
+diff --git a/law/SPECIALIST.md b/law/SPECIALIST.md
+index 9edc9f210380be9af39522df54cad9d43151b484..10c8076254e802d22203d5cea1706feb807f2529 100644
+--- a/law/SPECIALIST.md
++++ b/law/SPECIALIST.md
+@@ -81,6 +81,15 @@ named target method. Where practical, lock the path and argument contract
+ in a versioned integration test. For teardown or reload repairs, verify the
+ hook executes on normal exit and that re-entry still works; helper tests and
+ a clean build alone are not runtime acceptance.
++For a streaming or real-time pipeline with multiple stateful consumers, identify
++the clock and the owner of each discontinuity before changing seek, wrap,
++activation, reset, or device reconfiguration. Verify that every consumer joins
++the intended position and drops or reconstructs pending state consistently;
++continuous playback alone cannot prove this contract. Include forward and
++backward jumps, a boundary inside one callback, an inactive consumer joining
++later, and re-entry after preparation where supported. Compare representative
++output with an independently constructed sequence, and measure callback cost
++under the transition workload rather than inferring it from bounded storage.
+ 
+ ### LOW-REASON-001 — Justify the technique
+ 

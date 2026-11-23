@@ -49,7 +49,8 @@ The integrator owns final verification and honest status.
 
 ### AI-COORD-004 — Canonical editor
 
-Constitution changes use isolated branches and PRs. No two agents directly
+Constitution changes use the authorized isolated review slot and PRs under
+`GOV-CHANGE-001`; queue complete proposals when it is occupied. No two agents directly
 edit canonical `main`; an agent's own amendment cannot govern its current
 invocation.
 

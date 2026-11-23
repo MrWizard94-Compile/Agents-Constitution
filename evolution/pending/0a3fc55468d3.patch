@@ -1,0 +1,221 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 2277952decc7319bd3b7098e8dad72da121bb103..2c40234271431bb048038c127c2f1a1aafd75461 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,6 +1,6 @@
+ # WPAI Constitution
+ 
+-**Version:** 6.19.1
++**Version:** 6.20.0
+ 
+ **Status:** Binding
+ 
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 7a5ccd21dad92838129ed613b714b05d39deed10..905ae209c0390b3699f397f4bf8d65a09861c356 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,16 @@
+ # Changelog
+ 
++## 6.20.0 — 2026-11-09 (candidate)
++
++- Added `TEST-SAMPLE-001`: a named sampling span (one texture tile per voxel,
++  one UV unit per cell) must be measured on shipped mesh vertices or shader
++  inputs in the contract's units. World-space metres after a grid scale
++  change do not prove a per-cell tile. A unit-square face that must sample a
++  full authored tile must cover UV 0–1 and must not slide when the model
++  moves. Observed when 0.5 m voxels left `fs_terrain` sampling world metres,
++  so a block face showed a quarter of its 32×32 tile and mob atlases swam
++  over AABB corners. No protected rule changes.
++
+ ## 6.19.1 — 2026-11-03 (candidate)
+ 
+ - Licensed the public repository under CC BY-NC 4.0. The repository had no
+diff --git a/SKILL.md b/SKILL.md
+index 331084ed958b9b64e61e2e79c8739031e6e6e6f1..e37a4c0fc80f33856abd0f9c0be0f08204400915 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -7,7 +7,7 @@ description: >
+   Each top-level call must produce one meaningful Constitution improvement.
+ metadata:
+   short-description: "Apply and evolve WPAI Constitution"
+-  skill-version: "6.19.1"
++  skill-version: "6.20.0"
+   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+ ---
+ 
+diff --git a/SOURCE.json b/SOURCE.json
+index 06cb5bc13f643db581fa693022e7ea4a72138374..4d30044e5b746fedf6f0fc778a26f384311a3fd7 100644
+--- a/SOURCE.json
++++ b/SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": 2,
+   "name": "wpai-constitution",
+-  "skill_version": "6.19.1",
++  "skill_version": "6.20.0",
+   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
+   "default_branch": "main",
+diff --git a/VERSION b/VERSION
+index 60a019cf37a3ef29f4d6b029b5f617f953beab3e..a7c176ac7fee8166d6021d8109e1b8761f22841c 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-6.19.1
++6.20.0
+diff --git a/docs/QUALITY-ASSURANCE-MAP.md b/docs/QUALITY-ASSURANCE-MAP.md
+index b516493974c0f0ff68a10632a18bcbe195824c9b..a8546704ce7e5dc416c7c017d288d9bc96124936 100644
+--- a/docs/QUALITY-ASSURANCE-MAP.md
++++ b/docs/QUALITY-ASSURANCE-MAP.md
+@@ -19,6 +19,7 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
+ | Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |
+ | Stack and factual correctness | Do the imports, symbols, versions, contracts, and actual runtime match the implementation's claims? | `ENG-STACK-001`; `ENG-RESEARCH-001`; `ENG-FW-001` |
+ | Test integrity | Would the suite still fail if the defect were reintroduced, or has a skip, fixture, mock, assertion, or CI gate concealed it? | `TEST-QUALITY-001`; `TEST-REGRESSION-001` |
++| Visual sampling span | Does a one-tile-per-cell or full-atlas-face contract hold on shipped UVs in those units, not on world-space metres? | `TEST-SAMPLE-001`; `TEST-DOMAIN-001` |
+ | Security, privacy, and permission | Can untrusted content, excess privilege, secrets, or a dependency cross the intended boundary? | `SEC-INPUT-001`; `SEC-PRIV-001`; `SEC-SECRET-001`; `SEC-SUPPLY-001` |
+ | Usability and accessibility | Can representative people complete the intended task with the input, display, language, and assistive modes they need? | `TEST-DOMAIN-001`; `DOC-SYNC-001`; project acceptance criteria |
+ | Reliability and operations | Does the system recover from faults, interruption, restart, and unavailable shared services without data loss or false success? | `OBS-FAIL-001`; `LIFE-TOOL-001`; `REL-UPGRADE-001` |
+diff --git a/evolution/LEDGER.md b/evolution/LEDGER.md
+index 28d910c7c173db8c61d7a71190f7111d79bc1940..f6bf47b911ecba123dc8af1d0edc1dc65b0d83f0 100644
+--- a/evolution/LEDGER.md
++++ b/evolution/LEDGER.md
+@@ -2,6 +2,27 @@
+ 
+ The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
+ 
++## 2026-11-09 — Sampling span in the contract's units
++
++**Observed gap:** after voxels became 0.5 m, terrain and mob shaders still
++built UVs from world-space metres. A block face spanned UV 0.5 (a quarter of
++the 32×32 tile). Mob AABBs had no local UV, so authored eye/face tiles swam
++as the creature moved. `TEST-DOMAIN-001` requires calling the shipped
++function; it does not require measuring a named sampling span in the
++contract's units.
++
++**Meaningful change:** add `TEST-SAMPLE-001` in `law/ENGINEERING.md`. Tests
++must measure the named span on shipped mesh vertices or shader inputs in
++those units. World-space metres do not prove a per-cell tile. A full-atlas
++face must cover UV 0–1 and must not slide with world position.
++
++**Falsification:** 0.5 m voxels, UV = world.xz, one-voxel face UV span 0.5,
++suite still green; or entity vertices store world corners, UVs change when
++the mob translates, suite still green. Source mutation tests remove the
++operational clauses (sampling span, shipped mesh, contract's units,
++world-space metres, full authored tile). A version bump and this ledger
++entry do not themselves qualify.
++
+ ## 2026-11-03 — Public reuse terms are CC BY-NC 4.0
+ 
+ **Observed gap:** accepted `main` shipped no LICENSE. Readers could not tell
+diff --git a/governance/RULE-REGISTRY.md b/governance/RULE-REGISTRY.md
+index 55bbd9fea468e4077a3ccd7b7b3c4aa2e323ba01..c12e680cbc935aead2dfdbe02e2ee0d41f75d7c4 100644
+--- a/governance/RULE-REGISTRY.md
++++ b/governance/RULE-REGISTRY.md
+@@ -10,7 +10,7 @@ home. A reference here is not a second rule definition. IDs are never reused.
+ | `CONST-AUTH-001`, `CONST-QUALITY-001`, `CONST-RESOURCEFUL-001`, `CONST-COMPLETE-001`, `CONST-CRAFT-001`, `CONST-DEP-001`, `CONST-DONE-001`, `CONST-GATE-001` | `AGENTS.md` |
+ | `GOV-SSOT-001`, `GOV-FREEZE-001`, `GOV-EVOLVE-001`, `GOV-RATCHET-001`, `GOV-CHANGE-001`, `GOV-MIRROR-001`, `GOV-ARCHIVE-001` | `governance/EVOLUTION.md` |
+ | `ENG-WARN-001`, `ENG-STACK-001`, `ENG-RESEARCH-001`, `ENG-CODE-001`, `ENG-FW-001`, `ENG-REPRO-001` | `law/ENGINEERING.md` |
+-| `TEST-BEHAVIOR-001`, `TEST-QUALITY-001`, `TEST-DOMAIN-001`, `TEST-REGRESSION-001` | `law/ENGINEERING.md` |
++| `TEST-BEHAVIOR-001`, `TEST-QUALITY-001`, `TEST-DOMAIN-001`, `TEST-SAMPLE-001`, `TEST-REGRESSION-001` | `law/ENGINEERING.md` |
+ | `DOC-SYNC-001`, `DOC-WHY-001`, `DOC-PRIORITY-001`, `DOC-ADR-001`, `DOC-START-001` | `law/ENGINEERING.md` |
+ | `DEP-PIN-001`, `DEP-MIN-001`, `DEP-AUDIT-001`, `DEP-REPRO-001` | `law/ENGINEERING.md` |
+ | `PERF-HOT-001`, `PERF-REASON-001`, `PERF-BUDGET-001` | `law/ENGINEERING.md` |
+diff --git a/law/ENGINEERING.md b/law/ENGINEERING.md
+index c413edb31aabe945703e24ec4bb5468d93c73536..9af71476a1215768f6f70af2a665a0feb479958e 100644
+--- a/law/ENGINEERING.md
++++ b/law/ENGINEERING.md
+@@ -126,6 +126,18 @@ required live flow. For a game or mod, verify that the actual renderer,
+ server tick, or GameTest world calls the shipped production function; a
+ synthetic fixture outside the interactive entry is not runtime acceptance.
+ 
++### TEST-SAMPLE-001 — Sampling span in the contract's units
++
++When a visual contract names a sampling span (one texture tile per voxel,
++one UV unit per cell, texels per metre), tests MUST measure that span on the
++shipped mesh vertices or shader inputs in the contract's units. Positions
++stored in a different unit, such as world-space metres after a grid scale
++change, MUST NOT be treated as proving a per-cell tile. A test that only
++checks that a texture layer exists, or that UV components are finite, FAILS
++this rule. A unit-square face that must sample a full authored tile MUST
++cover UV 0–1 on the shipped mesh path, and those UVs MUST NOT slide when
++the model moves in world space.
++
+ ### TEST-REGRESSION-001 — Preserve the safety net
+ 
+ Do not delete or weaken a valid test to make a build green. Flakiness is a
+diff --git a/tests/test_source_validation.py b/tests/test_source_validation.py
+index f3ebf1b00325162a16c41742ae01bb6e6aa47348..d34c50326337f3883d2919390a48a6a8ff29678a 100644
+--- a/tests/test_source_validation.py
++++ b/tests/test_source_validation.py
+@@ -83,6 +83,30 @@ class SourceValidationTests(unittest.TestCase):
+             VALIDATOR.cache_link_contract_errors(specialist.replace("cached caller", "other class")),
+         )
+ 
++    def test_sample_span_rule_rejects_world_metre_uvs(self):
++        engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
++        self.assertEqual(VALIDATOR.sample_span_contract_errors(engineering), [])
++        self.assertIn(
++            "TEST-SAMPLE-001 detailed rule missing",
++            VALIDATOR.sample_span_contract_errors(
++                engineering.replace("### TEST-SAMPLE-001", "### Retired rule")
++            ),
++        )
++        for term in (
++            "sampling span",
++            "shipped mesh",
++            "contract's units",
++            "world-space metres",
++            "full authored tile",
++        ):
++            with self.subTest(term=term):
++                mutated = re.sub(re.escape(term), "other wording", engineering, flags=re.IGNORECASE)
++                self.assertNotEqual(mutated, engineering)
++                self.assertIn(
++                    f"TEST-SAMPLE-001 missing sampling safeguard: {term}",
++                    VALIDATOR.sample_span_contract_errors(mutated),
++                )
++
+     def test_resource_rule_requires_host_level_acceptance(self):
+         engineering = (ROOT / "law" / "ENGINEERING.md").read_text(encoding="utf-8")
+         self.assertEqual(VALIDATOR.integrated_resource_contract_errors(engineering), [])
+diff --git a/tools/validate-source.py b/tools/validate-source.py
+index 74acfdc1d1de5c0ab0bf4e6e64825db1e8af3c90..f7697d0472ebd92ba482eba661b16cbd2a884472 100644
+--- a/tools/validate-source.py
++++ b/tools/validate-source.py
+@@ -146,6 +146,27 @@ def cache_link_contract_errors(specialist: str) -> list[str]:
+     return [f"LOW-CACHE-001 missing linkage safeguard: {term}" for term in required if term not in normalized]
+ 
+ 
++def sample_span_contract_errors(engineering: str) -> list[str]:
++    """Guard UV/tile sampling span in the contract's units, not world metres."""
++    section = re.search(
++        r"^### TEST-SAMPLE-001\b.*?\n(.*?)(?=^### |\Z)",
++        engineering,
++        re.MULTILINE | re.DOTALL,
++    )
++    if section is None:
++        return ["TEST-SAMPLE-001 detailed rule missing"]
++    normalized = " ".join(section.group(1).casefold().split())
++    required = (
++        "sampling span",
++        "shipped mesh",
++        "contract's units",
++        "world-space metres",
++        "full authored tile",
++    )
++    return [f"TEST-SAMPLE-001 missing sampling safeguard: {term}"
++            for term in required if term not in normalized]
++
++
+ def integrated_resource_contract_errors(engineering: str) -> list[str]:
+     """Guard system-level acceptance when a provider runs inside a larger host."""
+     section = re.search(
+@@ -265,6 +286,7 @@ def validate(root: Path = ROOT) -> list[str]:
+     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
+     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
+     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
++    errors.extend(sample_span_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
+     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
+         errors.append("ledger must say ledger-only edits never count")
+ 

@@ -17,12 +17,19 @@ accepted main commit
 ```
 
 The source freezes at invocation start. An agent proposes one coherent,
-meaningful change on an isolated branch; validation and review precede
+meaningful change in the single authorized review slot; validation and review precede
 acceptance. The new rule is eligible only on a later invocation. This avoids
 self-amendment and concurrent writes to `main`. Version, ledger, and
 changelog support traceability but never count as the substantive change.
 The frozen revision is read byte-exact (`tools/check-frozen-load.py`), and a
 running loader that differs from it is disclosed, not obeyed.
+
+Branch history is not a branch backlog. `main` and the optional serial
+`codex/constitution-review` slot are the only allowed remote names. Completed
+branches are retired; unique pending work retains exact patches or verified
+private recovery. `evolution/pending` is explicitly unaccepted evidence and
+is excluded from generated law mirrors. The per-call evolution requirement
+can produce a complete queued patch while the shared review slot is occupied.
 
 The repository cannot force every AI platform to auto-load a skill. Local
 agents must install or sync the mirror through their supported mechanism;

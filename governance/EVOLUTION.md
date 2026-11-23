@@ -65,6 +65,21 @@ only from evidence, and use risk-proportional wording.
 
 ## GOV-CHANGE-001 — Review and acceptance
 
+The canonical repository has one review slot: `main` plus, while needed,
+`codex/constitution-review`. Inventory that slot before starting. Serialize
+edits on the review branch with one integrator; never overwrite another
+writer's work. If it is occupied, prepare a complete proposal patch with its
+base SHA and evidence instead of creating another branch. The per-call
+evolution obligation does not authorize branch proliferation. An artifact
+queued for review remains **staged, not propagated** as law.
+
+The repository's branch-creation ruleset permits only these two names, and
+automatic head-branch deletion is enabled. Audit the live controls with
+`python tools/check-branch-policy.py`; main's PR/CI protections remain separate.
+After acceptance, retire the review branch under `VCS-CLEAN-001`. A future
+change may recreate that same slot from then-current accepted `main`.
+Changing the budget or allowed names requires director authorization.
+
 1. Branch from the latest accepted `main` and check its current SHA.
 2. Write one coherent change and update the version, changelog, ledger,
    registry, and migration notes only where needed.

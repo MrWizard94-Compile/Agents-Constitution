@@ -2,6 +2,35 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-23 — Bound branch creation and close its lifecycle
+
+**Observed gap:** the canonical repository had 51 remote branches, automatic
+deletion disabled, six open proposals, and additional unpublished local work.
+Mandatory per-call isolated evolution had no review-slot budget or retirement
+contract, so completed and pending branches accumulated without limit.
+
+**Meaningful change:** strengthen the existing `VCS-CLEAN-001` home with
+director-set branch budgets, inventory before creation, review-slot reuse,
+verified recoverability for unique work, fresh-tip deletion checks and live
+post-cleanup confirmation. `GOV-CHANGE-001` names this repository's single
+review slot and queues complete patches when occupied. Its implementation
+uses automatic deletion and a creation-only ruleset for all other names,
+without changing main's PR/CI protections. A read-only checker detects drift.
+
+**Preservation:** nine already-public proposals retain exact parent-to-tip
+patches and hashes in `evolution/pending`; none is activated as law. Original
+remote/local refs and dirty work retain private standalone Git-bundle and
+file recovery. Closed historical proposals are not silently reopened.
+
+**Falsification:** the live audit must fail with a third branch, disabled
+automatic deletion, a wildcard exception, a bypass actor, or a creation rule
+that is absent on a prohibited name or applies to the review slot. It must
+distinguish unavailable/redacted evidence from a pass. Recovery is tested by
+restoring all original refs into a fresh bare repository and checking objects;
+pending patch hashes are independently compared with the original Git diffs.
+Fixtures test audit logic, not live enforcement. Source CI cannot prove that
+GitHub settings changed or that another client will honor local discipline.
+
 ## 2026-11-09 — Named specification controls are independent acceptance units
 
 **Observed gap:** `CONST-COMPLETE-001` existed only as a protected-table slogan

@@ -1,0 +1,276 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 29ef56698d46e9b7a4469f4ca6a91402bbf7fc63..987f8fe16f2fa5a504a5d3e36bed2e825c8fb4fc 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,6 +1,6 @@
+ # WPAI Constitution
+ 
+-**Version:** 6.18.0
++**Version:** 6.19.0
+ 
+ **Status:** Binding
+ 
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 06f8f144a75aaacb65d530a8a8d9b1965c20d0dc..e895b3bc4c22cd1d7f5fe84875f08afd03e8258d 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,17 @@
+ # Changelog
+ 
++## 6.19.0 — 2026-11-03 (candidate)
++
++- Added `VCS-INTEG-001`. A hosting provider's mergeable, clean, or blocked
++  flag does not prove a branch contains the base tip: fetch the tip and
++  record ahead/behind, then bring a preserved history current with a merge
++  commit and rerun the required checks. Pairwise cleanliness does not prove
++  a set of pull requests integrates; combine them locally without publishing
++  that ref, and report conflicts that appear only in combination. Merging,
++  approving, tagging, releasing, or changing repository settings still
++  requires separate authorization. `AI-COORD-002` and SOP stage 9 point at
++  the single home in `law/OPERATIONS.md`. No protected rule changes.
++
+ ## 6.18.0 — 2026-10-29 (candidate)
+ 
+ - Added protected, always-loaded `CONST-RESOURCEFUL-001` at the Director's
+diff --git a/SKILL.md b/SKILL.md
+index 3c255673417514c7f670aaedcbe6bf39190aa738..4139a5ea7d1604c33e0cfa9faa60fed03c01660f 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -7,7 +7,7 @@ description: >
+   Each top-level call must produce one meaningful Constitution improvement.
+ metadata:
+   short-description: "Apply and evolve WPAI Constitution"
+-  skill-version: "6.18.0"
++  skill-version: "6.19.0"
+   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+ ---
+ 
+diff --git a/SOP.md b/SOP.md
+index 8c8653f9cf28e320e9321c604fad231cffa42fc5..92877d50f1fcbd84a9794d4df6db2667b83b7ac1 100644
+--- a/SOP.md
++++ b/SOP.md
+@@ -1,6 +1,6 @@
+ # WPAI delivery SOP
+ 
+-**Version:** 3.3.0
++**Version:** 3.3.1
+ 
+ **Authority:** `AGENTS.md`
+ **Applies to:** Human-directed work under the WPAI Constitution
+@@ -106,6 +106,8 @@ an obvious in-scope correction for an artificial later pass.
+ Commit, push, open a PR, merge, release, deploy, or distribute only when the
+ director authorized that action and destination. Verify remote state after each
+ external action. Protect shared history; never force-push to cover drift.
++Updating a pull request onto a moved base, and checking several pull requests
++together, follows `VCS-INTEG-001`.
+ Release tags and published versions are immutable.
+ 
+ ## 10. Learn and evolve
+diff --git a/SOURCE.json b/SOURCE.json
+index 471c3692919950d70d9fd5c8ab5f396a182cbbf9..434274da72423d9942e7b7dd0b306350ef96753b 100644
+--- a/SOURCE.json
++++ b/SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": 2,
+   "name": "wpai-constitution",
+-  "skill_version": "6.18.0",
++  "skill_version": "6.19.0",
+   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
+   "default_branch": "main",
+diff --git a/VERSION b/VERSION
+index 1b386a547006ca3396d0cbf8426f5e7f0de36655..74c926af475d891b36e2cda1370eb760db907815 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-6.18.0
++6.19.0
+diff --git a/evolution/LEDGER.md b/evolution/LEDGER.md
+index 615c29f587db8962c53d22503129c023ffe465b0..cc36030b6c4e290e6e821eb50d2d8a2d88aaae9a 100644
+--- a/evolution/LEDGER.md
++++ b/evolution/LEDGER.md
+@@ -2,6 +2,41 @@
+ 
+ The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
+ 
++## 2026-11-03 — A clean merge flag is not a current base or a combined suite
++
++**Observed gap:** while updating several Strata pull requests after #8
++landed on `development`, the host reported #5 and #11 mergeable and clean
++even though both heads were still behind the new base tip. `VCS-HISTORY-001`
++already forbids rewriting shared history, and `AI-COORD-002` says an
++integrator checks combined behavior, but neither required a fetched
++ahead/behind count, a merge commit onto the actual tip, or an unpublished
++local integration of the set. An agent could skip the update, or recommend
++a merge order from pairwise status, and miss conflicts that appear only
++when the branches are combined.
++
++**Meaningful change:** add `VCS-INTEG-001` in `law/OPERATIONS.md`. Call a
++pull request current only after fetching the base tip and recording
++ahead/behind. Preserve history with a merge commit, keep both intended
++behaviors unless the director chose one, and rerun the project's required
++checks on that result. Before recommending a merge order, integrate the
++set locally without publishing that ref and report combination-only
++conflicts and failures. Do not merge, approve, tag, release, or change
++settings as part of the check unless that action was separately authorized.
++Collaboration and SOP point at this rule; they do not restate it.
++
++**Falsification:** a pull request whose provider flag is clean while the
++base tip is not an ancestor of the head. The rule fails if that flag is
++treated as current or the history is rebased to catch up. A second case is
++two heads that each merge cleanly onto the base and then conflict or fail
++tests together. The rule fails if a merge recommendation uses only the
++pairwise results. Source tests reject a missing heading and the loss of
++each operational clause. Those presence checks do not prove a future agent
++will fetch or run the combined suite.
++
++**Acceptance:** routine law/tool addition; no protected rule changes.
++Submit through a validated PR. It does not govern the invocation that
++authored it.
++
+ ## 2026-10-29 — Technical roadblocks demand engineered workarounds
+ 
+ **Director request:** give highest priority to “Technical roadblocks are not
+diff --git a/governance/RULE-REGISTRY.md b/governance/RULE-REGISTRY.md
+index 6bbf5c128bbe2d75f4a89977ecff45e70dc3ef87..fd599c989c6716e32c491b90ea3cea7b254b4c97 100644
+--- a/governance/RULE-REGISTRY.md
++++ b/governance/RULE-REGISTRY.md
+@@ -16,7 +16,7 @@ home. A reference here is not a second rule definition. IDs are never reused.
+ | `PERF-HOT-001`, `PERF-REASON-001`, `PERF-BUDGET-001` | `law/ENGINEERING.md` |
+ | `SEC-INPUT-001`, `SEC-PRIV-001`, `SEC-SURFACE-001`, `SEC-SECRET-001`, `SEC-LIB-001`, `SEC-SUPPLY-001`, `SEC-AUTHZ-001` | `law/SECURITY.md` |
+ | `OBS-LOG-001`, `OBS-FAIL-001`, `OBS-PRIV-001`, `OBS-NOVEL-001` | `law/SECURITY.md` |
+-| `VCS-ATOMIC-001`, `VCS-MSG-001`, `VCS-CLEAN-001`, `VCS-HISTORY-001` | `law/OPERATIONS.md` |
++| `VCS-ATOMIC-001`, `VCS-MSG-001`, `VCS-CLEAN-001`, `VCS-HISTORY-001`, `VCS-INTEG-001` | `law/OPERATIONS.md` |
+ | `REF-PLAN-001`, `REF-GREEN-001`, `REF-SAFE-001` | `law/OPERATIONS.md` |
+ | `MIG-INV-001`, `MIG-FEEL-001`, `MIG-NOTES-001`, `MIG-VERIFY-001`, `MIG-CLEAN-001` | `law/OPERATIONS.md` |
+ | `OPS-DEL-001`, `OPS-DEL-002` | `law/OPERATIONS.md` |
+diff --git a/law/COLLABORATION.md b/law/COLLABORATION.md
+index fdffec16a9fe552f866d563bcf74fef192200e40..e051c0319d3476f1b9ead29b7c783d5767259605 100644
+--- a/law/COLLABORATION.md
++++ b/law/COLLABORATION.md
+@@ -40,7 +40,8 @@ delegate merely because a task is large.
+ Agents may research or implement independent components in parallel.
+ Coordinate shared interfaces and avoid simultaneous edits to root law or
+ other high-conflict files. Merge only after the integrator checks combined
+-behavior, tests, docs, and scope.
++behavior, tests, docs, and scope. A provider mergeability flag does not
++replace the base-tip and combined-integration check in `VCS-INTEG-001`.
+ 
+ ### AI-COORD-003 — One package
+ 
+diff --git a/law/OPERATIONS.md b/law/OPERATIONS.md
+index 9a52ac6b603e2ac8ec35c6834ff064463dc032c8..fbaabe4376766f66396b9a544a910a81404de548 100644
+--- a/law/OPERATIONS.md
++++ b/law/OPERATIONS.md
+@@ -29,6 +29,27 @@ No reset, rebase, force-push, squash, or replacement of shared or unrelated
+ history without explicit direction. Preserve dirty worktrees and unpublished
+ commits. Use isolated branches and recoverable checkpoints for large changes.
+ 
++### VCS-INTEG-001 — Current base and combined integration
++
++A hosting provider's mergeable, clean, or blocked flag is not evidence that a
++branch contains the base tip. Before calling a pull request current, fetch
++that base tip and the head and record the ahead/behind counts. A status
++cached before the base moved does not count. A green check of the pre-merge
++head does not cover the merge.
++
++When shared history must be preserved, bring the base in with a merge commit.
++Do not rebase, squash, or force-push to make the branch look current
++(`VCS-HISTORY-001`). Resolve conflicts so each side's intended behavior
++remains, unless the director explicitly chose one side. Then run the
++project's required checks on the merged result.
++
++Pairwise cleanliness does not prove a set of pull requests integrates.
++Before recommending a merge order, or merging the set, integrate those heads
++locally on the fetched base without publishing that integration ref, and run
++the project's required checks. Report conflicts and test failures that appear
++only in combination. Do not merge, approve, tag, release, or change
++repository settings during that check unless the action was separately authorized.
++
+ ## Refactor and migration
+ 
+ ### REF-PLAN-001 — Plan broad refactors
+diff --git a/tests/test_source_validation.py b/tests/test_source_validation.py
+index 36fdcf6b8676c7e802226655886342f019a71dbe..31d4e591c50d8ef1b99a3ebc1e952c63d4225771 100644
+--- a/tests/test_source_validation.py
++++ b/tests/test_source_validation.py
+@@ -48,6 +48,36 @@ class SourceValidationTests(unittest.TestCase):
+             ["GOV-FREEZE-001 section missing"],
+         )
+ 
++    def test_integration_rule_rejects_a_clean_flag_without_the_base_tip(self):
++        operations = (ROOT / "law" / "OPERATIONS.md").read_text(encoding="utf-8")
++        self.assertEqual(VALIDATOR.integration_contract_errors(operations), [])
++        self.assertEqual(
++            VALIDATOR.integration_contract_errors(
++                operations.replace("### VCS-INTEG-001", "### Retired rule")
++            ),
++            ["VCS-INTEG-001 detailed rule missing"],
++        )
++        for term in (
++            "hosting provider",
++            "ahead/behind",
++            "merge commit",
++            "do not rebase",
++            "without publishing",
++            "only in combination",
++            "separately authorized",
++        ):
++            with self.subTest(term=term):
++                mutated = re.sub(re.escape(term), "other wording", operations, count=1, flags=re.IGNORECASE)
++                self.assertNotEqual(mutated, operations, "mutation must change the text")
++                self.assertIn(
++                    f"VCS-INTEG-001 missing integration safeguard: {term}",
++                    VALIDATOR.integration_contract_errors(mutated),
++                )
++        self.assertEqual(
++            VALIDATOR.integration_contract_errors(operations.replace("hosting provider", "hosting\nprovider")),
++            [],
++        )
++
+     def test_assumption_rule_rejects_lost_unread_input_safeguards(self):
+         collaboration = (ROOT / "law" / "COLLABORATION.md").read_text(encoding="utf-8")
+         self.assertEqual(VALIDATOR.unread_input_contract_errors(collaboration), [])
+diff --git a/tools/validate-source.py b/tools/validate-source.py
+index 5f32697b2284344cfcb06449da495dfed8fb30ee..91376273ce733114aae9ed4e4e09741004f248b3 100644
+--- a/tools/validate-source.py
++++ b/tools/validate-source.py
+@@ -116,6 +116,29 @@ def integrated_resource_contract_errors(engineering: str) -> list[str]:
+             for term in required if term not in normalized]
+ 
+ 
++def integration_contract_errors(operations: str) -> list[str]:
++    """Guard base-tip and combined-integration duties, not just the heading."""
++    section = re.search(
++        r"^### VCS-INTEG-001\b.*?\n(.*?)(?=^#{2,3} |\Z)",
++        operations,
++        re.MULTILINE | re.DOTALL,
++    )
++    if section is None:
++        return ["VCS-INTEG-001 detailed rule missing"]
++    normalized = " ".join(section.group(1).casefold().split())
++    required = (
++        "hosting provider",
++        "ahead/behind",
++        "merge commit",
++        "do not rebase",
++        "without publishing",
++        "only in combination",
++        "separately authorized",
++    )
++    return [f"VCS-INTEG-001 missing integration safeguard: {term}"
++            for term in required if term not in normalized]
++
++
+ def unread_input_contract_errors(collaboration: str) -> list[str]:
+     """Guard the unread-input clause, not just the CTX-ASSUME-001 heading."""
+     section = re.search(
+@@ -214,6 +237,7 @@ def validate(root: Path = ROOT) -> list[str]:
+     errors.extend(resourcefulness_contract_errors(agents, skill, sop))
+     errors.extend(freeze_contract_errors(evolution, skill))
+     errors.extend(unread_input_contract_errors((root / "law/COLLABORATION.md").read_text(encoding="utf-8-sig")))
++    errors.extend(integration_contract_errors((root / "law/OPERATIONS.md").read_text(encoding="utf-8-sig")))
+     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
+     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
+     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():

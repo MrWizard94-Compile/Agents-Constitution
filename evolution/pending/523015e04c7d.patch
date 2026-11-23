@@ -1,0 +1,126 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 8aa3e60f20c00ceae6c8199612d0667ad864635c..7c4c977a4564dcf5b61b2a7824279c9f8c354997 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,14 @@
+ # Changelog
+ 
++## 5.2.6 — 2026-10-06
++
++- Scope warning-as-error and lint configuration to project-owned compile tasks
++  when a build graph also compiles generated platform or third-party source.
++- Require task-graph inspection, visible inherited-warning triage, and a subsequent
++  warning-free owned-source verification build.
++- Prevent global task matchers from breaking vendor compilation or pressuring an
++  agent to weaken the actual project warning gate.
++
+ ## 5.2.5 — 2026-09-22
+ 
+ - Validate explicit `PACK_ROOT` candidates and root environment variables before discovery can fall back to another local pack.
+diff --git a/SKILL.md b/SKILL.md
+index baa399090edd41369412e2cad0549707e29c01f7..53cb3856ffbd201ddf077867580f54448d90f608 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -12,7 +12,7 @@ description: >
+   that must satisfy CONST-GATE-001 and CONST-DONE-001.
+ metadata:
+   short-description: "Enforce AGENTS Constitution pack"
+-  skill-version: "5.2.5"
++  skill-version: "5.2.6"
+   pack-version-pin: "5.1.0"
+   canonical-source: "MrWizard94-Compile/Agents-Constitution"
+   canonical-url: "https://github.com/MrWizard94-Compile/Agents-Constitution"
+@@ -210,6 +210,25 @@ or other runtime assembled from third-party components:
+    runtime acceptance. Credit the repair only after a clean relaunch and the
+    relevant behavior flow pass.
+ 
++#### Warning-gate task ownership
++
++When a build graph compiles generated platform code or third-party source as an
++internal prerequisite in addition to project-owned source:
++
++1. Apply warning-as-error and lint flags to the **project-owned compile tasks**.
++   Do not attach them globally to every task of the same tool type unless all of
++   those tasks compile delivery-owned source.
++2. Inspect the actual task graph after configuring the gate. A broad task matcher
++   must not change vendor compilation semantics, make generated dependencies fail,
++   or tempt the agent to weaken the project warning policy.
++3. Keep inherited toolchain warnings visible and triage an authoritative upgrade,
++   targeted upstream repair, or version pin. Record any warning outside delivery
++   ownership as an inherited finding; never suppress or misreport it as clean.
++4. Require a subsequent project verification build in which project-owned compile,
++   lint, analysis, and test tasks are warning-free. Do not claim that a cached or
++   skipped owned-source task proves the warning gate unless the same source and
++   compiler inputs were already verified.
++
+ ### Mode: `gate`
+ 
+ 1. Resolve `PACK_ROOT`; re-read Section 0 in pack `AGENTS.md` (canonical 15-point checklist).
+diff --git a/SOURCE.json b/SOURCE.json
+index 61c3873122a940f4e43c120c33e786af5621efcc..af327b7b9027dd7f882cb95e8d52637ef6d7f86c 100644
+--- a/SOURCE.json
++++ b/SOURCE.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": 1,
+   "name": "agents-constitution",
+-  "skill_version": "5.2.5",
++  "skill_version": "5.2.6",
+   "pack_version_pin": "5.1.0",
+   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
+   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
+diff --git a/VERSION b/VERSION
+index 462faf7485483d23e52b400c4e6492d7cf971fd5..a944d7e6175584a0a9405aa9212347a5da220d53 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-5.2.5
++5.2.6
+diff --git a/evolution/LEDGER.md b/evolution/LEDGER.md
+index 6940ad2ae6d48f6be7c80186027047f232430bd2..864493f7f4583a88cdd59a9e3443f3b46e65f0ea 100644
+--- a/evolution/LEDGER.md
++++ b/evolution/LEDGER.md
+@@ -2,6 +2,31 @@
+ 
+ The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
+ 
++## 2026-10-06 — Scope warning gates to delivery-owned compilation
++
++**Observed issue:** a NeoGradle build used a global `JavaCompile` matcher for
++`-Xlint:all -Werror`. That matcher also changed NeoForge's internal task for
++recompiling generated Minecraft and platform source, so pre-existing vendor
++warnings failed the build before project code was evaluated.
++
++**Meaningful improvement:** enforce mode now requires warning-as-error and lint
++flags to target project-owned compile tasks when a build graph also compiles
++generated or third-party source. Agents must inspect the resolved task graph,
++keep inherited warnings visible and triaged, and obtain a warning-free verification
++of the owned source without weakening its gate.
++
++**Future failure reduced:** agents are less likely to break toolchain bootstrap,
++misclassify upstream-generated warnings as product warnings, hide inherited
++findings, or disable strict compilation for their own code to make a vendor task
++pass.
++
++**Changed paths:** `SKILL.md`, `VERSION`, `SOURCE.json`, `CHANGELOG.md`,
++`tools/validate-source.py`, `evolution/LEDGER.md`.
++
++**Validation target:** `python tools/validate-source.py`,
++`python tools/evolution-guard.py --base 969ae2caa33c1e4c9de325282fe6029e35a1caea`,
++and the binding pack full self-run must pass before propagation.
++
+ ## 2026-09-22 — Explicit PACK_ROOT validation cannot silently fall through
+ 
+ **Meaningful improvement:** `resolve-pack.ps1` now validates a human-specified
+diff --git a/tools/validate-source.py b/tools/validate-source.py
+index 105ce02c2f9144c6fafcb73f0818c744452d3ac8..327d1c7d81e672d919c82800a0ea8f8c1edf2e40 100644
+--- a/tools/validate-source.py
++++ b/tools/validate-source.py
+@@ -27,6 +27,7 @@ CRITICAL_PHRASES = [
+     "exactly one evolution obligation per top-level invocation",
+     "highest quality reasonably achievable",
+     "runtime fixture dependency closure",
++    "project-owned compile tasks",
+ ]
+ 
+ 

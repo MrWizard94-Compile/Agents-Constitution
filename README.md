@@ -65,6 +65,40 @@ and requires zero approvals with no bypass actors. Exit 1 means policy drift.
 Exit 2 means GitHub could not be verified; neither source CI nor an offline
 fixture proves the live setting.
 
+## Branch lifecycle and pending proposals
+
+Keep `main` and at most one review branch, `codex/constitution-review`.
+Use that slot serially and delete it after merge; another agent's task does
+not justify another remote branch. Before creating it, read
+[`GOV-CHANGE-001`](governance/EVOLUTION.md) and inspect existing work.
+An active branch-creation ruleset allows only these names, and automatic
+head deletion is enabled. Verify the live repository separately from source CI:
+
+```powershell
+python tools/check-branch-policy.py
+python tools/check-repository-ruleset.py
+```
+
+The first command exits 0 only for the branch budget, automatic deletion,
+and effective creation restriction; 1 reports drift and 2 means unverified.
+The second audits main's existing PR/CI/history controls. These commands
+read GitHub and never modify settings or delete branches.
+
+The [pending proposal queue](evolution/pending/README.md) retains exact patches
+from retired public proposal branches. They are **unaccepted**, are outside
+the binding manifest, and must not be loaded or applied automatically.
+Archiving a proposal does not accept its law. Review and reconcile each one
+against current accepted `main` before a future PR. Superseded PRs retain
+their original discussion and diff on GitHub.
+
+Branch retirement must preserve unique work before deleting a reference.
+Keep private recovery bundles and manifests outside committed source; verify
+a bundle by restoring into a disposable bare repository and checking every
+original ref and object. To recover one tip without recreating the entire
+branch backlog, inspect `git bundle list-heads <bundle>`, fetch only the
+named ref into a disposable recovery repository, and check out its recorded
+SHA detached. Preserve dirty worktrees and unpublished proposals privately.
+
 ## Verify the frozen revision
 
 A top-level skill call reads binding law from one frozen commit. Confirm that
