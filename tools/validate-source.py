@@ -23,6 +23,8 @@ PROTECTED = {
 MINIMUM_MIRROR = {
     "SKILL.md", "AGENTS.md", "SOP.md", "VERSION", "SOURCE.json",
     "references/always-load.md", "docs/QUALITY-ASSURANCE-MAP.md",
+    "references/workflow-record.md", "templates/WORKFLOW-RECORD.json",
+    "tools/check-workflow-record.py",
     "governance/EVOLUTION.md",
     "governance/RULE-REGISTRY.md", "law/ENGINEERING.md", "law/SECURITY.md",
     "law/OPERATIONS.md", "law/COLLABORATION.md", "law/SPECIALIST.md",
@@ -295,6 +297,49 @@ def reviewed_evidence_contract_errors(root: Path) -> list[str]:
     return errors
 
 
+def workflow_contract_errors(root: Path) -> list[str]:
+    """Guard workflow structure and routes; cannot prove task execution."""
+    errors: list[str] = []
+    sop = (root / "SOP.md").read_text(encoding="utf-8-sig")
+    contract = re.search(r"^## SOP-EXEC-001\b[^\n]*\n(.*?)(?=^## |\Z)", sop, re.M | re.S)
+    if contract is None:
+        errors.append("SOP-EXEC-001 execution contract missing")
+    else:
+        body = " ".join(contract.group(1).casefold().split())
+        for term in ("every invocation", "must use this sop", "all ten stages",
+                     "reading or mentioning the sop is not execution", "run record",
+                     "reopen every affected", "existing invocation and freeze",
+                     "account for stages 9 and 10", "stop, pause or cancellation"):
+            if term not in body:
+                errors.append(f"SOP-EXEC-001 missing safeguard: {term}")
+    stages = list(re.finditer(r"^## (\d+)\. [^\n]+\n(.*?)(?=^## |\Z)", sop, re.M | re.S))
+    if [int(match.group(1)) for match in stages] != list(range(1, 11)):
+        errors.append("SOP must define ten ordered stages exactly once")
+    safeguards = {
+        1: ("acceptance criteria", "required evidence class"),
+        2: ("before editing", "recovery paths"),
+        3: ("primary standards", "trust boundaries"),
+        4: ("full requested outcome", "rollback"),
+        5: ("preserve behavior", "const-resourceful-001"),
+        6: ("independent oracle", "tests, fixtures, mocks, skips, and ci gates"),
+        7: ("exact commands", "withdraw unsupported claims"),
+        8: ("15-point section 0", "sop run record"),
+        9: ("director authorized", "verify remote state", "before retry", "observation window"),
+        10: ("staged, not propagated", "final candidate", "re-score section 0"),
+    }
+    for match in stages:
+        number = int(match.group(1))
+        body = " ".join(match.group(2).casefold().split())
+        for term in safeguards.get(number, ()):
+            if term not in body:
+                errors.append(f"SOP stage {number} missing safeguard: {term}")
+    for relative in ("SKILL.md", "AGENTS.md", "references/always-load.md"):
+        body = (root / relative).read_text(encoding="utf-8-sig")
+        if "SOP-EXEC-001" not in body:
+            errors.append(f"{relative} must route to SOP-EXEC-001")
+    return errors
+
+
 def validate(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     required = MINIMUM_MIRROR | {"README.md", "CHANGELOG.md", "evolution/LEDGER.md", "docs/ARCHITECTURE.md", "docs/SOURCE-INVENTORY.md"}
@@ -364,10 +409,11 @@ def validate(root: Path = ROOT) -> list[str]:
     errors.extend(cache_link_contract_errors((root / "law/SPECIALIST.md").read_text(encoding="utf-8-sig")))
     errors.extend(integrated_resource_contract_errors((root / "law/ENGINEERING.md").read_text(encoding="utf-8-sig")))
     errors.extend(reviewed_evidence_contract_errors(root))
+    errors.extend(workflow_contract_errors(root))
     if "never counts" not in (root / "evolution/LEDGER.md").read_text(encoding="utf-8-sig").casefold():
         errors.append("ledger must say ledger-only edits never count")
 
-    home_files = [root / "AGENTS.md", root / "governance/EVOLUTION.md"] + sorted((root / "law").glob("*.md"))
+    home_files = [root / "AGENTS.md", root / "SOP.md", root / "governance/EVOLUTION.md"] + sorted((root / "law").glob("*.md"))
     defined: dict[str, str] = {}
     for path in home_files:
         body = path.read_text(encoding="utf-8-sig")
@@ -391,6 +437,7 @@ def validate(root: Path = ROOT) -> list[str]:
         "IP": "law/SPECIALIST.md", "NET": "law/SPECIALIST.md",
         "LOW": "law/SPECIALIST.md", "HW": "law/SPECIALIST.md",
         "COST": "law/SPECIALIST.md", "GOV": "governance/EVOLUTION.md",
+        "SOP": "SOP.md",
     }
     for rule, home in defined.items():
         expected_home = "AGENTS.md" if rule.startswith("CONST-") else family_homes.get(rule.split("-", 1)[0])

@@ -12,3 +12,6 @@ from the same verified source commit. Local mirrors are generated and may be
 used only when provenance matches. This pointer adds project facts and tighter
 requirements; it is not a copy of constitutional law. If the pinned commit is
 unavailable or its validation fails, report the condition before delivery.
+Execute the SOP for every invocation and retain its scaled stage/evidence
+record. Project-specific procedures specialize the workflow; they do not
+silently replace it or exempt a task from its completion gates.

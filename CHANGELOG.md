@@ -1,5 +1,18 @@
 # Changelog
 
+## 6.24.0 — 2026-11-23 (proposal)
+
+- Make the existing SOP explicitly mandatory in every invocation and mode,
+  with all ten stages accounted, observable exits, acceptance-to-evidence
+  mapping and re-entry after scope/candidate/environment changes. Review
+  precedes publication; final closeout follows authorized delivery and evolution.
+- Add a compact task-record format and offline checker for omitted stages,
+  unresolved criteria, stale candidate evidence and evidence-class substitution.
+  Source checks now guard workflow structure and entrypoint routing.
+- Keep small tasks proportionate, director stop/authority controlling and
+  invocation freeze unchanged. No host adapter is installed, no new law is
+  applied retroactively, and record validity never proves real execution.
+
 ## 6.23.0 — 2026-11-23 (candidate)
 
 - Resolved the remaining proposal backlog against current law: nine public

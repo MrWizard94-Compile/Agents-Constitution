@@ -14,6 +14,7 @@ claim. The Section 0 gate still decides whether a completion claim is allowed.
 
 | Dimension | A useful falsification question | Constitutional home |
 |---|---|---|
+| Workflow execution | Can a task omit a stage, use stale evidence after a change, substitute approval for a live result, or end before its requested delivery is verified? Distinguish source guards, record checks and observed client behavior. | `SOP-EXEC-001`; `CONST-GATE-001` |
 | Purpose-fit and craft | If presentation and volume are stripped away, does each material part still serve the brief and real intended use, without invented detail or generic filler? Has the delivered form been examined? | `CONST-CRAFT-001`; `CONST-COMPLETE-001` |
 | Quality before speed | Was an applicable verification check skipped, shortened, or replaced to finish faster, look responsive, or reduce token use? | `CONST-QUALITY-001`; `COST-TOKEN-001`; `CONST-DONE-001` |
 | Functional fit and completeness | Does the real user flow satisfy each agreed outcome, including failure and recovery? When a specification enumerates named controls, is each named item present or recorded as an unmet acceptance item? | `CONST-COMPLETE-001`; `TEST-BEHAVIOR-001`; `MIG-VERIFY-001` |

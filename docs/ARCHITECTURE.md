@@ -37,6 +37,19 @@ agents must install or sync the mirror through their supported mechanism;
 other agents may read the repository directly. A GitHub commit, local mirror,
 project adoption, and successful runtime use are separate acceptance gates.
 
+`SOP-EXEC-001` owns a mandatory workflow for every mode. Its ten stages share
+one run record that survives continuation, tracks acceptance and reopens
+affected gates after change. The loader and project pointer route into that
+single process; domain laws supply checks, not competing workflows.
+
+Enforcement has distinct layers: source guards protect the published contract;
+the task-record checker rejects missing or internally inconsistent evidence;
+observed agent trials test actual choices; host permission controls constrain
+actions. None substitutes for the others. A record checker never grants
+permission or authenticates its evidence. A host adapter must be tested through
+its installed entry and actual action boundary before claiming enforcement.
+This source does not install such an adapter or claim universal client control.
+
 Historical SOUL and AGENTS copies are cataloged in `docs/SOURCE-INVENTORY.md`.
 Their unique requirements are mapped into active law, or marked as
 project-specific/archival. The archive is evidence, not a second source.

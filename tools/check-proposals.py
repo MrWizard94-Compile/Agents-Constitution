@@ -61,7 +61,7 @@ def check(root: Path = ROOT, require_resolved: bool = False) -> tuple[list[str],
         if not isinstance(entries, list) or len(entries) > 1000:
             raise ValueError("bounded entry list required")
         homes = set()
-        for relative in ("AGENTS.md", "governance/EVOLUTION.md", "law/ENGINEERING.md",
+        for relative in ("AGENTS.md", "SOP.md", "governance/EVOLUTION.md", "law/ENGINEERING.md",
                          "law/OPERATIONS.md", "law/SECURITY.md", "law/COLLABORATION.md", "law/SPECIALIST.md"):
             text = regular_file(root, relative, 200_000).decode("utf-8-sig")
             homes.update(re.findall(r"^#{2,3} ([A-Z][A-Z0-9-]*-\d{3})\b", text, re.MULTILINE))

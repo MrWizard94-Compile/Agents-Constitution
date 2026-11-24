@@ -2,6 +2,34 @@
 
 The ledger is evidence of evolution. A ledger entry, version bump, changelog edit, or formatting-only diff never counts as the meaningful improvement by itself.
 
+## 2026-11-23 — Always execute an accountable start-to-finish SOP
+
+**Observed gap:** the loader required reading the SOP but said to execute the
+"applicable SOP". Modes had no explicit common execution record; delivery
+appeared before publication/evolution. A disposable mutation of accepted
+v6.23.0 removed every SOP stage and retained only seven referenced Rule IDs:
+the existing full source validator returned no errors.
+
+**Meaningful change:** `SOP-EXEC-001` supplies a single mandatory workflow in
+every mode, ten observable stage exits, scaled records, criterion/evidence
+mapping, revalidation after change, continuation and final closeout. Existing
+law remains in its canonical homes. An offline task checker rejects incomplete
+or inconsistent completion records, and source guards preserve the workflow.
+
+**Falsification:** remove a stage or entry route, borrow a safeguard from the
+wrong stage, omit a required live evidence class, reuse an old candidate's
+observation, hide a requested publication as N/A, confuse approval with observed
+destination state, or leave an applicable gate open. These must not validate
+as complete. Honest partial/stopped records must remain representable. Test
+review-only completion with staged evolution and publication outside scope.
+Independently forward-test realistic agent decisions; structural tests alone
+cannot establish obedience. The record tool does not authenticate assertions.
+
+**Boundary:** proposed under director supervision; accepted v6.23.0 still
+governs this audit. One coherent workflow improvement, with no recursive duty,
+no publication grant and no protected-rule waiver. Adoption and installed-host
+enforcement require their own observed evidence; they are not inferred from CI.
+
 ## 2026-11-23 — Reconcile the proposal backlog into verifiable evidence contracts
 
 **Observed gap:** branch retirement preserved nine public proposals but did

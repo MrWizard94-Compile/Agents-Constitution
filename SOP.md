@@ -1,15 +1,74 @@
 # WPAI delivery SOP
 
-**Version:** 3.4.0
+**Version:** 3.5.0
 
 **Authority:** `AGENTS.md`
 **Applies to:** Human-directed work under the WPAI Constitution
 
-The ten-stage project-to-product workflow in the AGENTS Constitution 5.1 pack
-is preserved as a complete path for broad product work. For a narrow task,
-scale the depth of each phase to its risk and acceptance criteria. Do not
-perform ceremonial research or documentation that adds no decision value.
-Never scale away safety, quality, authorization, or evidence.
+## SOP-EXEC-001 — Always execute the workflow
+
+Every invocation under this Constitution MUST use this SOP from intake through
+closeout, in every skill mode. Reading or mentioning the SOP is not execution.
+This includes research, advice, audits, plans, creative work, code, maintenance,
+adoption, recovery and delivery. A review-only task produces a reviewed analysis
+or proposal at stage 5; it does not acquire implementation or publication rights.
+
+Account for all ten stages. Scale depth and evidence to the actual risk and
+medium, never silently omit a stage. Research at stage 3 may be N/A with a reason
+when no uncertain or changing claim needs investigation. Publication at stage 9
+may be N/A when it is outside the requested outcome. Missing permission for a
+requested deployment is an OPEN gate, not N/A. The other stages always apply;
+a small task may satisfy them briefly using the conversation and existing
+verified evidence. Do not create ceremonial documents or gratuitous tool calls.
+
+Keep one compact run record identifying the invocation, frozen law SHA, scope,
+candidate, acceptance criteria, stage results and evidence. Each stage is DONE,
+OPEN or reasoned N/A; DONE refers to its stated exit condition, not elapsed
+effort. For non-trivial work, use the machine-checkable format in
+[the workflow record guide](references/workflow-record.md). A trivial answer
+may account for the same fields compactly in its handoff. Keep sensitive task
+evidence with the project or private working records, not in this public source.
+
+Stages are ordered by dependency, not a rigid waterfall. Research, planning,
+implementation and testing may iterate. When scope, inputs, candidate bytes or
+environment change, reopen every affected acceptance item and downstream gate;
+old evidence remains historical and cannot certify the changed result. Reuse
+unaffected checks only with a stated equivalence of their relevant inputs.
+Record material decisions and authorization before their dependent actions.
+Existing authorization persists within its exact scope; do not ask repeatedly.
+
+A continuation, approval reply, recovery, handoff or compaction resumes the
+existing invocation and freeze under `GOV-FREEZE-001` and `CTX-SELF-001`.
+Reconcile the record with the latest genuine instruction and current state.
+Workers account for their assigned scope; the integrator owns the complete
+workflow and the single evolution obligation. Delegation creates no authority.
+The machine-checkable complete record belongs to that top-level invocation.
+Workers supply stage updates and evidence to it; they do not need a separate
+complete ten-stage record or their own amendment. A worker can finish its
+assigned contribution while the parent workflow remains open.
+
+Before claiming completion, account for stages 9 and 10 and recheck stages 7
+and 8 against the final state. An applicable OPEN/FAIL gate blocks Done; report
+partial progress and the exact remaining requirement. A director stop, pause or
+cancellation takes precedence: preserve a safe checkpoint, report stopped or
+partial, and do not continue merely to finish a checklist or evolution quota.
+The existing gates in `AGENTS.md` remain controlling. A valid record is evidence
+organization, not proof that its claims are true or that an agent complied.
+
+## Stage exits
+
+| Stage | Exit evidence required before dependent work or a completion claim |
+|---|---|
+| 1. Contract | Outcome, scope, authority, law SHA, quality profile and independently checkable acceptance criteria |
+| 2. Baseline | Current sources and consumers inspected; inherited state and recovery needs recorded |
+| 3. Design | Material uncertainty resolved or visible; chosen approach, alternatives and boundaries justified, or reasoned N/A |
+| 4. Plan | Complete authorized slice, dependencies, verification and recovery path |
+| 5. Produce | Requested code, artifact, analysis or proposal exists as a complete reviewable candidate |
+| 6. Verify | Each acceptance item has the required observation on that candidate; failures repaired or OPEN |
+| 7. Audit | Claims reconciled with evidence, test changes reviewed, limitations and residual findings explicit |
+| 8. Review package | Section 0 scored; candidate and evidence ready for director review; completion withheld if gates remain |
+| 9. Authorized delivery | Exact authorized destination/state independently confirmed, or reasoned N/A; requested but unverified delivery remains OPEN |
+| 10. Close and evolve | One useful amendment staged/in PR/accepted; final state, limitations and next owner/action reconciled |
 
 ## 1. Establish the working contract
 
@@ -37,6 +96,11 @@ surfaces, treat each named item as its own acceptance unit under
 `CONST-COMPLETE-001`; a parent screen or section that omits a named control is
 not complete.
 
+Give each material acceptance criterion a stable identifier and required
+evidence class before production. This applies to all deliverables, including
+documents and governance changes. An approval, build, fixture, installed file
+or live observation satisfies only the class it actually demonstrates.
+
 ## 2. Inventory and baseline
 
 Read current source and project guidance before editing. Inventory affected
@@ -59,6 +123,11 @@ compatibility, and verification before coding.
 Define prerequisites, implementation order, failure modes, tests, documentation,
 and rollback. A slice may be small, but it must be usable and validated as its
 own unit. State which evidence classes will remain outside the current scope.
+Preserve the full requested outcome when scheduling slices: track remaining
+criteria and dependencies explicitly; completing one slice does not complete
+the parent goal. Set a bounded investigation/retry budget and a useful safe
+checkpoint for long work. Escalate only the precise input or decision needed
+after applying `CONST-RESOURCEFUL-001`; continue independent authorized work.
 
 ## 5. Implement
 
@@ -108,13 +177,16 @@ is not a substitute for evidence about the intended use.
 A human approval of terms or an adaptation does not close a trial, demo or
 live-consumer gate, and the reverse also holds (`REL-HARDEN-001`).
 
-## 8. Package and deliver
+## 8. Package for review
 
 Execute the 15-point Section 0 gate. Present the outcome, changed-path manifest,
 verification, risks, evidence boundaries, and next actions under
 `REV-PACK-001`. A final-quality request requires the strongest quality
 achievable within the authorized scope and actual constraints; do not reserve
 an obvious in-scope correction for an artificial later pass.
+This is the pre-publication review gate. It does not certify later publication,
+installation or runtime. Include the SOP run record and resolve missing stage
+evidence before claiming the requested scope complete.
 
 ## 9. Publish only to the authorized destination
 
@@ -124,14 +196,30 @@ external action. Protect shared history; never force-push to cover drift.
 Release tags and published versions are immutable.
 Before claiming a PR current or recommending a merge order, verify the
 fetched base and combined result under `VCS-INTEG-001`.
+When deployment is in scope, verify the intended consumer after the change and
+name the operational owner, observation window, rollback trigger and recovery
+path. A queued job or successful upload is not observed deployment. If an
+authorized operation has an uncertain outcome, inspect its state before retry
+to avoid duplicate writes, charges or releases. A required observation window
+that has not elapsed remains OPEN; do not create unsolicited recurring jobs.
 
-## 10. Learn and evolve
+## 10. Close, hand off and evolve
 
 For each top-level skill invocation, complete one meaningfully useful
 Constitution change under `GOV-EVOLVE-001`. Ground it in a specific observed
 failure, ambiguity, inefficiency, or quality gap. Search for an existing
 canonical rule first, validate the improvement, and record it in the evolution
 ledger. It governs only later invocations after acceptance on `main`.
+Validate the complete apply-ready amendment even when publication is outside
+scope; report **staged, not propagated** under `GOV-EVOLVE-001`. Do not recurse
+into another evolution obligation or modify current law to pass this task.
+
+Reconcile the final candidate, authorized external state and acceptance record.
+Re-run affected verification after later edits or integration; re-score Section
+0 against what is actually handed off. State delivered outcome, scope, evidence
+limits, remaining work and next owner/action. Retire only authorized temporary
+state with recovery preserved. The run ends as complete, partial or stopped;
+none of those labels silently waives an unmet criterion or accepts new law.
 
 ## Evidence vocabulary
 
