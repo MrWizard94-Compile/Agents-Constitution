@@ -31,7 +31,7 @@ class ProposalRegisterTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
         self.addCleanup(self.temporary.cleanup)
-        for relative in ("AGENTS.md", "governance/EVOLUTION.md", "SOURCE.json",
+        for relative in ("AGENTS.md", "SOP.md", "governance/EVOLUTION.md", "SOURCE.json",
                          "law/ENGINEERING.md", "law/OPERATIONS.md", "law/SECURITY.md",
                          "law/COLLABORATION.md", "law/SPECIALIST.md"):
             target = self.root / relative
@@ -56,6 +56,11 @@ class ProposalRegisterTests(unittest.TestCase):
         errors, counts = REGISTER.check(self.root, True)
         self.assertEqual(counts, {"pending": 1})
         self.assertIn("1 unresolved proposal(s) remain", errors)
+
+    def test_sop_canonical_home_can_resolve_a_proposal(self):
+        self.entry["rule_ids"] = ["SOP-EXEC-001"]
+        self.save()
+        self.assertEqual(REGISTER.check(self.root, True), ([], {"incorporated": 1}))
 
     def test_corrupt_bytes_false_digest_or_unregistered_archive_file_fails(self):
         target = self.root / "evolution/proposals" / self.entry["patch"]

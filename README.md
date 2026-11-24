@@ -25,6 +25,22 @@ attribution. Commercial use is not granted. This is not legal advice.
 
 ## Verify source
 
+The SOP is the mandatory workflow in every mode, including an audit or
+proposal-only task. Follow `SOP-EXEC-001` from intake to final closeout;
+account for all ten stages, with evidence and justified applicability.
+For non-trivial work, keep a task-local [workflow record](references/workflow-record.md)
+and validate it before claiming the scoped outcome complete:
+
+```powershell
+python tools/check-workflow-record.py <record.json> --require-complete
+```
+
+The check rejects missing stages, unresolved gates and mismatched stated
+evidence classes or candidates. It cannot authenticate the observations or
+force another AI client to load instructions. Installed-client behavioral
+checks are a separate acceptance layer; source CI alone is not live enforcement.
+No existing task is retroactively governed by an amendment it authored.
+
 From a clean checkout, run:
 
 ```powershell

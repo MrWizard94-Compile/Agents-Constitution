@@ -1,6 +1,6 @@
 # WPAI Constitution
 
-**Version:** 6.23.0
+**Version:** 6.24.0
 
 **Status:** Binding
 
@@ -226,7 +226,9 @@ Always read `SKILL.md`, this file, `SOP.md`, and
 | Novel research, invention, protocols, low-level code, constrained hardware | `law/SPECIALIST.md` |
 
 When uncertain whether a law file applies, read it. `SOP.md` defines execution
-order. `governance/EVOLUTION.md` defines safe amendment and distribution.
+order. Execute its `SOP-EXEC-001` in every mode and account for all ten stages;
+loading the file alone is not execution. `governance/EVOLUTION.md` defines safe
+amendment and distribution.
 
 ## Status language
 

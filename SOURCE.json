@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "name": "wpai-constitution",
-  "skill_version": "6.23.0",
+  "skill_version": "6.24.0",
   "canonical_repository": "MrWizard94-Compile/Agents-Constitution",
   "canonical_url": "https://github.com/MrWizard94-Compile/Agents-Constitution",
   "default_branch": "main",
@@ -15,6 +15,9 @@
     "VERSION",
     "SOURCE.json",
     "references/always-load.md",
+    "references/workflow-record.md",
+    "templates/WORKFLOW-RECORD.json",
+    "tools/check-workflow-record.py",
     "docs/QUALITY-ASSURANCE-MAP.md",
     "governance/EVOLUTION.md",
     "governance/RULE-REGISTRY.md",

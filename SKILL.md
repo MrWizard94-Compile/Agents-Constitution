@@ -7,7 +7,7 @@ description: >
   Each top-level call must produce one meaningful Constitution improvement.
 metadata:
   short-description: "Apply and evolve WPAI Constitution"
-  skill-version: "6.23.0"
+  skill-version: "6.24.0"
   canonical-source: "MrWizard94-Compile/Agents-Constitution"
 ---
 
@@ -48,13 +48,21 @@ manifest live in `SOURCE.json`.
    faster.
    Apply `CONST-COMPLETE-001` when a specification enumerates named
    player-facing controls: each named item is an independent acceptance unit.
-4. Execute the applicable SOP with production completeness, intended-behavior
-   tests, root-cause warning repair, documentation, and honest evidence.
+4. Execute `SOP-EXEC-001` in `SOP.md` in every mode, for every invocation.
+   Account for all ten stages and maintain its scaled run record from intake
+   through final closeout. Follow its stage exits, iteration and resumption
+   rules; reading the SOP alone does not satisfy execution. For non-trivial
+   work, validate the record with `tools/check-workflow-record.py`; its guide
+   is `references/workflow-record.md`. Preserve production completeness,
+   intended-behavior tests, root-cause warning repair and documentation.
+   A worker contributes assigned evidence to the integrator's invocation record.
 5. Before claiming a delivery, score all 15 Section 0 checks in `AGENTS.md`.
    Any applicable FAIL stops the completion claim. Report verification limits
    plainly; tests do not prove deployment or physical acceptance.
-6. Satisfy the single evolution obligation below, then report its exact
-   canonical status in one line.
+6. Satisfy the single evolution obligation below, account for authorized
+   publication and final-state verification under SOP stages 9–10, then
+   report its exact canonical status in one line. An audit or proposal may
+   be complete while its adoption remains explicitly unaccepted.
 
 ## Exactly one meaningful evolution obligation
 
@@ -92,9 +100,10 @@ fulfill evolution.
 | Adopt into project | Adopt | Project pointer, consumer audit, pinned CI source; no law fork |
 | Self-audit or verify Constitution | Self-run | Source validator, tests, links, and concrete findings |
 
-All modes owe one meaningful evolution for a top-level call. The director can
-limit a task to analysis; that limits publication authority, not the duty to
-prepare an honest candidate.
+All modes use the same SOP; a mode selects the deliverable, never an exemption
+from workflow execution. All modes owe one meaningful evolution for a top-level
+call. The director can limit a task to analysis; that limits publication
+authority, not the duty to prepare an honest candidate.
 
 For adoption or cleanup, run `python tools/check-adoption.py <project-root>`
 from a verified source checkout after updating project pointers, CI, and
@@ -158,3 +167,8 @@ its limits, unresolved risks, and next human action. Distinguish source QA,
 package, install, runtime, physical acceptance, and publication. Include a
 compact `Skill evolution:` line naming the meaningful change and whether it
 is staged, in PR, or accepted on canonical `main`.
+Include the SOP run-record location or compact stage accounting; disclose any
+open stage or acceptance item and the next safe action. For a completed
+non-trivial top-level scope, use `tools/check-workflow-record.py <record> --require-complete`
+and independently inspect its cited evidence. A checker pass cannot certify
+that tools were run, approve an action, or prove live client compliance.

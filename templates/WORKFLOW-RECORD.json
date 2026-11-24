@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "invocation": "Set the stable invocation identity",
+  "law_sha": "",
+  "scope": "State the authorized outcome and exclusions",
+  "candidate": "Record the exact artifact or source identity",
+  "claim": "partial",
+  "stages": [
+    {"stage": 1, "status": "open", "reason": "Contract not yet established", "evidence": []},
+    {"stage": 2, "status": "open", "reason": "Baseline not yet inspected", "evidence": []},
+    {"stage": 3, "status": "open", "reason": "Design applicability not yet assessed", "evidence": []},
+    {"stage": 4, "status": "open", "reason": "Plan not yet established", "evidence": []},
+    {"stage": 5, "status": "open", "reason": "Candidate not yet produced", "evidence": []},
+    {"stage": 6, "status": "open", "reason": "Verification not yet performed", "evidence": []},
+    {"stage": 7, "status": "open", "reason": "Evidence not yet audited", "evidence": []},
+    {"stage": 8, "status": "open", "reason": "Review package not yet ready", "evidence": []},
+    {"stage": 9, "status": "open", "reason": "Publication scope not yet assessed", "evidence": []},
+    {"stage": 10, "status": "open", "reason": "Closeout and evolution not yet complete", "evidence": []}
+  ],
+  "acceptance": [],
+  "section0": [
+    {"item": 1, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 2, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 3, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 4, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 5, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 6, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 7, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 8, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 9, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 10, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 11, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 12, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 13, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 14, "status": "open", "reason": "Not yet assessed", "evidence": []},
+    {"item": 15, "status": "open", "reason": "Not yet assessed", "evidence": []}
+  ],
+  "evidence": [],
+  "evolution": {"status": "unstarted", "evidence": []},
+  "self_audit": [],
+  "remaining": ["Complete the working contract before dependent work"]
+}
